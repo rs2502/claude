@@ -1,0 +1,14 @@
+{
+  "name": "reinart-nachhilfe",
+  "version": "1.0.0",
+  "private": true,
+  "description": "reinart - Nachhilfe fuers Gymnasium",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "benutzer": "node benutzer.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.112.4"
+  }
+}

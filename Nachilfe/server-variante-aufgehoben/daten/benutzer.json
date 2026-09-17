@@ -1,0 +1,24 @@
+[
+  {
+    "id": "c801171b-7401-45c4-a159-0cf73326b75f",
+    "name": "Jonte",
+    "klasse": 5,
+    "rolle": "kind",
+    "avatar": "🦊",
+    "passwortHash": "scrypt$16384$8$1$ebLbY5KjexE0PByJi0n0sw==$G3amA6hkuBbMt8SV20eOtT51JtsU7J7jcLI+Jp9iZXcZ4MnjvY4igDo1aW6JoZ5ysPFRQ8/XW5O4pYMnU8DUkQ==",
+    "angelegtAm": "2026-07-21T15:55:15.667Z",
+    "scansHeute": 0,
+    "scanTag": "2026-07-21"
+  },
+  {
+    "id": "ff63ecff-4305-4758-bbe9-1a6ca8a212b0",
+    "name": "Bent",
+    "klasse": 8,
+    "rolle": "kind",
+    "avatar": "🦅",
+    "passwortHash": "scrypt$16384$8$1$9iVP/BEkaNJOch6V2wNDVA==$UB5d9kophrfLQDcoxiHIn79stmwQTawQJwjju+e9hkeoKczPwcdI8iwIQ5NOlzFulgw/8fb/R/HD40YjDh23bQ==",
+    "angelegtAm": "2026-07-21T15:55:15.746Z",
+    "scansHeute": 0,
+    "scanTag": ""
+  }
+]

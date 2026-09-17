@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storyboard Studio — Prompt Generator</title>
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<script>
+  /* Cache-Buster: CSS und JS werden bei jedem Aufruf frisch geholt,
+     damit nie eine alte Fassung aus dem Browser-Cache erscheint. */
+  var ASSET_V = '?v=' + Date.now();
+  document.head.insertAdjacentHTML('beforeend',
+    '<link rel="stylesheet" href="styles.css' + ASSET_V + '">');
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">▤</span>
+    <div>
+      <h1>Storyboard Studio <span class="ver" id="appVer"></span></h1>
+      <p>Prompt-Generator für Charakter-Sheets, Produkt-Sheets, Storyboards und Animationsfilme</p>
+    </div>
+  </div>
+  <div class="projectbar">
+    <input type="text" id="projectName" placeholder="Projektname" aria-label="Projektname">
+    <button class="btn ghost" id="btnSettings" title="API-Key für die Bildanalyse">⚙ Bildanalyse</button>
+    <button class="btn ghost" id="btnDemo" title="Beispielprojekt „Walter &amp; Rudi&quot; laden">Beispiel</button>
+    <button class="btn ghost" id="btnExport" title="Alle Daten als JSON sichern">Export</button>
+    <button class="btn ghost" id="btnImport" title="JSON-Datei laden">Import</button>
+    <button class="btn ghost danger" id="btnReset" title="Alle Felder leeren">Zurücksetzen</button>
+    <input type="file" id="fileImport" accept="application/json" hidden>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button class="tab active" data-tab="char" role="tab"><span>1</span> Charakter-Sheet</button>
+  <button class="tab" data-tab="prod" role="tab"><span>2</span> Produkt-Sheet</button>
+  <button class="tab" data-tab="story" role="tab"><span>3</span> Storyboard</button>
+  <button class="tab" data-tab="anim" role="tab"><span>4</span> Animationsfilm</button>
+</nav>
+
+<main>
+
+<!-- ============ TAB 1: CHARAKTER ============ -->
+<section class="tabpanel active" id="tab-char">
+  <div class="cols">
+    <div class="formcol">
+      <div class="card">
+        <h2>Charakter-Referenzblatt</h2>
+        <p class="hint">Vier Ansichten derselben Figur auf neutralem Grau — die Basis für konsistente Figuren in allen späteren Bildern.</p>
+
+        <div class="upload" id="charDrop" tabindex="0" role="button">
+          <input type="file" id="charFile" accept="image/*" multiple hidden>
+          <span class="upicon">⇪</span>
+          <span class="uptext">Referenzbild hierher ziehen, einfügen oder klicken</span>
+          <span class="upsub">Foto, Porträt oder Concept-Art — bis zu 4 Bilder</span>
+        </div>
+        <div class="thumbs" id="charThumbs"></div>
+
+        <details class="chatbox">
+          <summary>Felder automatisch ausfüllen — optional</summary>
+
+          <p class="hint"><b>Ohne Key, über einen Chat:</b> Knopf drücken, der Chat öffnet sich mit dem Auftrag im Eingabefeld. Foto anhängen, absenden, Antwort unten einfügen.</p>
+          <div class="rowbtns">
+            <button class="btn small" id="btnChatGptChar">ChatGPT öffnen</button>
+            <button class="btn small ghost" id="btnChatClaudeChar">Claude öffnen</button>
+            <button class="btn small ghost" id="btnCopyAskChar">Nur kopieren</button>
+          </div>
+          <fieldset class="checks">
+            <label><input type="checkbox" id="askNoFace"> ohne Gesichtsmerkmale fragen — nur Kleidung, Statur, Farben</label>
+          </fieldset>
+          <textarea id="pasteChar" rows="3" placeholder="Antwort aus dem Chat hier einfügen …"></textarea>
+          <div class="rowbtns">
+            <button class="btn small" id="btnApplyChar">Antwort übernehmen</button>
+          </div>
+
+          <hr class="sep">
+          <p class="hint"><b>Mit API-Key</b> (kostenpflichtig, oben unter ⚙ Bildanalyse): füllt die Felder ohne Umweg.</p>
+          <div class="rowbtns">
+            <button class="btn small ghost" id="btnAnalyzeChar">Felder aus Bild ausfüllen</button>
+            <span class="hint" id="charAiInfo"></span>
+          </div>
+        </details>
+
+        <div class="grid2">
+          <div class="field">
+            <label for="c_style">Art Style</label>
+            <input type="text" id="c_style" list="styles" placeholder="Liste öffnen — 16 Stile">
+          </div>
+          <div class="field">
+            <label for="c_bg">Hintergrund</label>
+            <select id="c_bg">
+              <option value="plain neutral grey studio background">Neutrales Studio-Grau (Standard)</option>
+              <option value="plain white studio background">Weiß</option>
+              <option value="plain dark charcoal studio background">Dunkelgrau/Anthrazit</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="c_name">Name der Figur <em>(nur intern, für die Bibliothek)</em></label>
+          <input type="text" id="c_name" placeholder="z. B. Walter">
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="c_age">Alter &amp; Typ</label>
+            <input type="text" id="c_age" placeholder="Mann, Mitte 50, europäisch">
+          </div>
+          <div class="field">
+            <label for="c_body">Körperbau &amp; Größe</label>
+            <input type="text" id="c_body" placeholder="schlank, mittelgroß, leicht gebeugte Haltung">
+          </div>
+        </div>
+        <div class="field">
+          <label for="c_face">Gesicht, Haare, Bart</label>
+          <textarea id="c_face" rows="3" placeholder="hoher Stirnansatz, stark zurückweichender Haaransatz, sehr kurze silbergraue Haare an den Seiten, grau-weißer Stoppelbart, klare blaue Augen, markante gerade Nase"></textarea>
+        </div>
+        <div class="field">
+          <label for="c_outfit">Kleidung <em>(Farben genau benennen)</em></label>
+          <textarea id="c_outfit" rows="3" placeholder="offener schwarzer Zip-Hoodie mit Kapuze unten, weißes V-Neck-Shirt darunter, dunkelblaue Straight-Leg-Jeans, dunkelbraun-schwarze Sneaker mit hellbrauner Gummisohle"></textarea>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="c_acc">Accessoires</label>
+            <input type="text" id="c_acc" placeholder="blaue Canvas-Umhängetasche, breiter blauer Gurt diagonal über der Brust">
+          </div>
+          <div class="field">
+            <label for="c_marks">Besondere Details</label>
+            <input type="text" id="c_marks" placeholder="Narbe, Tattoo, Brille, typische Mimik …">
+          </div>
+        </div>
+        <div class="field">
+          <label for="c_extra">Zusatzwünsche <em>(optional)</em></label>
+          <textarea id="c_extra" rows="2" placeholder="z. B. zusätzlich eine 3/4-Rückansicht, Mimik-Studie, Hände-Detail"></textarea>
+        </div>
+
+        <div class="rowbtns">
+          <button class="btn" id="btnSaveChar">In Bibliothek speichern</button>
+          <button class="btn ghost" id="btnClearChar">Felder leeren</button>
+          <span class="hint" id="libInfo"></span>
+        </div>
+        <div class="library" id="charLib"></div>
+      </div>
+    </div>
+    <aside class="outcol">
+      <div class="out">
+        <div class="outhead">
+          <h3>Prompt</h3>
+          <div class="outbtns">
+            <button class="btn small" data-copy="out-char">Kopieren</button>
+            <button class="btn small ghost" data-download="out-char" data-file="charakter-sheet-prompt.txt">.txt</button>
+          </div>
+        </div>
+        <div class="openrow" data-out="out-char" data-kind="img"></div>
+        <pre id="out-char" class="promptbox"></pre>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ TAB 2: PRODUKT ============ -->
+<section class="tabpanel" id="tab-prod">
+  <div class="cols">
+    <div class="formcol">
+      <div class="card">
+        <h2>Produkt-Referenzblatt</h2>
+        <p class="hint">Vier saubere Studioansichten desselben Produkts — für konsistente Produktbilder und Werbe-Clips.</p>
+
+        <div class="upload" id="prodDrop" tabindex="0" role="button">
+          <input type="file" id="prodFile" accept="image/*" multiple hidden>
+          <span class="upicon">⇪</span>
+          <span class="uptext">Produktfoto hierher ziehen, einfügen oder klicken</span>
+          <span class="upsub">Mehrere Ansichten liefern das beste Ergebnis — bis zu 4 Bilder</span>
+        </div>
+        <div class="thumbs" id="prodThumbs"></div>
+
+        <details class="chatbox">
+          <summary>Felder automatisch ausfüllen — optional</summary>
+
+          <p class="hint"><b>Ohne Key, über einen Chat:</b> Knopf drücken, der Chat öffnet sich mit dem Auftrag im Eingabefeld. Produktfoto anhängen, absenden, Antwort unten einfügen.</p>
+          <div class="rowbtns">
+            <button class="btn small" id="btnChatGptProd">ChatGPT öffnen</button>
+            <button class="btn small ghost" id="btnChatClaudeProd">Claude öffnen</button>
+            <button class="btn small ghost" id="btnCopyAskProd">Nur kopieren</button>
+          </div>
+          <textarea id="pasteProd" rows="3" placeholder="Antwort aus dem Chat hier einfügen …"></textarea>
+          <div class="rowbtns">
+            <button class="btn small" id="btnApplyProd">Antwort übernehmen</button>
+          </div>
+
+          <hr class="sep">
+          <p class="hint"><b>Mit API-Key</b> (kostenpflichtig, oben unter ⚙ Bildanalyse): füllt die Felder ohne Umweg.</p>
+          <div class="rowbtns">
+            <button class="btn small ghost" id="btnAnalyzeProd">Felder aus Bild ausfüllen</button>
+            <span class="hint" id="prodAiInfo"></span>
+          </div>
+        </details>
+
+        <div class="grid2">
+          <div class="field">
+            <label for="p_style">Visual Style</label>
+            <input type="text" id="p_style" list="prodstyles" placeholder="Liste öffnen — 10 Stile">
+          </div>
+          <div class="field">
+            <label for="p_bg">Hintergrund</label>
+            <select id="p_bg">
+              <option value="plain neutral grey background">Neutrales Grau (Standard)</option>
+              <option value="plain white seamless background">Weiß</option>
+              <option value="plain dark charcoal background">Dunkelgrau/Anthrazit</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="p_name">Produkt</label>
+          <input type="text" id="p_name" placeholder="z. B. kabelloser Kopfhörer, Kaffeemühle, Sneaker">
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="p_shape">Form &amp; Größe</label>
+            <input type="text" id="p_shape" placeholder="zylindrisch, 18 cm hoch, abgerundete Kanten">
+          </div>
+          <div class="field">
+            <label for="p_mat">Material &amp; Oberfläche</label>
+            <input type="text" id="p_mat" placeholder="gebürstetes Aluminium, matter Softtouch-Kunststoff">
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="p_color">Farben</label>
+            <input type="text" id="p_color" placeholder="mitternachtsblau mit kupferfarbenen Akzenten">
+          </div>
+          <div class="field">
+            <label for="p_brand">Branding</label>
+            <input type="text" id="p_brand" placeholder="dezent geprägtes Logo, sonst keine Schrift">
+          </div>
+        </div>
+        <div class="field">
+          <label for="p_feat">Bedienelemente, Anschlüsse, Funktionen</label>
+          <textarea id="p_feat" rows="3" placeholder="gerändeltes Einstellrad oben, USB-C-Port hinten unten, LED-Ring, magnetischer Deckel"></textarea>
+        </div>
+        <div class="field">
+          <label for="p_unique">Besondere Designelemente</label>
+          <textarea id="p_unique" rows="2" placeholder="durchgehende Fuge, sichtbare Schrauben, Lederband, geriffelte Textur"></textarea>
+        </div>
+        <div class="field">
+          <label for="p_detail">Fokus der Detailaufnahme</label>
+          <input type="text" id="p_detail" placeholder="das gerändelte Einstellrad und die Materialkante">
+        </div>
+        <div class="field">
+          <label for="p_light">Licht</label>
+          <input type="text" id="p_light" placeholder="clean studio lighting, soft shadows, balanced highlights">
+        </div>
+        <div class="field">
+          <label for="p_extra">Zusatzwünsche <em>(optional)</em></label>
+          <textarea id="p_extra" rows="2" placeholder="z. B. zusätzlich Explosionsdarstellung, Draufsicht, Größenvergleich"></textarea>
+        </div>
+        <div class="rowbtns">
+          <button class="btn ghost" id="btnClearProd">Felder leeren</button>
+        </div>
+      </div>
+    </div>
+    <aside class="outcol">
+      <div class="out">
+        <div class="outhead">
+          <h3>Prompt</h3>
+          <div class="outbtns">
+            <button class="btn small" data-copy="out-prod">Kopieren</button>
+            <button class="btn small ghost" data-download="out-prod" data-file="produkt-sheet-prompt.txt">.txt</button>
+          </div>
+        </div>
+        <div class="openrow" data-out="out-prod" data-kind="img"></div>
+        <pre id="out-prod" class="promptbox"></pre>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ TAB 3: STORYBOARD ============ -->
+<section class="tabpanel" id="tab-story">
+  <div class="cols">
+    <div class="formcol">
+
+      <div class="card">
+        <h2>Story &amp; Stil</h2>
+        <div class="field">
+          <label for="s_title">Titel</label>
+          <input type="text" id="s_title" placeholder="WALTER &amp; RUDI">
+        </div>
+        <div class="field">
+          <label for="s_story">Story-Idee <em>(ein Satz reicht)</em></label>
+          <textarea id="s_story" rows="3" placeholder="Ein Mann geht mit seinem Ridgeback durch den Wald – der Hund entdeckt ein Eichhörnchen."></textarea>
+        </div>
+        <div class="field">
+          <label for="s_chars">Charakter-Lock <em>(erscheint unverändert in jedem Panel)</em></label>
+          <textarea id="s_chars" rows="5" placeholder="Figurenbeschreibung auf Englisch – oder unten aus der Bibliothek einfügen."></textarea>
+          <div class="rowbtns">
+            <select id="s_libSelect"><option value="">— Aus Charakter-Bibliothek —</option></select>
+            <button class="btn small" id="btnInsertChar">Einfügen</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="s_setting">Setting &amp; Umgebung</label>
+          <input type="text" id="s_setting" placeholder="herbstlicher Buchenwald, schmaler Waldweg, Laub">
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="s_style">Visueller Stil</label>
+            <input type="text" id="s_style" list="styles" placeholder="Liste öffnen — 16 Stile">
+          </div>
+          <div class="field">
+            <label for="s_tone">Tonalität</label>
+            <input type="text" id="s_tone" list="tones" placeholder="komödiantisch, warmherzig">
+          </div>
+        </div>
+        <div class="field">
+          <label for="s_light">Licht &amp; Farbstimmung</label>
+          <input type="text" id="s_light" placeholder="goldene Morgenstunde, Lichtstrahlen durchs Blätterdach, warme Bernstein- und Moostöne">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Format</h2>
+        <div class="grid3">
+          <div class="field">
+            <label for="s_dur">Dauer (Sek.)</label>
+            <input type="number" id="s_dur" value="15" min="3" max="180">
+          </div>
+          <div class="field">
+            <label for="s_count">Panels</label>
+            <input type="number" id="s_count" value="15" min="2" max="40">
+          </div>
+          <div class="field">
+            <label for="s_ratio">Seitenverhältnis</label>
+            <select id="s_ratio">
+              <option>16:9</option><option>9:16</option><option>2.39:1</option>
+              <option>4:3</option><option>1:1</option><option>21:9</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid3">
+          <div class="field">
+            <label for="s_split">Aufteilen in</label>
+            <select id="s_split">
+              <option value="1">1 Blatt — alles</option>
+              <option value="2">2 Blätter</option>
+              <option value="3">3 Blätter</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="s_model">Ziel-Modell</label>
+            <select id="s_model">
+              <option>GPT Image 2</option><option>Nano Banana Pro</option>
+              <option>Midjourney</option><option>Flux</option><option>Adobe Firefly</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="s_grid">Raster</label>
+            <input type="text" id="s_grid" placeholder="automatisch" readonly>
+          </div>
+        </div>
+        <p class="hint" id="splitHint"></p>
+        <fieldset class="checks">
+          <legend>Elemente auf dem Sheet</legend>
+          <label><input type="checkbox" id="o_num" checked> Panelnummern</label>
+          <label><input type="checkbox" id="o_time" checked> Timecodes</label>
+          <label><input type="checkbox" id="o_cap" checked> Beschreibungs-Leiste unter jedem Panel</label>
+          <label><input type="checkbox" id="o_notes" checked> NOTES-Spalte</label>
+          <label><input type="checkbox" id="o_foot" checked> Footer-Leiste</label>
+          <label><input type="checkbox" id="o_dlg"> Dialog in der NOTES-Spalte</label>
+        </fieldset>
+        <div class="grid2">
+          <div class="field">
+            <label for="s_director">Regie <em>(Footer)</em></label>
+            <input type="text" id="s_director" placeholder="Reinhard Schockemöhle">
+          </div>
+          <div class="field">
+            <label for="s_date">Datum <em>(Footer)</em></label>
+            <input type="text" id="s_date" placeholder="27 JULY 2026">
+          </div>
+        </div>
+        <div class="field">
+          <label for="s_special">Spezialwünsche <em>(optional)</em></label>
+          <textarea id="s_special" rows="2" placeholder="z. B. kein Text im Bild, bestimmte Requisite, Running Gag"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardhead">
+          <h2>Panels</h2>
+          <div class="rowbtns">
+            <button class="btn small" id="btnScaffold">Gerüst erzeugen</button>
+            <button class="btn small ghost" id="btnAddPanel">+ Panel</button>
+          </div>
+        </div>
+        <p class="hint" id="panelHint">„Gerüst erzeugen" legt Panels mit Story-Beats, Shot-Typen und Timecodes an. Beschreibungen ergänzt du selbst — oder du lässt sie über den KI-Auftrag schreiben.</p>
+        <div id="panelList" class="panels"></div>
+      </div>
+
+    </div>
+    <aside class="outcol">
+      <div class="out">
+        <div class="outhead">
+          <h3>Ausgabe</h3>
+          <div class="outbtns">
+            <button class="btn small" data-copy="out-story">Kopieren</button>
+            <button class="btn small ghost" data-download="out-story" data-file="storyboard-prompt.txt">.txt</button>
+          </div>
+        </div>
+        <div class="seg" id="storyMode">
+          <button class="segbtn active" data-mode="image">Bild-Prompt</button>
+          <button class="segbtn" data-mode="brief">KI-Auftrag</button>
+        </div>
+        <div class="seg boards" id="storyBoards"></div>
+        <p class="hint segnote" id="segNote"></p>
+        <div class="openrow" data-out="out-story" data-kind="img"></div>
+        <pre id="out-story" class="promptbox"></pre>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ TAB 4: ANIMATION ============ -->
+<section class="tabpanel" id="tab-anim">
+  <div class="cols">
+    <div class="formcol">
+      <div class="card">
+        <h2>Animationsfilm aus dem Storyboard</h2>
+        <p class="hint">Nutzt Story, Stil, Charakter-Lock und alle Panels aus Tab 3 und macht daraus einen Shot-für-Shot-Videoprompt.</p>
+
+        <div class="grid2">
+          <div class="field">
+            <label for="a_model">Ziel-Modell</label>
+            <select id="a_model">
+              <option>Sora 2</option><option>Veo 3</option><option>Kling 2.5</option>
+              <option>Runway Gen-4</option><option>Seedance 2.0</option><option>Luma Ray</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="a_shotlen">Sekunden pro Shot</label>
+            <input type="number" id="a_shotlen" value="1" min="1" max="12" step="0.5">
+          </div>
+        </div>
+        <div class="field">
+          <label for="a_cam">Kamera-Charakter</label>
+          <input type="text" id="a_cam" list="cams" placeholder="smooth cinematic camera movement, motivated moves only">
+        </div>
+        <fieldset class="checks">
+          <legend>Regeln</legend>
+          <label><input type="checkbox" id="a_notext" checked> Kein Text, keine Untertitel, keine Logos</label>
+          <label><input type="checkbox" id="a_diegetic" checked> Nur diegetischer Ton (Ambiente, Foley, Figuren)</label>
+          <label><input type="checkbox" id="a_nomusic" checked> Keine Musik</label>
+          <label><input type="checkbox" id="a_ref" checked> Storyboard-Sheet als Referenz anhängen</label>
+          <label><input type="checkbox" id="a_loop"> Nahtloser Anschluss zwischen den Shots</label>
+        </fieldset>
+        <div class="field">
+          <label for="a_audio">Ton-Details</label>
+          <textarea id="a_audio" rows="2" placeholder="Blätterrascheln, Vogelrufe, Hundeschritte und Hecheln, Leine, ferner Wind"></textarea>
+        </div>
+        <div class="field">
+          <label for="a_extra">Zusatzwünsche <em>(optional)</em></label>
+          <textarea id="a_extra" rows="2" placeholder="z. B. Zeitlupe im Höhepunkt, 24 fps Look, leichte Filmkörnung"></textarea>
+        </div>
+        <div class="rowbtns">
+          <button class="btn" id="btnBuildAnim">Aus Storyboard aufbauen</button>
+          <span class="hint" id="animInfo"></span>
+        </div>
+      </div>
+    </div>
+    <aside class="outcol">
+      <div class="out">
+        <div class="outhead">
+          <h3>Video-Prompt</h3>
+          <div class="outbtns">
+            <button class="btn small" data-copy="out-anim">Kopieren</button>
+            <button class="btn small ghost" data-download="out-anim" data-file="animation-prompt.txt">.txt</button>
+          </div>
+        </div>
+        <div class="seg" id="animMode">
+          <button class="segbtn active" data-amode="full">Ganzer Film</button>
+          <button class="segbtn" data-amode="shots">Einzel-Shots</button>
+        </div>
+        <div class="seg boards" id="animBoards"></div>
+        <div class="openrow" data-out="out-anim" data-kind="vid"></div>
+        <pre id="out-anim" class="promptbox"></pre>
+      </div>
+    </aside>
+  </div>
+</section>
+
+</main>
+
+<datalist id="styles"></datalist>
+<datalist id="prodstyles"></datalist>
+<datalist id="tones">
+  <option>komödiantisch, warmherzig</option><option>dramatisch, gespannt</option><option>episch, heroisch</option>
+  <option>melancholisch, leise</option><option>verspielt, kindgerecht</option><option>düster, bedrohlich</option>
+</datalist>
+<datalist id="cams">
+  <option>smooth cinematic camera movement, motivated moves only</option>
+  <option>handheld documentary feel, subtle drift</option>
+  <option>locked-off tripod, minimal movement</option>
+  <option>fluid gimbal and crane moves</option>
+  <option>anamorphic dolly and slow push-ins</option>
+</datalist>
+
+<div class="modal" id="modal" hidden>
+  <div class="modalbox">
+    <h2>Bildanalyse</h2>
+    <p class="hint">Mit hinterlegtem Key liest ein Vision-Modell dein Bild aus und füllt die Felder automatisch. Keys bleiben nur in diesem Browser (localStorage), werden nicht mit dem Projekt exportiert und gehen direkt an den Anbieter — ohne Zwischenserver. Ohne Key funktioniert die App vollständig weiter, das Bild dient dann als Referenz zum Anhängen.</p>
+    <div class="field">
+      <label for="apiProvider">Anbieter</label>
+      <select id="apiProvider">
+        <option value="claude">Anthropic Claude — beschreibt auch Gesichter</option>
+        <option value="openai">OpenAI — beschreibt auch Gesichter</option>
+        <option value="gemini">Google Gemini — blockiert Gesichter realer Personen</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="apiKey" id="keyLabel">API-Key</label>
+      <input type="password" id="apiKey" placeholder="sk-…" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="apiModel">Modell</label>
+      <input type="text" id="apiModel" placeholder="gpt-4.1-mini" list="modellist">
+    </div>
+    <div class="rowbtns">
+      <button class="btn ghost" id="btnFindModel">Passendes Modell finden</button>
+      <span class="hint" id="modelInfo"></span>
+    </div>
+    <p class="hint" id="provHint"></p>
+    <datalist id="modellist"></datalist>
+    <div class="rowbtns">
+      <button class="btn" id="btnSaveKey">Speichern</button>
+      <button class="btn ghost" id="btnClearKey">Key löschen</button>
+      <button class="btn ghost" id="btnCloseModal">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+  var s = document.createElement('script');
+  s.src = 'script.js' + ASSET_V;
+  document.body.appendChild(s);
+</script>
+</body>
+</html>

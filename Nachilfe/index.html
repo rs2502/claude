@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>reinart – Deine Nachhilfe fürs Gymnasium</title>
+<link rel="stylesheet" href="styles.css?v=11">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-logo">🎓</span>
+    <div>
+      <h1>reinart</h1>
+      <p class="tagline">Deine Nachhilfe fürs Gymnasium</p>
+    </div>
+  </div>
+  <div class="topbar-right" id="topbarRight" hidden>
+    <div class="score-badge">
+      <span class="score-star">⭐</span>
+      <span id="scoreValue">0</span> Punkte
+    </div>
+    <div class="user-chip">
+      <span id="userAvatar">🦊</span>
+      <span id="userName">Jonte</span>
+    </div>
+    <button class="logout-btn" onclick="abmelden()">Abmelden</button>
+  </div>
+</header>
+
+<main>
+  <!-- PROFILWAHL -->
+  <section id="view-login" class="view active">
+    <div class="login-wrap">
+      <h2>Wer lernt heute?</h2>
+      <p class="login-sub">Wähle dein Profil.</p>
+
+      <div class="profile-grid" id="profileGrid"></div>
+
+      <div class="pin-box" id="pinBox" hidden>
+        <button class="back-btn" onclick="profilAbwaehlen()">← Anderes Profil</button>
+        <p class="pin-label">Hallo <b id="pinName">Jonte</b>! Gib deine PIN ein.</p>
+        <div class="pin-dots" id="pinDots"></div>
+        <div class="pin-error" id="pinError"></div>
+        <div class="pin-pad" id="pinPad"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STARTSEITE -->
+  <section id="view-home" class="view">
+    <div class="greeting">
+      <h2 id="homeGreeting">Hallo! 👋</h2>
+      <p id="homeIntro"></p>
+    </div>
+
+    <div class="subject-grid" id="subjectGrid"></div>
+
+    <div class="stats-card" id="statsCard"></div>
+
+    <div class="profile-settings">
+      <h3>PIN ändern</h3>
+      <div class="pin-change-row">
+        <input class="text-input small" id="pinAlt" type="password" inputmode="numeric" maxlength="4" placeholder="Alte PIN">
+        <input class="text-input small" id="pinNeu" type="password" inputmode="numeric" maxlength="4" placeholder="Neue PIN (4 Ziffern)">
+        <button class="btn-ghost" onclick="pinAendern()">Speichern</button>
+      </div>
+      <p class="pin-change-msg" id="pinChangeMsg"></p>
+    </div>
+  </section>
+
+  <!-- FACH -->
+  <section id="view-subject" class="view">
+    <button class="back-btn" onclick="goHome()">← Zurück zur Fächerwahl</button>
+    <div class="subject-header">
+      <span class="subject-header-icon" id="subjectHeaderIcon">📐</span>
+      <h2 id="subjectHeaderName">Mathe</h2>
+      <span class="klassen-badge" id="klassenBadge">5. Klasse</span>
+    </div>
+
+    <div class="tabs" id="subjectTabs"></div>
+
+    <div class="panel" id="practicePanel">
+      <div class="quiz-card">
+        <div class="quiz-progress">
+          <span id="quizCounter">Aufgabe 1</span>
+          <span id="streak" class="streak"></span>
+        </div>
+        <p class="question" id="questionText"></p>
+        <div id="answerArea"></div>
+        <div class="feedback" id="feedback"></div>
+        <div class="quiz-actions">
+          <button class="btn-primary" id="checkBtn" onclick="checkAnswer()" disabled>Antwort prüfen</button>
+          <button class="btn-ghost" id="nextBtn" onclick="nextQuestion()">Neue Aufgabe →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="learnPanel" hidden>
+      <div id="learnContent"></div>
+    </div>
+
+    <!-- Eigene Aufgabe eingeben -->
+    <div class="panel" id="eigenePanel" hidden>
+      <div class="scan-card">
+        <h3 id="eigeneTitel">Deine Aufgabe eingeben</h3>
+        <p class="scan-intro" id="eigeneIntro"></p>
+
+        <!-- Schritt 1: Aufgabe -->
+        <label class="feld-label" for="eigeneEingabe">Deine Aufgabe</label>
+        <input class="text-input gross" id="eigeneEingabe" type="text"
+               placeholder="z. B.  7x + 12 = 54" autocomplete="off"
+               spellcheck="false" autocapitalize="none">
+
+        <!-- Schritt 2: eigene Lösung — erscheint direkt darunter -->
+        <div id="antwortBereich" hidden>
+          <label class="feld-label" for="eigeneAntwort">Dein Ergebnis</label>
+          <input class="text-input gross" id="eigeneAntwort" type="text"
+                 placeholder="Was hast du herausbekommen?" autocomplete="off"
+                 spellcheck="false" autocapitalize="none">
+        </div>
+
+        <div class="quiz-actions">
+          <button class="btn-primary" id="eigeneBtn" type="button">Aufgabe übernehmen</button>
+          <button class="btn-ghost" id="wegSofortBtn" type="button" hidden>Ich weiß nicht weiter</button>
+        </div>
+
+        <div id="antwortFeedback"></div>
+
+        <div class="beispiele" id="beispielBereich">
+          <span class="beispiel-titel">Damit kenne ich mich aus — zum Ausprobieren antippen:</span>
+          <div class="beispiel-liste" id="beispielListe"></div>
+        </div>
+      </div>
+
+      <div id="eigeneErgebnis"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>reinart · Nachhilfe fürs Gymnasium · Läuft vollständig in deinem Browser. Nichts wird ins Internet geschickt.</p>
+</footer>
+
+<script src="loeser.js?v=7"></script>
+<script src="script.js?v=14"></script>
+</body>
+</html>

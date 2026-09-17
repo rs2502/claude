@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ad Film Studio — Logo rein. Werbeclip raus.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Montserrat:wght@700;800;900&family=Playfair+Display:wght@700;900&family=Space+Grotesk:wght@500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=2">
+</head>
+<body>
+
+<div class="aura" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brandmark">
+    <span class="dot"></span>
+    <div>
+      <strong>Ad Film Studio</strong>
+      <em>Logo rein. Werbeclip raus.</em>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn ghost" id="btnReshuffle" disabled>Copy neu würfeln</button>
+    <button class="btn ghost" id="btnCopyAll" disabled>Drehbuch kopieren</button>
+    <button class="btn ghost" id="btnExportDoc" disabled>Drehbuch exportieren</button>
+    <button class="btn primary" id="btnRender" disabled>Video rendern</button>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- ───────────────────── CONTROL PANEL ───────────────────── -->
+  <aside class="panel" id="panel">
+
+    <section class="pblock">
+      <h2 class="plabel">1 — Logo</h2>
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Logo hochladen">
+        <div class="drop-inner" id="dropInner">
+          <svg viewBox="0 0 24 24" class="upicon" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>
+          <p><strong>Logo ablegen</strong> oder klicken</p>
+          <small>PNG mit Transparenz empfohlen · SVG · JPG</small>
+        </div>
+        <img id="logoPreview" alt="Hochgeladenes Logo" hidden>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" hidden>
+      <button class="btn tiny ghost full" id="btnDemo">Demo-Logo verwenden</button>
+    </section>
+
+    <section class="pblock">
+      <h2 class="plabel">2 — Marke</h2>
+      <label class="field">
+        <span>Markenname</span>
+        <input type="text" id="brandName" placeholder="z. B. AURELIS" maxlength="24">
+      </label>
+      <label class="field">
+        <span>Produktkategorie</span>
+        <input type="text" id="category" placeholder="z. B. Bio-Schokolade" maxlength="40">
+      </label>
+      <label class="field">
+        <span>Markenarchetyp</span>
+        <select id="archetype"></select>
+      </label>
+      <label class="field">
+        <span>Typo-Persönlichkeit</span>
+        <select id="typo"></select>
+      </label>
+    </section>
+
+    <section class="pblock">
+      <h2 class="plabel">3 — Film</h2>
+      <label class="field">
+        <span>Format</span>
+        <select id="format"></select>
+      </label>
+      <label class="field">
+        <span>Länge</span>
+        <select id="duration">
+          <option value="15">15 Sekunden · 6 Shots</option>
+          <option value="20" selected>20 Sekunden · 8 Shots</option>
+          <option value="30">30 Sekunden · 10 Shots</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Schnitt-Rhythmus</span>
+        <select id="pace">
+          <option value="calm">Ruhig — lange Einstellungen</option>
+          <option value="normal" selected>Ausgewogen</option>
+          <option value="fast">Schnell — Social-Cut</option>
+        </select>
+      </label>
+      <label class="check"><input type="checkbox" id="optAudio" checked> Sound-Bett (Puls + Drone) mitrendern</label>
+      <label class="check"><input type="checkbox" id="optSafe"> Safe-Areas einblenden (nur Vorschau)</label>
+      <label class="check"><input type="checkbox" id="optLoop" checked> Vorschau in Schleife</label>
+    </section>
+
+    <section class="pblock">
+      <h2 class="plabel">4 — Farb-DNA</h2>
+      <div class="swatches" id="swatches">
+        <p class="hint">Farben werden automatisch aus dem Logo extrahiert.</p>
+      </div>
+      <label class="field row">
+        <span>Primärfarbe manuell</span>
+        <input type="color" id="primaryPick" value="#c8963e">
+      </label>
+    </section>
+
+    <section class="pblock">
+      <h2 class="plabel">5 — Prompts</h2>
+      <label class="field">
+        <span>Sprache der Shot-Prompts</span>
+        <select id="promptLang">
+          <option value="en">Englisch (empfohlen für Video-KI)</option>
+          <option value="de">Deutsch</option>
+        </select>
+      </label>
+      <label class="check"><input type="checkbox" id="optNegative" checked> Negative-Prompt anhängen</label>
+      <label class="check"><input type="checkbox" id="optParams" checked> Modell-Parameter anhängen</label>
+    </section>
+
+    <footer class="pfoot">
+      <p>Vorschau rendert live im Canvas · Export als WebM · Shot-Prompts für Veo, Sora, Runway, Kling</p>
+    </footer>
+  </aside>
+
+  <!-- ───────────────────── STAGE ───────────────────── -->
+  <div class="stage-wrap">
+
+    <div class="empty" id="empty">
+      <h1>Ein Logo. Ein Werbespot.</h1>
+      <p>Lade links dein Logo hoch. Das Studio extrahiert die Farb-DNA, schreibt ein Drehbuch mit 6 bis 10 Einstellungen und rendert daraus einen fertigen Werbeclip — abspielbar, exportierbar, inklusive Shot-Prompts für jede Video-KI.</p>
+      <ul class="rules">
+        <li><b>01</b> Das Logo bleibt unangetastet — es ist der Held jeder Einstellung.</li>
+        <li><b>02</b> Jeder Schnitt sitzt auf dem Puls — Rhythmus vor Effekt.</li>
+        <li><b>03</b> Die letzte Einstellung gehört immer der Marke.</li>
+      </ul>
+    </div>
+
+    <div class="studio" id="studio" hidden>
+
+      <!-- Player -->
+      <section class="player">
+        <div class="viewport" id="viewport">
+          <canvas id="stage" width="1080" height="1920"></canvas>
+          <div class="safe" id="safe" hidden><i></i></div>
+          <button class="playoverlay" id="playOverlay" aria-label="Abspielen"></button>
+          <div class="rec-badge" id="recBadge" hidden><i></i>Aufnahme läuft …</div>
+        </div>
+
+        <div class="transport">
+          <button class="tbtn" id="btnPlay" aria-label="Abspielen">
+            <svg viewBox="0 0 24 24" class="ico-play"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+            <svg viewBox="0 0 24 24" class="ico-pause" hidden><path d="M8 5h3v14H8zm5 0h3v14h-3z" fill="currentColor"/></svg>
+          </button>
+          <button class="tbtn" id="btnRestart" aria-label="Von vorn">
+            <svg viewBox="0 0 24 24"><path d="M12 5V2L7 6l5 4V7a5 5 0 11-5 5H5a7 7 0 107-7z" fill="currentColor"/></svg>
+          </button>
+          <div class="scrub" id="scrub">
+            <div class="track" id="track"><div class="fill" id="fill"></div></div>
+            <div class="marks" id="marks"></div>
+          </div>
+          <span class="time" id="time">0.0 / 20.0 s</span>
+        </div>
+
+        <div class="nowplaying" id="nowPlaying"></div>
+      </section>
+
+      <!-- Storyboard -->
+      <section class="board">
+        <h2 class="boardtitle">Drehbuch <span id="boardMeta"></span></h2>
+        <div class="shots" id="shots"></div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js?v=2"></script>
+</body>
+</html>
