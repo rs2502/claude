@@ -1,5 +1,5 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></head><body>
-<title>Pizza Italia Belag</title>
+<title>Pizza Salami Belag</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
@@ -7,7 +7,7 @@
   href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Karla:wght@400;600&family=Pacifico&display=swap"
 />
 <style>
-  /* Layout: one sticky stage; pizza anchored low (right on desktop), ingredients float in the air above and fall on scroll.
+  /* Layout: one sticky stage; a real pizza base anchored low (right on desktop), photo ingredients float above and fall on scroll.
      Single-theme by choice: a trattoria table (cream cloth, gingham) looks the same on any host. */
   :root {
     --cream: #fff4df;
@@ -16,7 +16,6 @@
     --muted: #6e4f3e;
     --tomato: #c62a1b;
     --basil: #1f7a34;
-    --gold: #f2b233;
     --font-display: "Archivo Black", "Arial Black", Impact, sans-serif;
     --font-script: "Pacifico", "Brush Script MT", cursive;
     --font-body: "Karla", "Segoe UI", system-ui, sans-serif;
@@ -42,10 +41,9 @@
     background-size: 28px 28px;
   }
 
-  /* --- Scroll section with sticky stage --- */
   #track {
     position: relative;
-    height: 520vh;
+    height: 480vh;
   }
   #stage {
     position: sticky;
@@ -53,7 +51,7 @@
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
-    background: radial-gradient(ellipse at 60% 70%, var(--cloth) 0%, var(--cream) 65%);
+    background: radial-gradient(ellipse at 62% 72%, var(--cloth) 0%, var(--cream) 65%);
   }
   .stage-cloth {
     position: absolute;
@@ -66,7 +64,7 @@
     left: 16px;
     right: 16px;
     top: 44px;
-    z-index: 3;
+    z-index: 5;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -102,36 +100,46 @@
   }
 
   #pizza,
-  .piece {
+  #sauce,
+  .piece,
+  #heat {
     position: absolute;
     left: 0;
     top: 0;
     will-change: transform;
+    pointer-events: none;
   }
   #pizza {
     z-index: 1;
-    filter: drop-shadow(0 18px 22px rgba(90, 50, 20, 0.28));
   }
-  .piece {
+  #pizza img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 22px 26px rgba(90, 50, 20, 0.32));
+  }
+  #sauce {
     z-index: 2;
-    pointer-events: none;
   }
-  .piece svg,
-  #pizza svg {
+  #sauce svg {
     display: block;
     width: 100%;
     height: 100%;
     overflow: visible;
   }
-  .piece .bob {
+  .piece {
+    z-index: 3;
+  }
+  .piece img {
+    display: block;
     width: 100%;
     height: 100%;
-    animation: bob 3.2s ease-in-out infinite;
-    filter: drop-shadow(0 6px 5px rgba(60, 30, 10, 0.25));
+    animation: bob 3.4s ease-in-out infinite;
+    filter: drop-shadow(0 10px 8px rgba(60, 30, 10, 0.28));
   }
-  .piece.landed .bob {
+  .piece.landed img {
     animation: none;
-    filter: drop-shadow(0 2px 2px rgba(60, 30, 10, 0.3));
+    filter: drop-shadow(0 2px 3px rgba(60, 30, 10, 0.35));
   }
   @keyframes bob {
     0%,
@@ -139,17 +147,24 @@
       transform: translateY(0) rotate(0deg);
     }
     50% {
-      transform: translateY(-10px) rotate(6deg);
+      transform: translateY(-10px) rotate(5deg);
     }
   }
+  /* Oven glow over the finished pizza */
+  #heat {
+    z-index: 4;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 170, 60, 0.35) 0%, rgba(255, 120, 30, 0.12) 55%, transparent 72%);
+    mix-blend-mode: soft-light;
+    opacity: 0;
+  }
 
-  /* Ingredient checklist: the order is real (the order they land) */
   #steps {
     position: absolute;
     left: 16px;
     right: 16px;
     bottom: 18px;
-    z-index: 3;
+    z-index: 5;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -165,7 +180,7 @@
     padding: 6px 12px 7px;
     border-radius: 999px;
     border: 2px solid #e6cfa6;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.72);
     color: var(--muted);
     font-weight: 600;
     font-size: 14px;
@@ -187,7 +202,6 @@
     color: #fff;
   }
 
-  /* --- Closing section --- */
   #done {
     padding-inline: 16px;
     padding-block: 72px 88px;
@@ -233,33 +247,53 @@
     <div class="gingham stage-cloth" aria-hidden="true"></div>
     <div id="intro">
       <p class="eyebrow">RISTORANTE PIZZERIA ITALIA</p>
-      <h1>Frisch belegt</h1>
+      <h1>Pizza Salami, frisch belegt</h1>
       <p class="lead">Langsam nach unten scrollen: Die Zutaten landen nacheinander auf dem Teig.</p>
       <div id="status" aria-live="polite">Zutaten in der Luft …</div>
     </div>
 
-    <div id="pizza" aria-hidden="true">
-      <svg viewBox="-100 -100 200 200">
+    <div id="pizza"><img src="img/base.webp" alt="Pizzaboden" /></div>
+
+    <div id="sauce" aria-hidden="true">
+      <svg viewBox="-110 -110 220 220">
         <defs>
-          <radialGradient id="crust" r="0.5">
-            <stop offset="0.82" stop-color="#e9b36a" />
-            <stop offset="0.93" stop-color="#d48b3a" />
-            <stop offset="1" stop-color="#b86d28" />
+          <radialGradient id="sauceFill" r="0.5">
+            <stop offset="0" stop-color="#c63a22" />
+            <stop offset="0.6" stop-color="#b93018" />
+            <stop offset="0.9" stop-color="#a42614" />
+            <stop offset="1" stop-color="#8f2011" />
           </radialGradient>
-          <radialGradient id="dough" r="0.5">
-            <stop offset="0" stop-color="#fbe3b3" />
-            <stop offset="1" stop-color="#f1cd8c" />
+          <radialGradient id="sauceEdge" r="0.5">
+            <stop offset="0.78" stop-color="#fff" />
+            <stop offset="0.97" stop-color="#fff" stop-opacity="0.55" />
+            <stop offset="1" stop-color="#fff" stop-opacity="0" />
           </radialGradient>
+          <mask id="sauceMask" maskContentUnits="userSpaceOnUse">
+            <circle r="104" fill="url(#sauceEdge)" />
+          </mask>
+          <filter id="sauceTex" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="4" result="warp" />
+            <feDisplacementMap in="SourceGraphic" in2="warp" scale="24" xChannelSelector="R" yChannelSelector="G" result="blob" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="21" result="pulp" />
+            <feColorMatrix in="pulp" type="matrix" values="0 0 0 0 0.55  0 0 0 0 0.08  0 0 0 0 0.03  1.6 0 0 0 -0.75" result="pulpTint" />
+            <feComposite in="pulpTint" in2="blob" operator="in" result="pulpIn" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="11" result="grain" />
+            <feSpecularLighting in="grain" surfaceScale="1.3" specularConstant="0.6" specularExponent="30" lighting-color="#ffe2d2" result="spec">
+              <feDistantLight azimuth="235" elevation="55" />
+            </feSpecularLighting>
+            <feComposite in="spec" in2="blob" operator="in" result="specIn" />
+            <feMerge result="body">
+              <feMergeNode in="blob" />
+              <feMergeNode in="pulpIn" />
+            </feMerge>
+            <feComposite in="body" in2="specIn" operator="arithmetic" k1="0" k2="1" k3="0.3" k4="0" />
+          </filter>
         </defs>
-        <circle r="98" fill="url(#crust)" />
-        <circle r="86" fill="url(#dough)" />
-        <ellipse cx="-70" cy="-40" rx="5" ry="3" fill="#8a4b1c" opacity="0.55" />
-        <ellipse cx="62" cy="-58" rx="4" ry="2.5" fill="#8a4b1c" opacity="0.5" />
-        <ellipse cx="84" cy="24" rx="5" ry="3" fill="#8a4b1c" opacity="0.5" />
-        <ellipse cx="-40" cy="82" rx="4" ry="2.5" fill="#8a4b1c" opacity="0.55" />
-        <ellipse cx="-88" cy="20" rx="3" ry="2" fill="#8a4b1c" opacity="0.5" />
+        <g mask="url(#sauceMask)"><circle r="96" fill="url(#sauceFill)" filter="url(#sauceTex)" /></g>
       </svg>
     </div>
+
+    <div id="heat" aria-hidden="true"></div>
 
     <ol id="steps" aria-label="Belag in dieser Reihenfolge"></ol>
   </div>
@@ -267,115 +301,52 @@
 
 <section id="done">
   <h2>Buon appetito!</h2>
-  <p>Tomatensoße, Mozzarella, Salami, Champignons, Oliven und frisches Basilikum, frisch aus dem Ofen der Pizzeria Italia.</p>
+  <p>Tomatensoße, Mozzarella und italienische Salami auf knusprigem Teig, frisch aus dem Ofen der Pizzeria Italia.</p>
 </section>
 
 <div class="gingham" aria-hidden="true"></div>
 
-<svg width="0" height="0" style="position: absolute" aria-hidden="true">
-  <defs>
-    <g id="i-sauce">
-      <path
-        d="M0,-86 C30,-88 58,-72 72,-50 C88,-26 90,6 82,30 C72,58 48,80 18,86 C-12,92 -44,84 -64,64 C-84,44 -92,14 -86,-16 C-80,-46 -58,-74 -30,-84 C-20,-87 -10,-86 0,-86Z"
-        fill="#d8341f"
-      />
-      <path d="M-40,-50 C-20,-60 10,-58 26,-48" fill="none" stroke="#ec5a3f" stroke-width="7" stroke-linecap="round" opacity="0.7" />
-    </g>
-    <g id="i-cheese">
-      <path
-        d="M-6,-44 C16,-50 38,-34 42,-12 C48,8 40,30 20,40 C2,50 -24,46 -38,30 C-50,16 -48,-8 -36,-24 C-28,-36 -18,-42 -6,-44Z"
-        fill="#fffaf0"
-        stroke="#f1e2c2"
-        stroke-width="4"
-      />
-      <ellipse cx="-8" cy="-10" rx="12" ry="7" fill="#fff" opacity="0.9" />
-    </g>
-    <g id="i-salami">
-      <circle r="46" fill="#b3261e" stroke="#7d1812" stroke-width="5" />
-      <circle cx="-16" cy="-12" r="5" fill="#f4c6b8" />
-      <circle cx="14" cy="-20" r="4" fill="#f4c6b8" />
-      <circle cx="20" cy="10" r="5" fill="#f4c6b8" />
-      <circle cx="-8" cy="20" r="4" fill="#f4c6b8" />
-      <circle cx="-26" cy="8" r="3" fill="#f4c6b8" />
-      <circle cx="4" cy="-2" r="3" fill="#f4c6b8" />
-    </g>
-    <g id="i-mushroom">
-      <path d="M-42,-4 C-42,-34 -20,-46 0,-46 C20,-46 42,-34 42,-4 C30,-8 18,-6 12,-2 L14,40 C8,46 -8,46 -14,40 L-12,-2 C-18,-6 -30,-8 -42,-4Z" fill="#f3e6d2" stroke="#b99a78" stroke-width="4" stroke-linejoin="round" />
-      <path d="M-34,-10 C-20,-18 20,-18 34,-10" fill="none" stroke="#b99a78" stroke-width="3" />
-    </g>
-    <g id="i-olive">
-      <circle r="44" fill="#262626" />
-      <circle r="18" fill="#f1cd8c" />
-      <path d="M-26,-24 C-16,-34 0,-36 10,-32" fill="none" stroke="#5a5a5a" stroke-width="6" stroke-linecap="round" />
-    </g>
-    <g id="i-basil">
-      <path d="M0,-48 C30,-30 32,22 0,48 C-32,22 -30,-30 0,-48Z" fill="#2f9a47" />
-      <path d="M0,-40 L0,44" stroke="#1f7a34" stroke-width="4" />
-      <path d="M0,-10 L14,-22 M0,10 L16,-2 M0,-10 L-14,-22 M0,10 L-16,-2" stroke="#1f7a34" stroke-width="3" />
-    </g>
-  </defs>
-</svg>
-
 <script>
   (function () {
-    // Ingredient groups land in this order. win = scroll-progress window [start, end].
+    // Stages in landing order. win = scroll-progress window [start, end].
     const groups = [
-      { id: "sauce", name: "Tomatensoße", color: "#d8341f", win: [0.03, 0.2] },
-      { id: "cheese", name: "Mozzarella", color: "#f1e2c2", win: [0.2, 0.38] },
-      { id: "salami", name: "Salami", color: "#b3261e", win: [0.38, 0.55] },
-      { id: "mushroom", name: "Champignons", color: "#d8c3a5", win: [0.55, 0.69] },
-      { id: "olive", name: "Oliven", color: "#262626", win: [0.69, 0.81] },
-      { id: "basil", name: "Basilikum", color: "#2f9a47", win: [0.81, 0.93] },
+      { id: "sauce", name: "Tomatensoße", color: "#b52a17", win: [0.03, 0.22] },
+      { id: "mozz", name: "Mozzarella", color: "#f4efe6", win: [0.22, 0.5] },
+      { id: "salami", name: "Salami", color: "#a8323a", win: [0.5, 0.78] },
+      { id: "bake", name: "Ab in den Ofen", color: "#e8912f", win: [0.8, 0.95] },
     ];
 
-    // Pieces. ex/ey: landing spot in pizza radii from the centre. fx/fy: start spot in the air band (0..1).
-    // size: in pizza radii. r0 → r1: rotation in the air → on the pizza.
+    // Photo pieces. ex/ey: landing spot in pizza radii (dough edge ≈ 0.63). fx/fy: start in the air band (0..1).
+    // size in pizza radii; r0 → r1 rotation in the air → on the pizza.
     const P = [
-      { g: "sauce", ex: 0, ey: 0, size: 1.72, fx: 0.5, fy: 0.15, r0: -30, r1: 0 },
+      { g: "mozz", ex: -0.28, ey: -0.26, size: 0.3, fx: 0.1, fy: 0.3, r0: 40, r1: 10 },
+      { g: "mozz", ex: 0.26, ey: -0.32, size: 0.28, fx: 0.82, fy: 0.08, r0: -50, r1: -35 },
+      { g: "mozz", ex: 0.4, ey: 0.12, size: 0.27, fx: 0.96, fy: 0.55, r0: 80, r1: 120 },
+      { g: "mozz", ex: -0.02, ey: 0.02, size: 0.3, fx: 0.42, fy: 0.02, r0: -20, r1: 200 },
+      { g: "mozz", ex: -0.42, ey: 0.2, size: 0.27, fx: 0.0, fy: 0.68, r0: 60, r1: 75 },
+      { g: "mozz", ex: 0.12, ey: 0.42, size: 0.28, fx: 0.62, fy: 0.45, r0: -70, r1: -95 },
+      { g: "mozz", ex: -0.14, ey: -0.48, size: 0.25, fx: 0.25, fy: 0.0, r0: 30, r1: 150 },
+      { g: "mozz", ex: -0.22, ey: 0.44, size: 0.25, fx: 0.3, fy: 0.62, r0: -30, r1: 20 },
 
-      { g: "cheese", ex: -0.35, ey: -0.3, size: 0.3, fx: 0.12, fy: 0.3, r0: 40, r1: 10 },
-      { g: "cheese", ex: 0.3, ey: -0.4, size: 0.3, fx: 0.82, fy: 0.1, r0: -50, r1: -20 },
-      { g: "cheese", ex: 0.5, ey: 0.15, size: 0.28, fx: 0.95, fy: 0.55, r0: 80, r1: 40 },
-      { g: "cheese", ex: -0.05, ey: 0.05, size: 0.3, fx: 0.4, fy: 0.05, r0: -20, r1: 5 },
-      { g: "cheese", ex: -0.5, ey: 0.3, size: 0.28, fx: 0.02, fy: 0.7, r0: 60, r1: 70 },
-      { g: "cheese", ex: 0.15, ey: 0.52, size: 0.28, fx: 0.62, fy: 0.45, r0: -70, r1: -30 },
-      { g: "cheese", ex: -0.2, ey: -0.6, size: 0.26, fx: 0.25, fy: 0.0, r0: 30, r1: 90 },
-
-      { g: "salami", ex: 0, ey: -0.42, size: 0.28, fx: 0.55, fy: 0.25, r0: 120, r1: 0 },
-      { g: "salami", ex: 0.45, ey: -0.12, size: 0.28, fx: 0.9, fy: 0.2, r0: -90, r1: 30 },
-      { g: "salami", ex: 0.3, ey: 0.4, size: 0.28, fx: 0.75, fy: 0.62, r0: 60, r1: -20 },
-      { g: "salami", ex: -0.3, ey: 0.42, size: 0.28, fx: 0.18, fy: 0.6, r0: -140, r1: 15 },
-      { g: "salami", ex: -0.5, ey: -0.08, size: 0.28, fx: 0.05, fy: 0.15, r0: 100, r1: -10 },
-      { g: "salami", ex: -0.1, ey: 0.15, size: 0.28, fx: 0.35, fy: 0.4, r0: -60, r1: 25 },
-
-      { g: "mushroom", ex: 0.18, ey: -0.2, size: 0.22, fx: 0.68, fy: 0.05, r0: -80, r1: -15 },
-      { g: "mushroom", ex: -0.28, ey: -0.12, size: 0.22, fx: 0.3, fy: 0.2, r0: 70, r1: 20 },
-      { g: "mushroom", ex: 0.6, ey: 0.3, size: 0.22, fx: 0.98, fy: 0.35, r0: -40, r1: 60 },
-      { g: "mushroom", ex: -0.12, ey: 0.58, size: 0.22, fx: 0.45, fy: 0.7, r0: 110, r1: -40 },
-      { g: "mushroom", ex: 0.08, ey: 0.32, size: 0.22, fx: 0.58, fy: 0.5, r0: -120, r1: 10 },
-
-      { g: "olive", ex: 0.22, ey: 0.12, size: 0.11, fx: 0.72, fy: 0.3, r0: 0, r1: 0 },
-      { g: "olive", ex: -0.4, ey: 0.12, size: 0.11, fx: 0.1, fy: 0.45, r0: 0, r1: 0 },
-      { g: "olive", ex: 0.5, ey: -0.4, size: 0.11, fx: 0.88, fy: 0.05, r0: 0, r1: 0 },
-      { g: "olive", ex: -0.15, ey: -0.35, size: 0.11, fx: 0.38, fy: 0.12, r0: 0, r1: 0 },
-      { g: "olive", ex: 0.35, ey: 0.6, size: 0.11, fx: 0.8, fy: 0.72, r0: 0, r1: 0 },
-      { g: "olive", ex: -0.6, ey: -0.3, size: 0.11, fx: 0.0, fy: 0.3, r0: 0, r1: 0 },
-
-      { g: "basil", ex: 0.1, ey: -0.1, size: 0.22, fx: 0.5, fy: 0.0, r0: -90, r1: -30 },
-      { g: "basil", ex: -0.35, ey: 0.62, size: 0.22, fx: 0.15, fy: 0.55, r0: 100, r1: 40 },
-      { g: "basil", ex: 0.6, ey: -0.1, size: 0.22, fx: 0.95, fy: 0.15, r0: -40, r1: 70 },
-      { g: "basil", ex: -0.45, ey: -0.45, size: 0.22, fx: 0.22, fy: 0.08, r0: 60, r1: -50 },
+      { g: "salami", ex: 0.02, ey: -0.3, size: 0.3, fx: 0.55, fy: 0.25, r0: 120, r1: 0 },
+      { g: "salami", ex: 0.36, ey: -0.08, size: 0.3, fx: 0.9, fy: 0.2, r0: -90, r1: 30 },
+      { g: "salami", ex: 0.24, ey: 0.32, size: 0.3, fx: 0.75, fy: 0.62, r0: 60, r1: -20 },
+      { g: "salami", ex: -0.24, ey: 0.3, size: 0.3, fx: 0.18, fy: 0.58, r0: -140, r1: 15 },
+      { g: "salami", ex: -0.4, ey: -0.06, size: 0.29, fx: 0.05, fy: 0.15, r0: 100, r1: -10 },
+      { g: "salami", ex: -0.06, ey: 0.08, size: 0.3, fx: 0.35, fy: 0.4, r0: -60, r1: 25 },
+      { g: "salami", ex: 0.4, ey: -0.38, size: 0.27, fx: 0.7, fy: 0.02, r0: 160, r1: 60 },
     ];
 
     const stage = document.getElementById("stage");
     const track = document.getElementById("track");
     const pizza = document.getElementById("pizza");
+    const sauce = document.getElementById("sauce");
+    const heat = document.getElementById("heat");
     const status = document.getElementById("status");
     const steps = document.getElementById("steps");
     const intro = document.getElementById("intro");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    // Build checklist
     const stepEls = {};
     groups.forEach((g) => {
       const li = document.createElement("li");
@@ -385,52 +356,51 @@
       stepEls[g.id] = li;
     });
 
-    // Build pieces and give each its own slot inside its group's window
     const byGroup = {};
     P.forEach((p) => (byGroup[p.g] = (byGroup[p.g] || []).concat(p)));
     groups.forEach((g) => {
-      const list = byGroup[g.id];
+      const list = byGroup[g.id] || [];
       const span = g.win[1] - g.win[0];
       list.forEach((p, i) => {
-        const lead = list.length > 1 ? (0.45 * span * i) / (list.length - 1) : 0;
+        const lead = list.length > 1 ? (0.5 * span * i) / (list.length - 1) : 0;
         p.t0 = g.win[0] + lead;
-        p.t1 = p.t0 + span * 0.55;
+        p.t1 = p.t0 + span * 0.5;
         const el = document.createElement("div");
         el.className = "piece";
         el.innerHTML =
-          '<div class="bob" style="animation-delay:-' +
-          ((i * 0.53) % 3.2).toFixed(2) +
-          's"><svg viewBox="-50 -50 100 100"><use href="#i-' +
-          g.id +
-          '"/></svg></div>';
-        if (g.id === "sauce") el.querySelector("svg").setAttribute("viewBox", "-100 -100 200 200");
+          '<img alt="" src="img/' + g.id + '.webp" style="animation-delay:-' + ((i * 0.61) % 3.4).toFixed(2) + 's" />';
         stage.appendChild(el);
         p.el = el;
       });
     });
 
-    let L = null; // layout metrics
+    let L = null;
     function layout() {
       const W = stage.clientWidth;
       const H = stage.clientHeight;
       const wide = W >= 900;
-      const stepsBox = steps.getBoundingClientRect();
-      const bottomReserve = H - (stepsBox.top - stage.getBoundingClientRect().top) + 16;
-      const R = Math.max(90, Math.min(wide ? W * 0.22 : W * 0.36, H * (wide ? 0.34 : 0.22), 300));
+      const stageTop = stage.getBoundingClientRect().top;
+      const bottomReserve = H - (steps.getBoundingClientRect().top - stageTop) + 16;
+      const R = Math.max(100, Math.min(wide ? W * 0.23 : W * 0.4, H * (wide ? 0.36 : 0.25), 320));
       const cx = wide ? W * 0.66 : W / 2;
       const cy = wide ? H - R - 48 : H - R - bottomReserve;
-      const introBottom = wide ? 40 : intro.getBoundingClientRect().bottom - stage.getBoundingClientRect().top + 8;
+      const introBottom = wide ? 40 : intro.getBoundingClientRect().bottom - stageTop + 8;
       const airTop = introBottom + 20;
-      const airBottom = Math.max(airTop + 60, cy - R * 0.35);
+      const airBottom = Math.max(airTop + 60, cy - R * 0.4);
       const airLeft = wide ? W * 0.44 : 20;
       const airRight = W - 20;
       L = { W, H, R, cx, cy, airTop, airBottom, airLeft, airRight };
-      pizza.style.width = pizza.style.height = 2 * R + "px";
-      pizza.style.transform = "translate(" + (cx - R) + "px," + (cy - R) + "px)";
+      // The photo's pizza fills 856 of 900 px, so the element is slightly larger than 2R.
+      const img = 2 * R * (900 / 856);
+      pizza.style.width = pizza.style.height = img + "px";
+      pizza.style.transform = "translate(" + (cx - img / 2) + "px," + (cy - img / 2) + "px)";
+      const sd = 2 * R * 0.7;
+      sauce.style.width = sauce.style.height = sd + "px";
+      heat.style.width = heat.style.height = 2.3 * R + "px";
+      heat.style.transform = "translate(" + (cx - 1.15 * R) + "px," + (cy - 1.15 * R) + "px)";
       P.forEach((p) => {
-        const s = p.size * R;
-        p.el.style.width = p.el.style.height = s + "px";
-        p.s = s;
+        p.s = p.size * R;
+        p.el.style.width = p.el.style.height = p.s + "px";
       });
       render();
     }
@@ -444,37 +414,57 @@
 
     const lerp = (a, b, t) => a + (b - a) * t;
     const clamp01 = (t) => Math.min(1, Math.max(0, t));
+    const easeOut3 = (t) => 1 - Math.pow(1 - t, 3);
+
+    // Gravity fall for the first 80%, then a small hop on landing.
+    function fall(t) {
+      const f = clamp01(t / 0.8);
+      let y = f * f;
+      if (t > 0.8) y = 1 - Math.sin((Math.PI * (t - 0.8)) / 0.2) * 0.05;
+      return { f, y };
+    }
 
     function render() {
       if (!L) return;
       const pr = progress();
+      const bake = clamp01((pr - groups[3].win[0]) / (groups[3].win[1] - groups[3].win[0]));
+
+      // Sauce: a dollop falls from the air, then spreads across the dough.
+      {
+        const g = groups[0];
+        const t = clamp01((pr - g.win[0]) / (g.win[1] - g.win[0]));
+        const ft = clamp01(t / 0.45);
+        const m = fall(ft);
+        const sx = lerp(L.airLeft, L.airRight, 0.5);
+        const sy = L.airTop + 10;
+        const x = lerp(sx, L.cx, 1 - (1 - m.f) * (1 - m.f));
+        const y = lerp(sy, L.cy, m.y);
+        const spread = clamp01((t - 0.45) / 0.55);
+        const scale = lerp(0.16, 1, easeOut3(spread));
+        const sd = 2 * L.R * 0.7;
+        sauce.style.transform =
+          "translate(" + (x - sd / 2) + "px," + (y - sd / 2) + "px) rotate(" + lerp(-40, 0, m.f) + "deg) scale(" + scale + ")";
+      }
+
       P.forEach((p) => {
         const t = clamp01((pr - p.t0) / (p.t1 - p.t0));
+        const m = fall(t);
         const sx = lerp(L.airLeft, L.airRight, p.fx);
         const sy = lerp(L.airTop, L.airBottom, p.fy);
-        const ex = L.cx + p.ex * L.R;
-        const ey = L.cy + p.ey * L.R;
-        let x, y, scale, rot;
-        const isSauce = p.g === "sauce";
-        // Fall with gravity for the first 80%, then a small hop on landing.
-        const ft = isSauce ? clamp01(t / 0.55) : t;
-        const fallT = clamp01(ft / 0.8);
-        let fy = fallT * fallT;
-        if (ft > 0.8) fy = 1 - Math.sin((Math.PI * (ft - 0.8)) / 0.2) * 0.05;
-        x = lerp(sx, ex, 1 - (1 - fallT) * (1 - fallT));
-        y = lerp(sy, ey, fy);
-        rot = lerp(p.r0, p.r1, fallT);
-        if (isSauce) {
-          // A dollop falls, then spreads across the dough.
-          const spread = clamp01((t - 0.55) / 0.45);
-          scale = lerp(0.2, 1, 1 - Math.pow(1 - spread, 3));
-        } else {
-          scale = lerp(1.3, 1, fallT);
-        }
+        const x = lerp(sx, L.cx + p.ex * L.R, 1 - (1 - m.f) * (1 - m.f));
+        const y = lerp(sy, L.cy + p.ey * L.R, m.y);
+        let scale = lerp(1.3, 1, m.f);
+        // In the oven the mozzarella melts and spreads a little.
+        if (p.g === "mozz") scale *= lerp(1, 1.22, easeOut3(bake));
         p.el.style.transform =
-          "translate(" + (x - p.s / 2) + "px," + (y - p.s / 2) + "px) rotate(" + rot + "deg) scale(" + scale + ")";
+          "translate(" + (x - p.s / 2) + "px," + (y - p.s / 2) + "px) rotate(" + lerp(p.r0, p.r1, m.f) + "deg) scale(" + scale + ")";
         p.el.classList.toggle("landed", t >= 1);
       });
+
+      // Oven: warm glow plus a slightly toastier, more saturated look.
+      heat.style.opacity = (Math.sin(bake * Math.PI) * 0.9 + bake * 0.35).toFixed(3);
+      const warm = "saturate(" + lerp(1, 1.18, bake) + ") sepia(" + lerp(0, 0.12, bake) + ") brightness(" + lerp(1, 0.97, bake) + ")";
+      pizza.style.filter = sauce.style.filter = warm;
 
       let current = null;
       groups.forEach((g) => {
@@ -486,7 +476,9 @@
         pr >= groups[groups.length - 1].win[1]
           ? "Fertig: buon appetito!"
           : current
-            ? "Jetzt: " + current.name
+            ? current.id === "bake"
+              ? "Ab in den Ofen …"
+              : "Jetzt: " + current.name
             : "Zutaten in der Luft …";
       if (status.textContent !== text) status.textContent = text;
     }
@@ -505,6 +497,7 @@
     window.addEventListener("resize", layout);
     if (reduce.addEventListener) reduce.addEventListener("change", layout);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+    window.addEventListener("load", layout);
     layout();
   })();
 </script>
