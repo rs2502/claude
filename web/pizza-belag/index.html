@@ -1,0 +1,511 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></head><body>
+<title>Pizza Italia Belag</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Karla:wght@400;600&family=Pacifico&display=swap"
+/>
+<style>
+  /* Layout: one sticky stage; pizza anchored low (right on desktop), ingredients float in the air above and fall on scroll.
+     Single-theme by choice: a trattoria table (cream cloth, gingham) looks the same on any host. */
+  :root {
+    --cream: #fff4df;
+    --cloth: #ffe7bf;
+    --ink: #2b1a12;
+    --muted: #6e4f3e;
+    --tomato: #c62a1b;
+    --basil: #1f7a34;
+    --gold: #f2b233;
+    --font-display: "Archivo Black", "Arial Black", Impact, sans-serif;
+    --font-script: "Pacifico", "Brush Script MT", cursive;
+    --font-body: "Karla", "Segoe UI", system-ui, sans-serif;
+    color-scheme: light;
+  }
+  html {
+    background: var(--cream);
+  }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.5;
+  }
+  .gingham {
+    height: 28px;
+    background-color: #fff;
+    background-image:
+      linear-gradient(90deg, rgba(198, 42, 27, 0.55) 50%, transparent 50%),
+      linear-gradient(0deg, rgba(198, 42, 27, 0.55) 50%, transparent 50%);
+    background-size: 28px 28px;
+  }
+
+  /* --- Scroll section with sticky stage --- */
+  #track {
+    position: relative;
+    height: 520vh;
+  }
+  #stage {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 60% 70%, var(--cloth) 0%, var(--cream) 65%);
+  }
+  .stage-cloth {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+  }
+  #intro {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 44px;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 30rem;
+  }
+  .eyebrow {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.22em;
+    color: var(--tomato);
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--font-script);
+    font-weight: 400;
+    font-size: clamp(38px, 7vw, 76px);
+    line-height: 1.15;
+    color: var(--basil);
+    text-wrap: balance;
+  }
+  #intro p.lead {
+    margin: 0;
+    color: var(--muted);
+    max-width: 26rem;
+  }
+  #status {
+    font-family: var(--font-display);
+    font-size: clamp(18px, 2.4vw, 24px);
+    color: var(--tomato);
+    min-height: 1.4em;
+    margin-top: 6px;
+  }
+
+  #pizza,
+  .piece {
+    position: absolute;
+    left: 0;
+    top: 0;
+    will-change: transform;
+  }
+  #pizza {
+    z-index: 1;
+    filter: drop-shadow(0 18px 22px rgba(90, 50, 20, 0.28));
+  }
+  .piece {
+    z-index: 2;
+    pointer-events: none;
+  }
+  .piece svg,
+  #pizza svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .piece .bob {
+    width: 100%;
+    height: 100%;
+    animation: bob 3.2s ease-in-out infinite;
+    filter: drop-shadow(0 6px 5px rgba(60, 30, 10, 0.25));
+  }
+  .piece.landed .bob {
+    animation: none;
+    filter: drop-shadow(0 2px 2px rgba(60, 30, 10, 0.3));
+  }
+  @keyframes bob {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(6deg);
+    }
+  }
+
+  /* Ingredient checklist: the order is real (the order they land) */
+  #steps {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 18px;
+    z-index: 3;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  #steps li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px 7px;
+    border-radius: 999px;
+    border: 2px solid #e6cfa6;
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 14px;
+    transition:
+      background 0.25s,
+      color 0.25s,
+      border-color 0.25s;
+  }
+  #steps li .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow: 0 0 0 2px #fff;
+  }
+  #steps li.done {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+  }
+
+  /* --- Closing section --- */
+  #done {
+    padding-inline: 16px;
+    padding-block: 72px 88px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  #done h2 {
+    margin: 0;
+    font-family: var(--font-script);
+    font-weight: 400;
+    font-size: clamp(40px, 8vw, 80px);
+    line-height: 1.2;
+    color: var(--tomato);
+  }
+  #done p {
+    margin: 0;
+    max-width: 34rem;
+    color: var(--muted);
+  }
+
+  @media (min-width: 900px) {
+    #intro {
+      left: 6vw;
+      top: 50%;
+      transform: translateY(-60%);
+      max-width: 34vw;
+    }
+    #steps {
+      justify-content: flex-start;
+      left: 6vw;
+      right: auto;
+      max-width: 34vw;
+      bottom: 40px;
+    }
+  }
+</style>
+
+<section id="track" aria-label="Pizza-Animation">
+  <div id="stage">
+    <div class="gingham stage-cloth" aria-hidden="true"></div>
+    <div id="intro">
+      <p class="eyebrow">RISTORANTE PIZZERIA ITALIA</p>
+      <h1>Frisch belegt</h1>
+      <p class="lead">Langsam nach unten scrollen: Die Zutaten landen nacheinander auf dem Teig.</p>
+      <div id="status" aria-live="polite">Zutaten in der Luft …</div>
+    </div>
+
+    <div id="pizza" aria-hidden="true">
+      <svg viewBox="-100 -100 200 200">
+        <defs>
+          <radialGradient id="crust" r="0.5">
+            <stop offset="0.82" stop-color="#e9b36a" />
+            <stop offset="0.93" stop-color="#d48b3a" />
+            <stop offset="1" stop-color="#b86d28" />
+          </radialGradient>
+          <radialGradient id="dough" r="0.5">
+            <stop offset="0" stop-color="#fbe3b3" />
+            <stop offset="1" stop-color="#f1cd8c" />
+          </radialGradient>
+        </defs>
+        <circle r="98" fill="url(#crust)" />
+        <circle r="86" fill="url(#dough)" />
+        <ellipse cx="-70" cy="-40" rx="5" ry="3" fill="#8a4b1c" opacity="0.55" />
+        <ellipse cx="62" cy="-58" rx="4" ry="2.5" fill="#8a4b1c" opacity="0.5" />
+        <ellipse cx="84" cy="24" rx="5" ry="3" fill="#8a4b1c" opacity="0.5" />
+        <ellipse cx="-40" cy="82" rx="4" ry="2.5" fill="#8a4b1c" opacity="0.55" />
+        <ellipse cx="-88" cy="20" rx="3" ry="2" fill="#8a4b1c" opacity="0.5" />
+      </svg>
+    </div>
+
+    <ol id="steps" aria-label="Belag in dieser Reihenfolge"></ol>
+  </div>
+</section>
+
+<section id="done">
+  <h2>Buon appetito!</h2>
+  <p>Tomatensoße, Mozzarella, Salami, Champignons, Oliven und frisches Basilikum, frisch aus dem Ofen der Pizzeria Italia.</p>
+</section>
+
+<div class="gingham" aria-hidden="true"></div>
+
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <defs>
+    <g id="i-sauce">
+      <path
+        d="M0,-86 C30,-88 58,-72 72,-50 C88,-26 90,6 82,30 C72,58 48,80 18,86 C-12,92 -44,84 -64,64 C-84,44 -92,14 -86,-16 C-80,-46 -58,-74 -30,-84 C-20,-87 -10,-86 0,-86Z"
+        fill="#d8341f"
+      />
+      <path d="M-40,-50 C-20,-60 10,-58 26,-48" fill="none" stroke="#ec5a3f" stroke-width="7" stroke-linecap="round" opacity="0.7" />
+    </g>
+    <g id="i-cheese">
+      <path
+        d="M-6,-44 C16,-50 38,-34 42,-12 C48,8 40,30 20,40 C2,50 -24,46 -38,30 C-50,16 -48,-8 -36,-24 C-28,-36 -18,-42 -6,-44Z"
+        fill="#fffaf0"
+        stroke="#f1e2c2"
+        stroke-width="4"
+      />
+      <ellipse cx="-8" cy="-10" rx="12" ry="7" fill="#fff" opacity="0.9" />
+    </g>
+    <g id="i-salami">
+      <circle r="46" fill="#b3261e" stroke="#7d1812" stroke-width="5" />
+      <circle cx="-16" cy="-12" r="5" fill="#f4c6b8" />
+      <circle cx="14" cy="-20" r="4" fill="#f4c6b8" />
+      <circle cx="20" cy="10" r="5" fill="#f4c6b8" />
+      <circle cx="-8" cy="20" r="4" fill="#f4c6b8" />
+      <circle cx="-26" cy="8" r="3" fill="#f4c6b8" />
+      <circle cx="4" cy="-2" r="3" fill="#f4c6b8" />
+    </g>
+    <g id="i-mushroom">
+      <path d="M-42,-4 C-42,-34 -20,-46 0,-46 C20,-46 42,-34 42,-4 C30,-8 18,-6 12,-2 L14,40 C8,46 -8,46 -14,40 L-12,-2 C-18,-6 -30,-8 -42,-4Z" fill="#f3e6d2" stroke="#b99a78" stroke-width="4" stroke-linejoin="round" />
+      <path d="M-34,-10 C-20,-18 20,-18 34,-10" fill="none" stroke="#b99a78" stroke-width="3" />
+    </g>
+    <g id="i-olive">
+      <circle r="44" fill="#262626" />
+      <circle r="18" fill="#f1cd8c" />
+      <path d="M-26,-24 C-16,-34 0,-36 10,-32" fill="none" stroke="#5a5a5a" stroke-width="6" stroke-linecap="round" />
+    </g>
+    <g id="i-basil">
+      <path d="M0,-48 C30,-30 32,22 0,48 C-32,22 -30,-30 0,-48Z" fill="#2f9a47" />
+      <path d="M0,-40 L0,44" stroke="#1f7a34" stroke-width="4" />
+      <path d="M0,-10 L14,-22 M0,10 L16,-2 M0,-10 L-14,-22 M0,10 L-16,-2" stroke="#1f7a34" stroke-width="3" />
+    </g>
+  </defs>
+</svg>
+
+<script>
+  (function () {
+    // Ingredient groups land in this order. win = scroll-progress window [start, end].
+    const groups = [
+      { id: "sauce", name: "Tomatensoße", color: "#d8341f", win: [0.03, 0.2] },
+      { id: "cheese", name: "Mozzarella", color: "#f1e2c2", win: [0.2, 0.38] },
+      { id: "salami", name: "Salami", color: "#b3261e", win: [0.38, 0.55] },
+      { id: "mushroom", name: "Champignons", color: "#d8c3a5", win: [0.55, 0.69] },
+      { id: "olive", name: "Oliven", color: "#262626", win: [0.69, 0.81] },
+      { id: "basil", name: "Basilikum", color: "#2f9a47", win: [0.81, 0.93] },
+    ];
+
+    // Pieces. ex/ey: landing spot in pizza radii from the centre. fx/fy: start spot in the air band (0..1).
+    // size: in pizza radii. r0 → r1: rotation in the air → on the pizza.
+    const P = [
+      { g: "sauce", ex: 0, ey: 0, size: 1.72, fx: 0.5, fy: 0.15, r0: -30, r1: 0 },
+
+      { g: "cheese", ex: -0.35, ey: -0.3, size: 0.3, fx: 0.12, fy: 0.3, r0: 40, r1: 10 },
+      { g: "cheese", ex: 0.3, ey: -0.4, size: 0.3, fx: 0.82, fy: 0.1, r0: -50, r1: -20 },
+      { g: "cheese", ex: 0.5, ey: 0.15, size: 0.28, fx: 0.95, fy: 0.55, r0: 80, r1: 40 },
+      { g: "cheese", ex: -0.05, ey: 0.05, size: 0.3, fx: 0.4, fy: 0.05, r0: -20, r1: 5 },
+      { g: "cheese", ex: -0.5, ey: 0.3, size: 0.28, fx: 0.02, fy: 0.7, r0: 60, r1: 70 },
+      { g: "cheese", ex: 0.15, ey: 0.52, size: 0.28, fx: 0.62, fy: 0.45, r0: -70, r1: -30 },
+      { g: "cheese", ex: -0.2, ey: -0.6, size: 0.26, fx: 0.25, fy: 0.0, r0: 30, r1: 90 },
+
+      { g: "salami", ex: 0, ey: -0.42, size: 0.28, fx: 0.55, fy: 0.25, r0: 120, r1: 0 },
+      { g: "salami", ex: 0.45, ey: -0.12, size: 0.28, fx: 0.9, fy: 0.2, r0: -90, r1: 30 },
+      { g: "salami", ex: 0.3, ey: 0.4, size: 0.28, fx: 0.75, fy: 0.62, r0: 60, r1: -20 },
+      { g: "salami", ex: -0.3, ey: 0.42, size: 0.28, fx: 0.18, fy: 0.6, r0: -140, r1: 15 },
+      { g: "salami", ex: -0.5, ey: -0.08, size: 0.28, fx: 0.05, fy: 0.15, r0: 100, r1: -10 },
+      { g: "salami", ex: -0.1, ey: 0.15, size: 0.28, fx: 0.35, fy: 0.4, r0: -60, r1: 25 },
+
+      { g: "mushroom", ex: 0.18, ey: -0.2, size: 0.22, fx: 0.68, fy: 0.05, r0: -80, r1: -15 },
+      { g: "mushroom", ex: -0.28, ey: -0.12, size: 0.22, fx: 0.3, fy: 0.2, r0: 70, r1: 20 },
+      { g: "mushroom", ex: 0.6, ey: 0.3, size: 0.22, fx: 0.98, fy: 0.35, r0: -40, r1: 60 },
+      { g: "mushroom", ex: -0.12, ey: 0.58, size: 0.22, fx: 0.45, fy: 0.7, r0: 110, r1: -40 },
+      { g: "mushroom", ex: 0.08, ey: 0.32, size: 0.22, fx: 0.58, fy: 0.5, r0: -120, r1: 10 },
+
+      { g: "olive", ex: 0.22, ey: 0.12, size: 0.11, fx: 0.72, fy: 0.3, r0: 0, r1: 0 },
+      { g: "olive", ex: -0.4, ey: 0.12, size: 0.11, fx: 0.1, fy: 0.45, r0: 0, r1: 0 },
+      { g: "olive", ex: 0.5, ey: -0.4, size: 0.11, fx: 0.88, fy: 0.05, r0: 0, r1: 0 },
+      { g: "olive", ex: -0.15, ey: -0.35, size: 0.11, fx: 0.38, fy: 0.12, r0: 0, r1: 0 },
+      { g: "olive", ex: 0.35, ey: 0.6, size: 0.11, fx: 0.8, fy: 0.72, r0: 0, r1: 0 },
+      { g: "olive", ex: -0.6, ey: -0.3, size: 0.11, fx: 0.0, fy: 0.3, r0: 0, r1: 0 },
+
+      { g: "basil", ex: 0.1, ey: -0.1, size: 0.22, fx: 0.5, fy: 0.0, r0: -90, r1: -30 },
+      { g: "basil", ex: -0.35, ey: 0.62, size: 0.22, fx: 0.15, fy: 0.55, r0: 100, r1: 40 },
+      { g: "basil", ex: 0.6, ey: -0.1, size: 0.22, fx: 0.95, fy: 0.15, r0: -40, r1: 70 },
+      { g: "basil", ex: -0.45, ey: -0.45, size: 0.22, fx: 0.22, fy: 0.08, r0: 60, r1: -50 },
+    ];
+
+    const stage = document.getElementById("stage");
+    const track = document.getElementById("track");
+    const pizza = document.getElementById("pizza");
+    const status = document.getElementById("status");
+    const steps = document.getElementById("steps");
+    const intro = document.getElementById("intro");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    // Build checklist
+    const stepEls = {};
+    groups.forEach((g) => {
+      const li = document.createElement("li");
+      li.style.setProperty("--c", g.color);
+      li.innerHTML = '<span class="dot"></span>' + g.name;
+      steps.appendChild(li);
+      stepEls[g.id] = li;
+    });
+
+    // Build pieces and give each its own slot inside its group's window
+    const byGroup = {};
+    P.forEach((p) => (byGroup[p.g] = (byGroup[p.g] || []).concat(p)));
+    groups.forEach((g) => {
+      const list = byGroup[g.id];
+      const span = g.win[1] - g.win[0];
+      list.forEach((p, i) => {
+        const lead = list.length > 1 ? (0.45 * span * i) / (list.length - 1) : 0;
+        p.t0 = g.win[0] + lead;
+        p.t1 = p.t0 + span * 0.55;
+        const el = document.createElement("div");
+        el.className = "piece";
+        el.innerHTML =
+          '<div class="bob" style="animation-delay:-' +
+          ((i * 0.53) % 3.2).toFixed(2) +
+          's"><svg viewBox="-50 -50 100 100"><use href="#i-' +
+          g.id +
+          '"/></svg></div>';
+        if (g.id === "sauce") el.querySelector("svg").setAttribute("viewBox", "-100 -100 200 200");
+        stage.appendChild(el);
+        p.el = el;
+      });
+    });
+
+    let L = null; // layout metrics
+    function layout() {
+      const W = stage.clientWidth;
+      const H = stage.clientHeight;
+      const wide = W >= 900;
+      const stepsBox = steps.getBoundingClientRect();
+      const bottomReserve = H - (stepsBox.top - stage.getBoundingClientRect().top) + 16;
+      const R = Math.max(90, Math.min(wide ? W * 0.22 : W * 0.36, H * (wide ? 0.34 : 0.22), 300));
+      const cx = wide ? W * 0.66 : W / 2;
+      const cy = wide ? H - R - 48 : H - R - bottomReserve;
+      const introBottom = wide ? 40 : intro.getBoundingClientRect().bottom - stage.getBoundingClientRect().top + 8;
+      const airTop = introBottom + 20;
+      const airBottom = Math.max(airTop + 60, cy - R * 0.35);
+      const airLeft = wide ? W * 0.44 : 20;
+      const airRight = W - 20;
+      L = { W, H, R, cx, cy, airTop, airBottom, airLeft, airRight };
+      pizza.style.width = pizza.style.height = 2 * R + "px";
+      pizza.style.transform = "translate(" + (cx - R) + "px," + (cy - R) + "px)";
+      P.forEach((p) => {
+        const s = p.size * R;
+        p.el.style.width = p.el.style.height = s + "px";
+        p.s = s;
+      });
+      render();
+    }
+
+    function progress() {
+      if (reduce.matches) return 1;
+      const r = track.getBoundingClientRect();
+      const total = track.offsetHeight - stage.offsetHeight;
+      return Math.min(1, Math.max(0, -r.top / total));
+    }
+
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const clamp01 = (t) => Math.min(1, Math.max(0, t));
+
+    function render() {
+      if (!L) return;
+      const pr = progress();
+      P.forEach((p) => {
+        const t = clamp01((pr - p.t0) / (p.t1 - p.t0));
+        const sx = lerp(L.airLeft, L.airRight, p.fx);
+        const sy = lerp(L.airTop, L.airBottom, p.fy);
+        const ex = L.cx + p.ex * L.R;
+        const ey = L.cy + p.ey * L.R;
+        let x, y, scale, rot;
+        const isSauce = p.g === "sauce";
+        // Fall with gravity for the first 80%, then a small hop on landing.
+        const ft = isSauce ? clamp01(t / 0.55) : t;
+        const fallT = clamp01(ft / 0.8);
+        let fy = fallT * fallT;
+        if (ft > 0.8) fy = 1 - Math.sin((Math.PI * (ft - 0.8)) / 0.2) * 0.05;
+        x = lerp(sx, ex, 1 - (1 - fallT) * (1 - fallT));
+        y = lerp(sy, ey, fy);
+        rot = lerp(p.r0, p.r1, fallT);
+        if (isSauce) {
+          // A dollop falls, then spreads across the dough.
+          const spread = clamp01((t - 0.55) / 0.45);
+          scale = lerp(0.2, 1, 1 - Math.pow(1 - spread, 3));
+        } else {
+          scale = lerp(1.3, 1, fallT);
+        }
+        p.el.style.transform =
+          "translate(" + (x - p.s / 2) + "px," + (y - p.s / 2) + "px) rotate(" + rot + "deg) scale(" + scale + ")";
+        p.el.classList.toggle("landed", t >= 1);
+      });
+
+      let current = null;
+      groups.forEach((g) => {
+        const done = pr >= g.win[1];
+        stepEls[g.id].classList.toggle("done", done);
+        if (!current && !done && pr > g.win[0] - 0.01) current = g;
+      });
+      const text =
+        pr >= groups[groups.length - 1].win[1]
+          ? "Fertig: buon appetito!"
+          : current
+            ? "Jetzt: " + current.name
+            : "Zutaten in der Luft …";
+      if (status.textContent !== text) status.textContent = text;
+    }
+
+    let ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        render();
+      });
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", layout);
+    if (reduce.addEventListener) reduce.addEventListener("change", layout);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+    layout();
+  })();
+</script>
+</body></html>
