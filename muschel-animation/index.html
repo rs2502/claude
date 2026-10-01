@@ -1,0 +1,644 @@
+<title>Muscheln in drei Soßen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: Bühne (Topf von oben) links, Rezeptkarte rechts; auf dem Handy untereinander. */
+  :root {
+    --bg: #edf1f2;
+    --surface: #f8fafa;
+    --fg: #17212b;
+    --muted: #586874;
+    --line: #cdd7dc;
+    --sauce: #c8372d;
+    --sauce-ink: #fff;
+    --display: "Gloock", "Georgia", serif;
+    --body: "Figtree", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10161b; --surface: #171f26; --fg: #e6ecef; --muted: #93a3ae; --line: #2a3742;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10161b; --surface: #171f26; --fg: #e6ecef; --muted: #93a3ae; --line: #2a3742;
+    color-scheme: dark;
+  }
+  [data-sauce="tomate"] { --sauce: #c8372d; --sauce-ink: #fff; }
+  [data-sauce="wein"]   { --sauce: #a88a2c; --sauce-ink: #fff; }
+  [data-sauce="safran"] { --sauce: #d98a0b; --sauce-ink: #1d1406; }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font: 16px/1.55 var(--body);
+    padding-inline: 16px; padding-block: 28px 40px;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 28px; }
+  header { display: grid; gap: 6px; }
+  .eyebrow {
+    font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+  }
+  h1 {
+    font: 400 clamp(2.1rem, 5vw, 3.4rem)/1.05 var(--display); margin: 0; text-wrap: balance;
+  }
+  h1 em { font-style: normal; color: var(--sauce); transition: color .6s; }
+
+  .main { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+  @media (max-width: 820px) { .main { grid-template-columns: minmax(0, 1fr); } }
+
+  .stage { display: grid; gap: 14px; min-width: 0; }
+  .canvas-box {
+    position: relative; width: 100%; max-width: 100%; aspect-ratio: 1; border-radius: 6px; overflow: hidden;
+    background: #262c30;
+  }
+  canvas { display: block; width: 100%; height: 100%; }
+
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tab {
+    font: 500 15px/1 var(--body); color: var(--fg); background: transparent;
+    border: 1.5px solid var(--line); border-radius: 999px; padding: 10px 16px 10px 12px;
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+    transition: border-color .2s, background .2s, color .2s;
+  }
+  .tab .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
+  .tab:hover { border-color: var(--c); }
+  .tab[aria-selected="true"] { background: var(--c); border-color: var(--c); color: var(--ink); }
+  .tab[aria-selected="true"] .dot { background: var(--ink); opacity: .85; }
+  .tab:focus-visible, .ctrl:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+  .ctrl-group { display: flex; gap: 8px; }
+  .ctrl {
+    font: 500 14px/1 var(--body); color: var(--fg); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; cursor: pointer;
+  }
+  .ctrl:hover { border-color: var(--muted); }
+  .auto { font: 400 14px/1 var(--body); color: var(--muted); display: inline-flex; gap: 6px; align-items: center; }
+  .auto input { accent-color: var(--sauce); }
+
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; }
+  .steps li { display: grid; gap: 6px; font-size: 13px; line-height: 1.3; color: var(--muted); min-width: 0; }
+  .steps .bar { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+  .steps .bar i { display: block; height: 100%; width: 0; background: var(--sauce); }
+  .steps li.on { color: var(--fg); }
+  .steps b { font: 500 11px/1 var(--mono); letter-spacing: .08em; display: block; margin-bottom: 2px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: 24px; display: grid; gap: 18px; min-width: 0;
+  }
+  .card h2 { font: 400 2rem/1.1 var(--display); margin: 0; text-wrap: balance; }
+  .kicker { font: 500 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--sauce); transition: color .6s; }
+  .card p { margin: 0; max-width: 62ch; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font: 400 13px/1.4 var(--mono); color: var(--muted); }
+  .meta strong { color: var(--fg); font-weight: 500; }
+  .card h3 { font: 700 13px/1 var(--body); letter-spacing: .1em; text-transform: uppercase; margin: 0; color: var(--muted); }
+  .ingr { list-style: none; margin: 0; padding: 0; display: grid; }
+  .ingr li { display: grid; grid-template-columns: 6.5rem minmax(0,1fr); gap: 12px; padding: 7px 0; border-top: 1px solid var(--line); }
+  .ingr li:last-child { border-bottom: 1px solid var(--line); }
+  .ingr .q { font: 500 14px/1.5 var(--mono); font-variant-numeric: tabular-nums; color: var(--sauce); transition: color .6s; }
+
+  .tips { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 20px; border-top: 1px solid var(--line); padding-top: 20px; }
+  @media (max-width: 720px) { .tips { grid-template-columns: minmax(0,1fr); } }
+  .tips h4 { font: 400 1.15rem/1.2 var(--display); margin: 0 0 4px; }
+  .tips p { margin: 0; color: var(--muted); font-size: 14.5px; }
+
+  @media (prefers-reduced-motion: reduce) { h1 em, .kicker, .ingr .q { transition: none; } }
+</style>
+
+<div class="wrap" id="app" data-sauce="tomate">
+  <header>
+    <span class="eyebrow">1 kg frische Miesmuscheln · drei Arten</span>
+    <h1>Muscheln in <em id="h1sauce">Tomatensoße</em></h1>
+  </header>
+
+  <div class="main">
+    <section class="stage" aria-label="Animation">
+      <div class="tabs" role="tablist" aria-label="Soße wählen">
+        <button class="tab" role="tab" id="tab-tomate" data-key="tomate" aria-selected="true" style="--c:#c8372d;--ink:#fff"><span class="dot"></span>Tomate</button>
+        <button class="tab" role="tab" id="tab-wein" data-key="wein" aria-selected="false" style="--c:#a88a2c;--ink:#fff"><span class="dot"></span>Weißwein</button>
+        <button class="tab" role="tab" id="tab-safran" data-key="safran" aria-selected="false" style="--c:#d98a0b;--ink:#1d1406"><span class="dot"></span>Safran</button>
+      </div>
+
+      <div class="canvas-box"><canvas id="pot" role="img" aria-label="Topf mit Miesmuscheln, die sich in der Soße öffnen"></canvas></div>
+
+      <ol class="steps" id="steps">
+        <li><div class="bar"><i></i></div><span><b>1</b>In den heißen Sud</span></li>
+        <li><div class="bar"><i></i></div><span><b>2</b>Dämpfen, Schalen öffnen sich</span></li>
+        <li><div class="bar"><i></i></div><span><b>3</b>Garnieren</span></li>
+        <li><div class="bar"><i></i></div><span><b>4</b>Servieren</span></li>
+      </ol>
+
+      <div class="controls">
+        <div class="ctrl-group">
+          <button class="ctrl" id="replay" type="button">Neu kochen</button>
+          <button class="ctrl" id="pause" type="button">Pause</button>
+        </div>
+        <label class="auto"><input type="checkbox" id="autoplay" checked> Soßen automatisch wechseln</label>
+      </div>
+    </section>
+
+    <article class="card" aria-live="polite">
+      <span class="kicker" id="kicker">Alla marinara</span>
+      <h2 id="name">Tomatensoße</h2>
+      <p id="desc"></p>
+      <div class="meta" id="meta"></div>
+      <h3>Zutaten für 2 Personen</h3>
+      <ul class="ingr" id="ingr"></ul>
+    </article>
+  </div>
+
+  <section class="tips" aria-label="Küchentipps">
+    <div><h4>Saison</h4><p>September bis April, in den Monaten mit „r“. Frische Muscheln riechen nach Meer und sind schwer und geschlossen.</p></div>
+    <div><h4>Vorbereiten</h4><p>Unter kaltem Wasser abbürsten, den Bart zur Spitze hin abziehen. Offene Muscheln antippen: Wer sich nicht schließt, kommt weg.</p></div>
+    <div><h4>Nach dem Kochen</h4><p>Muscheln, die geschlossen bleiben, aussortieren. Den Sud nicht wegschütten, er ist das Beste daran.</p></div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const SAUCES = {
+    tomate: {
+      name: "Tomatensoße", kicker: "Alla marinara",
+      desc: "Knoblauch, Schalotte und eine Chili in Olivenöl anschwitzen, stückige Tomaten dazu und zehn Minuten einkochen. Dann die Muscheln hinein, Deckel drauf. Zum Schluss Basilikum. Dazu Spaghetti oder geröstetes Brot.",
+      meta: [["Garzeit", "6–8 Min."], ["Topf", "mind. 4 l"], ["Wein", "Vermentino"]],
+      ingr: [["1 kg", "Miesmuscheln, geputzt"], ["400 g", "stückige Tomaten"], ["100 ml", "trockener Weißwein"], ["2 Zehen", "Knoblauch, in Scheiben"], ["1", "Schalotte, fein gewürfelt"], ["1", "rote Chili oder 1 Prise Flocken"], ["3 EL", "Olivenöl"], ["½ Bund", "Basilikum"]],
+      base: ["#e0503a", "#a3271b"], deep: "#6e170f", sheen: "rgba(255,196,96,0.55)", bubble: "#ef7a5c",
+    },
+    wein: {
+      name: "Weißweinsoße", kicker: "Moules marinières",
+      desc: "Schalotten und Knoblauch in Butter glasig dünsten, mit trockenem Weißwein ablöschen und kurz aufkochen. Muscheln hinein, Deckel drauf, zweimal schwenken. Den Sud mit Petersilie und einem Stück kalter Butter binden. Dazu Baguette.",
+      meta: [["Garzeit", "5–6 Min."], ["Topf", "mind. 4 l"], ["Wein", "Muscadet, Riesling"]],
+      ingr: [["1 kg", "Miesmuscheln, geputzt"], ["200 ml", "trockener Weißwein"], ["2", "Schalotten, fein gewürfelt"], ["2 Zehen", "Knoblauch, gehackt"], ["40 g", "Butter, davon 20 g kalt"], ["3 Zweige", "Thymian"], ["½ Bund", "glatte Petersilie"], ["1 Prise", "Pfeffer, frisch gemahlen"]],
+      base: ["#eadcaa", "#b39a5c"], deep: "#6f5a2a", sheen: "rgba(255,236,170,0.7)", bubble: "#f6ecc6",
+    },
+    safran: {
+      name: "Safransoße", kicker: "Crème au safran",
+      desc: "Safranfäden zehn Minuten im warmen Wein ziehen lassen. Schalotte in Butter anschwitzen, Safranwein und Sahne angießen, aufkochen. Muscheln darin dämpfen, bis alle offen sind. Die Soße wird goldgelb und leicht cremig. Dazu Pommes frites.",
+      meta: [["Garzeit", "6–7 Min."], ["Topf", "mind. 4 l"], ["Wein", "Chardonnay"]],
+      ingr: [["1 kg", "Miesmuscheln, geputzt"], ["0,1 g", "Safranfäden (1 Döschen)"], ["150 ml", "trockener Weißwein"], ["150 ml", "Sahne"], ["1", "Schalotte, fein gewürfelt"], ["20 g", "Butter"], ["½ Bund", "Schnittlauch"], ["1 Spritzer", "Zitronensaft"]],
+      base: ["#f6bd3c", "#d3800f"], deep: "#7e4304", sheen: "rgba(255,248,214,0.7)", bubble: "#ffd77a",
+    },
+  };
+  const ORDER = ["tomate", "wein", "safran"];
+  const CYCLE = 11; // Sekunden pro Soße im Automatikmodus
+  const STEP_ENDS = [2.0, 4.8, 6.2, 7.6];
+
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------- Zufall mit Seed ----------
+  function rng(seed) {
+    return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  }
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const ease = t => 1 - Math.pow(1 - clamp(t), 3);
+  const easeBack = t => { t = clamp(t); const c = 1.6; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+
+  // ---------- Szene vorbereiten (Einheiten: Topfmitte = 0,0; sichtbar -130..130) ----------
+  const SR = 96; // Radius der Soßenoberfläche
+
+  function makeMussels(seed) {
+    const r = rng(seed), list = [];
+    let tries = 0;
+    while (list.length < 22 && tries < 4000) {
+      tries++;
+      const L = 21 + r() * 6;
+      const rad = 74 * Math.sqrt(r()), th = r() * Math.PI * 2;
+      const x = Math.cos(th) * rad, y = Math.sin(th) * rad;
+      if (list.some(m => Math.hypot(m.x - x, m.y - y) < (m.L + L) * 0.62)) continue;
+      list.push({ x, y, L, rot: r() * Math.PI * 2, openAt: 2.1 + r() * 2.2, openMax: 0.75 + r() * 0.3, drop: list.length * 0.055 });
+    }
+    // Zum Mittelpunkt hin des Topfes ausrichten wirkt natürlicher
+    return list;
+  }
+
+  function makeFlecks(key, seed) {
+    const r = rng(seed), out = [];
+    const n = key === "tomate" ? 70 : key === "wein" ? 46 : 55;
+    for (let i = 0; i < n; i++) {
+      const rad = SR * 0.95 * Math.sqrt(r()), th = r() * Math.PI * 2;
+      out.push({ x: Math.cos(th) * rad, y: Math.sin(th) * rad, a: r() * Math.PI * 2, s: 0.6 + r() * 0.9, k: r() });
+    }
+    return out;
+  }
+
+  function makeGarnish(key, seed) {
+    const r = rng(seed), out = [];
+    const types = { tomate: ["basil", "basil", "chili", "chili", "chili"], wein: ["parsley", "parsley", "parsley", "garlic", "thyme"], safran: ["thread", "thread", "chive", "chive", "chive"] }[key];
+    const n = key === "tomate" ? 34 : 46;
+    for (let i = 0; i < n; i++) {
+      const rad = SR * 0.9 * Math.sqrt(r()), th = r() * Math.PI * 2;
+      out.push({ type: types[Math.floor(r() * types.length)], x: Math.cos(th) * rad, y: Math.sin(th) * rad, a: r() * Math.PI * 2, s: 0.7 + r() * 0.6, d: 4.9 + r() * 1.1, b: r() });
+    }
+    return out;
+  }
+
+  const scenes = {};
+  ORDER.forEach((k, i) => {
+    scenes[k] = { mussels: makeMussels(11 + i * 7), flecks: makeFlecks(k, 101 + i), garnish: makeGarnish(k, 301 + i) };
+  });
+
+  const slate = (() => { const r = rng(5), d = []; for (let i = 0; i < 420; i++) d.push([r() * 280 - 140, r() * 280 - 140, r() * 1.4 + 0.3, r()]); return d; })();
+
+  // ---------- Canvas ----------
+  const canvas = document.getElementById("pot");
+  const ctx = canvas.getContext("2d");
+  let S = 600, dpr = 1;
+
+  function resize() {
+    const box = canvas.parentElement.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    S = box.width;
+    canvas.width = Math.round(S * dpr); canvas.height = Math.round(S * dpr);
+    draw(0);
+  }
+
+  // Weicher Dampf-Sprite
+  const steamSprite = (() => {
+    const c = document.createElement("canvas"); c.width = c.height = 64;
+    const g = c.getContext("2d"), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.5, "rgba(255,255,255,0.45)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return c;
+  })();
+
+  // ---------- Zustand ----------
+  let current = "tomate", previous = null, switchAt = 0;
+  let t = reduce ? 9 : 0;           // Zeit seit Kochbeginn
+  let playing = !reduce;
+  let auto = !reduce;
+  const steam = [], bubbles = [];
+  const fx = rng(999);
+
+  // ---------- Zeichnen: Hintergrund ----------
+  function drawTable() {
+    ctx.fillStyle = "#2a3034"; ctx.fillRect(-140, -140, 280, 280);
+    for (const [x, y, s, k] of slate) {
+      ctx.fillStyle = k > 0.5 ? "rgba(255,255,255,0.035)" : "rgba(0,0,0,0.12)";
+      ctx.beginPath(); ctx.arc(x, y, s, 0, Math.PI * 2); ctx.fill();
+    }
+    // Leinentuch links oben
+    ctx.save(); ctx.translate(-150, -150); ctx.rotate(0.35);
+    ctx.fillStyle = "#d9d3c4"; ctx.fillRect(0, 0, 70, 110);
+    ctx.strokeStyle = "rgba(48,80,110,0.55)"; ctx.lineWidth = 2;
+    for (let i = 10; i < 70; i += 12) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 110); ctx.stroke(); }
+    ctx.restore();
+    // Zitronenhälfte rechts unten
+    ctx.save(); ctx.translate(112, 114);
+    ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.beginPath(); ctx.arc(3, 4, 30, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#e9c227"; ctx.beginPath(); ctx.arc(0, 0, 30, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#f6eecb"; ctx.beginPath(); ctx.arc(0, 0, 27, 0, Math.PI * 2); ctx.fill();
+    for (let i = 0; i < 9; i++) {
+      const a0 = i / 9 * Math.PI * 2 + 0.06, a1 = (i + 1) / 9 * Math.PI * 2 - 0.06;
+      ctx.fillStyle = i % 2 ? "#f3d64e" : "#f0cf3f";
+      ctx.beginPath(); ctx.moveTo(Math.cos((a0 + a1) / 2) * 2.5, Math.sin((a0 + a1) / 2) * 2.5); ctx.arc(0, 0, 24.5, a0, a1); ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+    // Grobes Meersalz
+    const r = rng(77);
+    for (let i = 0; i < 14; i++) {
+      ctx.save(); ctx.translate(-118 + r() * 34, 92 + r() * 34); ctx.rotate(r() * 3);
+      ctx.fillStyle = "rgba(240,244,246,0.85)"; const s = 1 + r() * 1.8; ctx.fillRect(-s, -s, s * 2, s * 2); ctx.restore();
+    }
+  }
+
+  function drawPot() {
+    // Griffe
+    for (const sgn of [-1, 1]) {
+      ctx.save(); ctx.scale(sgn, 1);
+      ctx.fillStyle = "rgba(0,0,0,0.35)"; roundRect(106, -8, 24, 20, 6); ctx.fill();
+      const g = ctx.createLinearGradient(0, -9, 0, 9); g.addColorStop(0, "#4b5459"); g.addColorStop(1, "#1d2124");
+      ctx.fillStyle = g; roundRect(104, -10, 23, 20, 6); ctx.fill();
+      ctx.restore();
+    }
+    // Schatten
+    ctx.fillStyle = "rgba(0,0,0,0.4)"; ctx.beginPath(); ctx.arc(4, 6, 113, 0, Math.PI * 2); ctx.fill();
+    // Gusseisen-Rand
+    let g = ctx.createRadialGradient(-30, -40, 20, 0, 0, 114);
+    g.addColorStop(0, "#4a5358"); g.addColorStop(1, "#16191b");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, 112, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "rgba(200,210,215,0.28)"; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(0, 0, 109, Math.PI * 1.05, Math.PI * 1.7); ctx.stroke();
+    // Innenwand (Emaille)
+    g = ctx.createRadialGradient(0, 0, 90, 0, 0, 104);
+    g.addColorStop(0, "#0f1213"); g.addColorStop(1, "#2b3134");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, 104, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+
+  // ---------- Soße ----------
+  function drawSauce(key, alpha, time) {
+    const s = SAUCES[key], sc = scenes[key];
+    ctx.save(); ctx.globalAlpha = alpha;
+    ctx.beginPath(); ctx.arc(0, 0, SR, 0, Math.PI * 2); ctx.clip();
+    const wob = Math.sin(time * 0.8) * 4;
+    let g = ctx.createRadialGradient(-20 + wob, -26, 6, 0, 0, SR);
+    g.addColorStop(0, s.base[0]); g.addColorStop(0.75, s.base[1]); g.addColorStop(1, s.deep);
+    ctx.fillStyle = g; ctx.fillRect(-SR, -SR, SR * 2, SR * 2);
+
+    // Einlagen in der Soße
+    for (const f of sc.flecks) {
+      ctx.save(); ctx.translate(f.x + Math.sin(time * 0.6 + f.k * 9) * 0.8, f.y + Math.cos(time * 0.5 + f.k * 7) * 0.8); ctx.rotate(f.a + time * 0.05 * (f.k - 0.5)); ctx.scale(f.s, f.s);
+      if (key === "tomate") {
+        if (f.k < 0.6) { ctx.fillStyle = f.k < 0.3 ? "#b52417" : "#e8604a"; ctx.beginPath(); ctx.moveTo(-3, -2); ctx.lineTo(2.5, -3); ctx.lineTo(3.4, 2); ctx.lineTo(-2, 3); ctx.closePath(); ctx.fill(); }
+        else if (f.k < 0.8) { ctx.strokeStyle = "rgba(255,226,190,0.7)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(0, 0, 3, 0.2, 2.2); ctx.stroke(); }
+        else { ctx.fillStyle = "rgba(255,190,70,0.55)"; ctx.beginPath(); ctx.arc(0, 0, 2.2, 0, Math.PI * 2); ctx.fill(); }
+      } else if (key === "wein") {
+        if (f.k < 0.55) { ctx.strokeStyle = "rgba(225,205,225,0.85)"; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(0, 0, 3.5, 0.3, 2.4); ctx.stroke(); }
+        else { ctx.fillStyle = "rgba(255,240,170,0.75)"; ctx.beginPath(); ctx.arc(0, 0, 1.4 + f.k * 2.2, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = "rgba(160,120,40,0.35)"; ctx.lineWidth = 0.5; ctx.stroke(); }
+      } else {
+        if (f.k < 0.45) { ctx.strokeStyle = "rgba(200,70,20,0.75)"; ctx.lineWidth = 0.8; ctx.beginPath(); ctx.moveTo(-4, 0); ctx.quadraticCurveTo(0, -2.5, 4, 0.5); ctx.stroke(); }
+        else if (f.k < 0.75) { ctx.strokeStyle = "rgba(255,240,200,0.75)"; ctx.lineWidth = 1.1; ctx.beginPath(); ctx.arc(0, 0, 3, 0.3, 2.2); ctx.stroke(); }
+        else { ctx.fillStyle = "rgba(255,250,225,0.55)"; ctx.beginPath(); ctx.ellipse(0, 0, 4, 2, 0, 0, Math.PI * 2); ctx.fill(); }
+      }
+      ctx.restore();
+    }
+    // Glanz
+    ctx.fillStyle = s.sheen;
+    ctx.globalAlpha = alpha * 0.55;
+    ctx.beginPath(); ctx.ellipse(-30 + wob, -40, 30, 9, -0.5, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = alpha;
+    // Randschatten
+    g = ctx.createRadialGradient(0, 0, SR * 0.7, 0, 0, SR);
+    g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, "rgba(0,0,0,0.45)");
+    ctx.fillStyle = g; ctx.fillRect(-SR, -SR, SR * 2, SR * 2);
+    ctx.restore();
+  }
+
+  function drawBubbles(key) {
+    const col = SAUCES[key].bubble;
+    for (const b of bubbles) {
+      const p = b.age / b.life;
+      if (p < 0.85) {
+        const r = b.r * ease(p / 0.85);
+        ctx.fillStyle = col; ctx.globalAlpha = 0.55; ctx.beginPath(); ctx.arc(b.x, b.y, r, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 0.8; ctx.fillStyle = "rgba(255,255,255,0.8)"; ctx.beginPath(); ctx.arc(b.x - r * 0.35, b.y - r * 0.35, r * 0.28, 0, Math.PI * 2); ctx.fill();
+      } else {
+        const q = (p - 0.85) / 0.15;
+        ctx.globalAlpha = 0.6 * (1 - q); ctx.strokeStyle = col; ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.arc(b.x, b.y, b.r * (1 + q * 0.9), 0, Math.PI * 2); ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ---------- Muschel ----------
+  function valvePath(L, W) {
+    ctx.beginPath(); ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(L * 0.18, -W * 0.9, L * 0.62, -W * 1.25, L * 0.92, -W * 0.78);
+    ctx.bezierCurveTo(L * 1.04, -W * 0.45, L * 1.02, -W * 0.05, L * 0.9, W * 0.12);
+    ctx.bezierCurveTo(L * 0.62, W * 0.36, L * 0.25, W * 0.2, 0, 0);
+    ctx.closePath();
+  }
+
+  function drawValve(L, W, open, mirror, sauceKey) {
+    ctx.save();
+    if (mirror) ctx.scale(1, -1);
+    // Außenschale
+    const g = ctx.createLinearGradient(0, -W, L, W * 0.3);
+    g.addColorStop(0, "#2a3550"); g.addColorStop(0.45, "#141b2b"); g.addColorStop(1, "#22304a");
+    valvePath(L, W); ctx.fillStyle = g; ctx.fill();
+    ctx.strokeStyle = "rgba(0,0,0,0.6)"; ctx.lineWidth = 0.7; ctx.stroke();
+    // Zuwachsstreifen
+    ctx.save(); valvePath(L, W); ctx.clip();
+    ctx.strokeStyle = "rgba(140,170,210,0.22)"; ctx.lineWidth = 0.6;
+    for (let i = 1; i <= 4; i++) { ctx.beginPath(); ctx.arc(0, 0, L * (0.25 + i * 0.17), -1.3, 0.5); ctx.stroke(); }
+    ctx.fillStyle = "rgba(190,215,240,0.18)"; ctx.beginPath(); ctx.ellipse(L * 0.5, -W * 0.5, L * 0.28, W * 0.18, -0.15, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    if (open > 0.02) {
+      const a = clamp(open * 1.4);
+      ctx.globalAlpha = a;
+      // Perlmutt
+      ctx.save(); ctx.translate(L * 0.08, -W * 0.06); ctx.scale(0.86, 0.78);
+      const n = ctx.createLinearGradient(0, -W, L, W);
+      n.addColorStop(0, "#c9d6e6"); n.addColorStop(0.5, "#eef2f7"); n.addColorStop(1, "#9fb1c9");
+      valvePath(L, W); ctx.fillStyle = n; ctx.fill(); ctx.restore();
+      // Muschelfleisch
+      ctx.save(); ctx.translate(L * 0.16, -W * 0.12); ctx.scale(0.7, 0.62);
+      const m = ctx.createRadialGradient(L * 0.5, -W * 0.4, 1, L * 0.5, -W * 0.3, L * 0.6);
+      m.addColorStop(0, "#f7b25e"); m.addColorStop(0.7, "#e2792f"); m.addColorStop(1, "#b9541d");
+      valvePath(L, W); ctx.fillStyle = m; ctx.fill();
+      ctx.strokeStyle = "rgba(70,40,25,0.75)"; ctx.lineWidth = 1.1; ctx.stroke();
+      ctx.restore();
+      // Soßenglanz auf dem Fleisch
+      ctx.globalAlpha = a * 0.35;
+      ctx.save(); ctx.translate(L * 0.16, -W * 0.12); ctx.scale(0.7, 0.62);
+      ctx.fillStyle = SAUCES[sauceKey].base[0];
+      ctx.beginPath(); ctx.ellipse(L * 0.62, -W * 0.25, L * 0.18, W * 0.3, 0.2, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      ctx.globalAlpha = 1;
+    }
+    ctx.restore();
+  }
+
+  function drawMussel(m, time, sauceKey) {
+    const tIn = time - m.drop;
+    if (tIn < 0) return;
+    const d = ease(tIn / 0.55);
+    const scale = 1 + (1 - d) * 0.7;
+    const open = m.openMax * easeBack((time - m.openAt) / 0.9);
+    const W = m.L * 0.32;
+    const spread = open * 0.62;
+    ctx.save();
+    ctx.translate(m.x, m.y - (1 - d) * 12);
+    ctx.rotate(m.rot);
+    ctx.scale(scale, scale);
+    ctx.globalAlpha = d;
+    // Schatten
+    ctx.fillStyle = "rgba(0,0,0,0.32)";
+    for (const [a, mir] of [[spread, -1], [-spread, 1]]) {
+      ctx.save(); ctx.rotate(-m.rot); ctx.translate(1.6, 2.4); ctx.rotate(m.rot + a); ctx.scale(1, mir);
+      valvePath(m.L, W); ctx.fill(); ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+    ctx.save(); ctx.rotate(spread); drawValve(m.L, W, open, true, sauceKey); ctx.restore();
+    ctx.save(); ctx.rotate(-spread); drawValve(m.L, W, open, false, sauceKey); ctx.restore();
+    // Scharnier
+    ctx.fillStyle = "#0d121c"; ctx.beginPath(); ctx.arc(0, 0, 1.6, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  // ---------- Garnitur ----------
+  function drawGarnish(g, time) {
+    const p = ease((time - g.d) / 0.6);
+    if (p <= 0) return;
+    ctx.save();
+    ctx.translate(g.x, g.y - (1 - p) * 20);
+    ctx.rotate(g.a + (1 - p) * 1.5);
+    const s = g.s * (1 + (1 - p) * 0.8);
+    ctx.scale(s, s);
+    ctx.globalAlpha = p;
+    switch (g.type) {
+      case "basil": {
+        const gr = ctx.createLinearGradient(-6, 0, 6, 0); gr.addColorStop(0, "#2f6b24"); gr.addColorStop(1, "#4f9a35");
+        ctx.fillStyle = gr; ctx.beginPath(); ctx.moveTo(-7, 0); ctx.quadraticCurveTo(0, -6.5, 7, 0); ctx.quadraticCurveTo(0, 6.5, -7, 0); ctx.fill();
+        ctx.strokeStyle = "rgba(200,240,170,0.6)"; ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(-6, 0); ctx.lineTo(6, 0); ctx.stroke();
+        break;
+      }
+      case "chili":
+        ctx.fillStyle = g.b > 0.5 ? "#9d1c14" : "#d1361f"; ctx.fillRect(-1.1, -0.8, 2.2, 1.6);
+        if (g.b > 0.7) { ctx.fillStyle = "#f2d483"; ctx.beginPath(); ctx.arc(2.4, 0.5, 0.7, 0, Math.PI * 2); ctx.fill(); }
+        break;
+      case "parsley":
+        ctx.fillStyle = g.b > 0.5 ? "#3e7d24" : "#5c9e33";
+        for (const [x, y, r] of [[0, 0, 1.4], [1.6, 0.6, 1.1], [-1.2, 1, 1]]) { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); }
+        break;
+      case "garlic":
+        ctx.fillStyle = "#f2ead2"; ctx.beginPath(); ctx.ellipse(0, 0, 3.2, 2.6, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "rgba(190,170,120,0.8)"; ctx.lineWidth = 0.5; ctx.beginPath(); ctx.ellipse(0, 0, 1.9, 1.4, 0, 0, Math.PI * 2); ctx.stroke();
+        break;
+      case "thyme":
+        ctx.fillStyle = "#6f8a4b";
+        for (let i = -2; i <= 2; i++) { ctx.beginPath(); ctx.ellipse(i * 1.6, (i % 2) * 0.8, 0.9, 0.5, 0.4, 0, Math.PI * 2); ctx.fill(); }
+        break;
+      case "thread":
+        ctx.strokeStyle = "#b8240f"; ctx.lineWidth = 0.75; ctx.lineCap = "round";
+        ctx.beginPath(); ctx.moveTo(-6, 1); ctx.quadraticCurveTo(-1, -3, 5, 0); ctx.stroke();
+        ctx.strokeStyle = "#e5571b"; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(4, -0.3); ctx.lineTo(6, 0.4); ctx.stroke();
+        break;
+      case "chive":
+        ctx.strokeStyle = "#4f8f2f"; ctx.lineWidth = 1.5; ctx.lineCap = "butt";
+        ctx.beginPath(); ctx.moveTo(-2, 0); ctx.lineTo(2, 0); ctx.stroke();
+        ctx.fillStyle = "#c9e6a8"; ctx.beginPath(); ctx.arc(-2, 0, 0.55, 0, Math.PI * 2); ctx.fill();
+        break;
+    }
+    ctx.restore();
+  }
+
+  // ---------- Dampf ----------
+  function drawSteam() {
+    for (const p of steam) {
+      const q = p.age / p.life;
+      const a = Math.sin(q * Math.PI) * p.alpha;
+      const r = p.r0 + q * p.grow;
+      ctx.globalAlpha = a;
+      ctx.drawImage(steamSprite, p.x - r, p.y - r, r * 2, r * 2);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function steamIntensity(time) {
+    return clamp(0.25 + ease((time - 0.6) / 2.5) * 0.75 - ease((time - 7) / 3) * 0.35, 0.2, 1);
+  }
+
+  function step(dt) {
+    const I = steamIntensity(t);
+    if (!reduce) {
+      if (fx() < dt * 14 * I) {
+        const rad = 78 * Math.sqrt(fx()), th = fx() * Math.PI * 2;
+        steam.push({ x: Math.cos(th) * rad, y: Math.sin(th) * rad, vx: (fx() - 0.5) * 6 + 3, vy: -8 - fx() * 8, r0: 8 + fx() * 6, grow: 24 + fx() * 18, age: 0, life: 2.6 + fx() * 1.6, alpha: 0.10 + fx() * 0.12 });
+      }
+      if (fx() < dt * 10 * I) {
+        const rad = 88 * Math.sqrt(fx()), th = fx() * Math.PI * 2;
+        bubbles.push({ x: Math.cos(th) * rad, y: Math.sin(th) * rad, r: 1 + fx() * 2.6, age: 0, life: 0.7 + fx() * 0.9 });
+      }
+    }
+    for (const arr of [steam, bubbles]) {
+      for (let i = arr.length - 1; i >= 0; i--) {
+        const p = arr[i]; p.age += dt;
+        if (p.vx !== undefined) { p.x += p.vx * dt; p.y += p.vy * dt; }
+        if (p.age >= p.life) arr.splice(i, 1);
+      }
+    }
+  }
+
+  // ---------- Frame ----------
+  function draw() {
+    const k = S / 260;
+    ctx.setTransform(dpr * k, 0, 0, dpr * k, dpr * S / 2, dpr * S / 2);
+    drawTable();
+    drawPot();
+    const blend = previous ? ease((t - switchAt) / 0.9) : 1;
+    if (previous && blend < 1) drawSauce(previous, 1, t);
+    drawSauce(current, blend, t);
+    ctx.save(); ctx.beginPath(); ctx.arc(0, 0, SR, 0, Math.PI * 2); ctx.clip();
+    drawBubbles(current);
+    ctx.restore();
+    const sc = scenes[current];
+    for (const m of sc.mussels) drawMussel(m, t, current);
+    for (const g of sc.garnish) drawGarnish(g, t);
+    drawSteam();
+  }
+
+  // ---------- UI ----------
+  const app = document.getElementById("app");
+  const stepEls = [...document.querySelectorAll("#steps li")];
+  const tabs = [...document.querySelectorAll(".tab")];
+
+  function fillCard(key) {
+    const s = SAUCES[key];
+    app.dataset.sauce = key;
+    document.getElementById("h1sauce").textContent = s.name;
+    document.getElementById("name").textContent = s.name;
+    document.getElementById("kicker").textContent = s.kicker;
+    document.getElementById("desc").textContent = s.desc;
+    document.getElementById("meta").innerHTML = s.meta.map(([a, b]) => `<span>${a} <strong>${b}</strong></span>`).join("");
+    document.getElementById("ingr").innerHTML = s.ingr.map(([q, n]) => `<li><span class="q">${q}</span><span>${n}</span></li>`).join("");
+    tabs.forEach(b => b.setAttribute("aria-selected", String(b.dataset.key === key)));
+  }
+
+  function updateSteps() {
+    let start = 0;
+    stepEls.forEach((li, i) => {
+      const end = STEP_ENDS[i];
+      const p = clamp((t - start) / (end - start));
+      li.querySelector("i").style.width = (p * 100).toFixed(1) + "%";
+      li.classList.toggle("on", t >= start);
+      start = end;
+    });
+  }
+
+  function cook(key, keepSauceBlend = true) {
+    previous = keepSauceBlend && key !== current ? current : null;
+    current = key;
+    t = 0; switchAt = 0;
+    steam.length = 0; bubbles.length = 0;
+    fillCard(key);
+  }
+
+  tabs.forEach(b => b.addEventListener("click", () => {
+    cook(b.dataset.key);
+    if (reduce && !playing) { t = 9; previous = null; draw(); updateSteps(); }
+  }));
+  tabs.forEach((b, i) => b.addEventListener("keydown", e => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    const n = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+    n.focus(); n.click();
+  }));
+
+  const pauseBtn = document.getElementById("pause");
+  function setPlaying(v) {
+    playing = v; pauseBtn.textContent = v ? "Pause" : "Weiter";
+    if (v) { last = performance.now(); requestAnimationFrame(loop); }
+  }
+  pauseBtn.addEventListener("click", () => setPlaying(!playing));
+  document.getElementById("replay").addEventListener("click", () => { cook(current, false); if (!playing) setPlaying(true); });
+  const autoBox = document.getElementById("autoplay");
+  autoBox.checked = auto;
+  autoBox.addEventListener("change", () => { auto = autoBox.checked; });
+
+  let last = performance.now();
+  function loop(now) {
+    if (!playing) return;
+    const dt = Math.min((now - last) / 1000, 0.05); last = now;
+    t += dt;
+    if (auto && t > CYCLE) cook(ORDER[(ORDER.indexOf(current) + 1) % ORDER.length]);
+    if (reduce && t > 9) { setPlaying(false); }
+    step(dt);
+    draw();
+    updateSteps();
+    requestAnimationFrame(loop);
+  }
+
+  fillCard(current);
+  new ResizeObserver(resize).observe(canvas.parentElement);
+  resize();
+  updateSteps();
+  pauseBtn.textContent = playing ? "Pause" : "Weiter";
+  if (playing) requestAnimationFrame(loop);
+})();
+</script>
