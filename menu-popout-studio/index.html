@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Menu Pop-out Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: zweispaltige Werkbank – links Formular (Restaurant, Video, Gerichte), rechts klebende Prompt-Vorschau mit Timeline */
+:root {
+  --bg: #f3f2ee;
+  --surface: #ffffff;
+  --ink: #1f2420;
+  --muted: #646b63;
+  --line: #d9dbd3;
+  --accent: #4d6a2c;      /* Basilikum */
+  --accent-ink: #ffffff;
+  --tomato: #b8432f;
+  --code-bg: #20251f;
+  --code-ink: #e8eadf;
+  --seg-a: #4d6a2c; --seg-b: #b8432f; --seg-c: #c7922e; --seg-d: #3f6f7a; --seg-e: #7a4f7a;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161915; --surface: #1f231e; --ink: #e9ebe3; --muted: #9aa294; --line: #343a32;
+    --accent: #9cbf6a; --accent-ink: #141711; --tomato: #e0745f;
+    --code-bg: #0f120e; --code-ink: #e3e7d8;
+    --seg-a: #9cbf6a; --seg-b: #e0745f; --seg-c: #dcb05a; --seg-d: #6fb0bd; --seg-e: #b98bb9;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161915; --surface: #1f231e; --ink: #e9ebe3; --muted: #9aa294; --line: #343a32;
+  --accent: #9cbf6a; --accent-ink: #141711; --tomato: #e0745f;
+  --code-bg: #0f120e; --code-ink: #e3e7d8;
+  --seg-a: #9cbf6a; --seg-b: #e0745f; --seg-c: #dcb05a; --seg-d: #6fb0bd; --seg-e: #b98bb9;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; }
+header.top { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.1; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+h1 span { color: var(--tomato); }
+.sub { color: var(--muted); margin: 4px 0 0; max-width: 60ch; }
+.profiles { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 960px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+section.block { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 12px; }
+.col { display: grid; gap: 18px; min-width: 0; }
+h2 { font-family: var(--font-display); font-weight: 500; font-size: 1.15rem; margin: 0; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
+.fields.three { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 560px) { .fields, .fields.three { grid-template-columns: minmax(0, 1fr); } }
+.full { grid-column: 1 / -1; }
+label.f { display: grid; gap: 4px; min-width: 0; }
+label.f > span { font-size: 0.78rem; font-weight: 600; color: var(--muted); }
+input[type=text], input[type=number], select, textarea {
+  width: 100%; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px;
+}
+textarea { resize: vertical; min-height: 60px; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.check { display: flex; gap: 8px; align-items: center; font-size: 0.9rem; }
+button { font: inherit; font-weight: 600; border-radius: 6px; padding: 7px 12px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button.danger { color: var(--tomato); }
+button.icon { padding: 4px 9px; font-size: 0.85rem; }
+button:disabled { opacity: 0.4; cursor: default; }
+
+.dish { border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: grid; gap: 10px; background: var(--bg); }
+.dish-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dish-num { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; color: var(--accent-ink); flex: none; }
+.dish-title { font-weight: 600; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.dish-time { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.dish-actions { display: flex; gap: 4px; }
+.hero-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--tomato); font-weight: 700; }
+
+.sticky { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); display: grid; gap: 12px; min-width: 0; }
+@media (max-width: 960px) { .sticky { position: static; } }
+.timeline { display: flex; height: 34px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+.seg { display: grid; place-items: center; font-size: 0.72rem; font-weight: 600; color: var(--accent-ink); min-width: 0; overflow: hidden; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.seg.intro { background: var(--line); color: var(--ink); }
+.stats { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.stats b { color: var(--ink); }
+.warn { color: var(--tomato); font-weight: 600; }
+pre.prompt { margin: 0; background: var(--code-bg); color: var(--code-ink); font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55; padding: 16px; border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 70vh; overflow: auto; }
+@media (max-width: 960px) { pre.prompt { max-height: none; } }
+.bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.toast { font-size: 0.85rem; color: var(--accent); font-weight: 600; min-height: 1.2em; }
+.io { display: grid; gap: 8px; }
+.io textarea { font-family: var(--font-mono); font-size: 0.75rem; min-height: 140px; }
+.hint { font-size: 0.82rem; color: var(--muted); margin: 0; }
+@media (prefers-reduced-motion: no-preference) { button { transition: border-color .15s, background .15s; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Prompt-Generator · KI-Video</div>
+      <h1>Menu Pop-out <span>Studio</span></h1>
+      <p class="sub">Restaurant und Gerichte eintragen, der One-Take-Werbespot-Prompt mit 3D-Pop-outs aus der Speisekarte entsteht live daneben.</p>
+    </div>
+    <div class="profiles">
+      <label class="f" style="min-width:200px"><span>Restaurant</span>
+        <select id="profileSelect"></select>
+      </label>
+      <button id="newProfile" type="button">+ Neu</button>
+      <button id="dupProfile" type="button">Duplizieren</button>
+      <button id="delProfile" type="button" class="danger">Löschen</button>
+    </div>
+  </header>
+  <p class="hint" id="delConfirm" hidden><span class="warn">Restaurant wirklich löschen?</span> <button type="button" id="delYes" class="danger icon">Ja, löschen</button> <button type="button" id="delNo" class="icon">Abbrechen</button></p>
+
+  <div class="grid">
+    <div class="col">
+      <section class="block">
+        <h2>Restaurant &amp; Referenzen</h2>
+        <div class="fields">
+          <label class="f"><span>Restaurantname (wie im Logo)</span><input type="text" id="brand" data-k="brand"></label>
+          <label class="f"><span>Küche</span><input type="text" id="cuisine" data-k="cuisine" placeholder="Italian"></label>
+          <label class="f"><span>Datei: Speisekarten-Foto</span><input type="text" id="menuFile" data-k="menuFile"></label>
+          <label class="f"><span>Datei: Logo</span><input type="text" id="logoFile" data-k="logoFile"></label>
+          <label class="f full"><span>Logo-Beschreibung (englisch)</span><input type="text" id="logoDesc" data-k="logoDesc" placeholder="gold-gradient"></label>
+          <label class="f"><span>Datei: Speisekarten-Buch</span><input type="text" id="bookFile" data-k="bookFile"></label>
+          <label class="f"><span>Buch kurz (englisch)</span><input type="text" id="bookShort" data-k="bookShort" placeholder="woven book"></label>
+          <label class="f full"><span>Buch-Beschreibung (englisch)</span><input type="text" id="bookDesc" data-k="bookDesc"></label>
+          <label class="check full"><input type="checkbox" id="plaque" data-k="plaque"> Buch hat ein Namensschild, das über dem Blatt sichtbar bleiben soll</label>
+          <label class="f"><span>Untergrund</span><input type="text" id="surface" data-k="surface"></label>
+          <label class="f"><span>Licht</span><input type="text" id="lighting" data-k="lighting"></label>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Video</h2>
+        <div class="fields three">
+          <label class="f"><span>Länge (s)</span><input type="number" id="duration" data-k="duration" min="4" max="120" step="1"></label>
+          <label class="f"><span>Intro (s)</span><input type="number" id="intro" data-k="intro" min="0" max="20" step="0.5"></label>
+          <label class="f"><span>Auflösung</span><select id="res" data-k="res"><option>4K</option><option>1080p</option><option>720p</option></select></label>
+          <label class="f"><span>FPS</span><select id="fps" data-k="fps"><option>60</option><option>30</option><option>24</option></select></label>
+          <label class="f full"><span>Kamera &amp; Stil</span><textarea id="style" data-k="style" rows="4"></textarea></label>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Gerichte <button type="button" id="addDish" class="primary icon">+ Gericht</button></h2>
+        <p class="hint">Text auf der Karte exakt wie gedruckt übernehmen. Das letzte Gericht ist automatisch das Hero-Finale.</p>
+        <div id="dishes" style="display:grid;gap:12px"></div>
+      </section>
+
+      <section class="block">
+        <h2>Sichern &amp; übertragen</h2>
+        <p class="hint">Alle Restaurants werden in diesem Browser gespeichert. Für ein anderes Gerät: JSON exportieren, kopieren und dort einfügen.</p>
+        <div class="bar">
+          <button type="button" id="exportBtn">Alle als JSON anzeigen</button>
+          <button type="button" id="importBtn">JSON importieren</button>
+          <label class="f" style="display:inline-grid"><span>oder Datei laden</span><input type="file" id="importFile" accept="application/json,.json"></label>
+        </div>
+        <div class="io" id="ioBox" hidden>
+          <textarea id="ioText" spellcheck="false"></textarea>
+          <div class="bar"><button type="button" id="ioCopy">Kopieren</button><button type="button" id="ioApply" class="primary">Import übernehmen</button><span class="toast" id="ioToast"></span></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="sticky">
+      <section class="block">
+        <h2>Timeline <span class="stats" id="stats"></span></h2>
+        <div class="timeline" id="timeline"></div>
+      </section>
+      <section class="block">
+        <h2>Prompt
+          <span class="bar"><span class="toast" id="copyToast"></span><button type="button" id="copyPrompt" class="primary">Prompt kopieren</button></span>
+        </h2>
+        <pre class="prompt" id="prompt" tabindex="0"></pre>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var KEY = "menuPopoutStudio.v1";
+  var SEG = ["--seg-a", "--seg-b", "--seg-c", "--seg-d", "--seg-e"];
+  var MOVES = {
+    popout: { label: "3D-Pop-out", head: "3D POP-OUT" },
+    orbit:  { label: "Flowing Orbit", head: "FLOWING ORBIT" },
+    roll:   { label: "Cinematic Roll", head: "CINEMATIC ROLL" },
+    swoop:  { label: "Dynamic Swoop", head: "DYNAMIC SWOOP" },
+    pushin: { label: "Push-in", head: "PUSH-IN" },
+    crane:  { label: "Crane Rise", head: "CRANE RISE" },
+    glide:  { label: "Low Glide", head: "LOW GLIDE" }
+  };
+  var DEFAULT_STYLE = "One continuous camera movement, seamless transitions and no hard cuts. Dynamic speed-ramping with extreme slow-motion moments, realistic food textures, physically believable sauce and steam, shallow depth of field, subtle anamorphic lens flares and warm cinematic commercial colour grading.";
+
+  function uid() { return Math.random().toString(36).slice(2, 10); }
+
+  function sample() {
+    return {
+      id: uid(), brand: "Da Mimmo", cuisine: "Italian",
+      menuFile: "IMG_0350 2.JPG", logoFile: "damimmo(1).png", logoDesc: "gold-gradient",
+      bookFile: "Unknown.png", bookShort: "woven book",
+      bookDesc: "natural beige woven cover and rectangular tan “Da Mimmo” plaque", plaque: true,
+      surface: "a warm wooden restaurant table", lighting: "Warm restaurant lighting",
+      duration: 17, intro: 2, res: "4K", fps: "60", style: DEFAULT_STYLE,
+      dishes: [
+        { title: "Pasta with Gorgonzola, pumpkin and guanciale", menu: "Nudeln in Gorgonzola-Kürbis-Soße mit Guanciale", price: "", short: "pasta", move: "popout",
+          emerge: "a refined ceramic pasta plate",
+          detail: "Pasta coated in creamy Gorgonzola-pumpkin sauce moves toward the lens, topped with crisp golden guanciale. In extreme slow motion, glossy sauce clings to the pasta while delicate steam curls upward." },
+        { title: "Fish fillet with saffron cream", menu: "Fischfilet in Sahne-Safran-Soße und Gemüsejulienne, Salatbeilage", price: "", short: "fish", move: "orbit",
+          emerge: "a plate",
+          detail: "A tender fish fillet rests in silky golden saffron cream sauce alongside fine julienned vegetables, accompanied by a small side salad. Capture the delicate fish texture, glossy sauce and rising steam in a cinematic macro view." },
+        { title: "Grilled Angus rump steak", menu: "Zarte Scheiben vom Angus Rumpsteak gegrillt mit Pommes und Salatbeilage", price: "", short: "steak", move: "roll",
+          emerge: "a plate of tender grilled Angus rump steak slices, golden fries and a fresh side salad",
+          detail: "Low-angle lighting reveals the seared edges and succulent meat. A few fries briefly lift in slow motion before settling onto the floating plate." },
+        { title: "Braised beef with green peppercorn cream", menu: "Rinder Semmerrolle (Rinderschmorbraten) in Sahnesoße mit grünem Pfeffer, Gemüsebeilage", price: "", short: "braised beef", move: "swoop",
+          emerge: "a plate of tender sliced braised beef, accompanied by vegetables,",
+          detail: "Cream sauce studded with green peppercorns gently flows over the beef in extreme slow motion. Emphasize the moist braised texture, glossy sauce and soft volumetric steam." },
+        { title: "Pizza with mushrooms, Parma ham and caramelized onions", menu: "Pizza mit Tomatensoße, Mozzarella, gemischten Pilzen, Parmaschinken und karamellisierten Zwiebeln", price: "", short: "pizza", move: "pushin",
+          emerge: "a freshly baked pizza",
+          detail: "It reveals a crisp golden crust, rich tomato sauce, melted mozzarella, mixed mushrooms, delicate Parma ham and caramelized onions." }
+      ]
+    };
+  }
+  function blankProfile() {
+    var p = sample();
+    p.id = uid(); p.brand = "Neues Restaurant"; p.menuFile = "menu.jpg"; p.logoFile = "logo.png"; p.bookFile = "menu-book.jpg";
+    p.bookDesc = "leather cover and embossed name plaque";
+    p.bookShort = "menu book";
+    p.dishes = [blankDish("popout"), blankDish("orbit"), blankDish("pushin")];
+    return p;
+  }
+  function blankDish(move) { return { title: "", menu: "", price: "", short: "dish", move: move || "swoop", emerge: "a plate", detail: "" }; }
+
+  var state;
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) { var s = JSON.parse(raw); if (s && s.profiles && s.profiles.length) return s; }
+    } catch (e) {}
+    var p = sample();
+    return { currentId: p.id, profiles: [p] };
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function cur() {
+    for (var i = 0; i < state.profiles.length; i++) if (state.profiles[i].id === state.currentId) return state.profiles[i];
+    state.currentId = state.profiles[0].id; return state.profiles[0];
+  }
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function cap(s) { s = String(s || "").trim(); return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+  function trimEnd(s) { return String(s || "").trim().replace(/[,;]\s*$/, ""); }
+  function sentence(s) { s = String(s || "").trim(); if (!s) return ""; return /[.!?”"]$/.test(s) ? s : s + "."; }
+  var WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
+  function word(n) { return WORDS[n] || String(n); }
+  function fmt(t) {
+    var m = Math.floor(t / 60), s = Math.round((t - m * 60) * 10) / 10;
+    var ss = Number.isInteger(s) ? String(s).padStart(2, "0") : s.toFixed(1).padStart(4, "0");
+    return m + ":" + ss;
+  }
+
+  function timing(p) {
+    var n = p.dishes.length, D = Number(p.duration) || 0, I = Math.max(0, Number(p.intro) || 0);
+    var per = n ? (D - I) / n : 0;
+    var out = { intro: [0, I], dishes: [], per: per, D: D, I: I };
+    for (var i = 0; i < n; i++) out.dishes.push([I + per * i, I + per * (i + 1)]);
+    return out;
+  }
+
+  function lead(move, d, prev, isLast) {
+    var M = "“" + trimEnd(d.menu || d.title) + (d.price ? " – " + d.price : "") + "”";
+    var E = trimEnd(d.emerge) || "a plate";
+    var finalW = isLast ? "final " : "";
+    switch (move) {
+      case "orbit":
+        return (prev ? "The camera smoothly orbits the " + prev.short + " as it recedes toward its menu entry. " : "The camera smoothly orbits across the sheet. ") +
+          cap(E) + " rises from " + M + ".";
+      case "roll": return "A " + finalW + "controlled camera roll transitions toward " + M + ". " + cap(E) + " pops upward from the paper.";
+      case "swoop": return "The camera " + (isLast ? "makes a final swoop" : "swoops") + " toward " + M + ". " + cap(E) + " emerges from the menu.";
+      case "pushin": return "A " + finalW + "dramatic push-in reaches " + M + ". " + cap(E) + " rises from the menu surface.";
+      case "crane": return "The camera cranes upward and drifts across the sheet to " + M + ". " + cap(E) + " lifts off the paper.";
+      case "glide": return "The camera glides low across the paper toward " + M + ". " + cap(E) + " slides up out of the print.";
+      default: return "From " + M + ", " + E + " emerges upward from the printed sheet into three-dimensional space.";
+    }
+  }
+  function anchor(i, p, d) {
+    var b = p.bookShort || "menu book";
+    var list = [
+      "The logo-bearing sheet and " + b + " remain visible beneath and behind the floating " + (d.short || "plate") + ".",
+      "Maintain the menu sheet and " + b + " in the background.",
+      "Preserve the original placement of the paper, logo and book throughout the movement.",
+      "Keep the " + b + " and printed menu visible behind it."
+    ];
+    return list[i % list.length];
+  }
+
+  function buildPrompt(p) {
+    var t = timing(p), n = p.dishes.length, brand = p.brand || "Restaurant";
+    var logo = (p.logoDesc ? p.logoDesc + " " : "") + "“" + brand + "” logo";
+    var L = [];
+    L.push("A continuous " + t.D + "-second " + p.res + " " + p.fps + "fps cinematic commercial in one ultra-smooth one-take camera movement, showcasing " + word(n) + " " + (p.cuisine ? p.cuisine + " " : "") + (n === 1 ? "dish" : "dishes") + " through photorealistic 3D pop-out mechanics.");
+    L.push("");
+    L.push("REFERENCE ASSETS:");
+    if (p.menuFile) L.push("• “" + p.menuFile + "”: reference for the " + word(n) + " dish descriptions, prices and menu information.");
+    if (p.logoFile) L.push("• “" + p.logoFile + "”: exact " + logo + " to place prominently at the top of the printed menu sheet.");
+    if (p.bookFile) L.push("• “" + p.bookFile + "”: exact reference for the closed menu book beneath the sheet" + (p.bookDesc ? ", with its " + p.bookDesc : "") + ".");
+    L.push("");
+    L.push("BACKGROUND & PHYSICAL COMPOSITION:");
+    L.push("A white printed menu sheet lies flat on top of the closed " + (p.bookShort || "menu book") + (p.bookFile ? " from " + p.bookFile : "") + ", resting on " + (p.surface || "a restaurant table") + ". Scale and position the sheet so that the book cover remains clearly visible around its edges" + (p.plaque ? " and the book’s original “" + brand + "” plaque remains exposed above the sheet" : "") + ".");
+    L.push("");
+    L.push("Place the supplied " + logo + (p.logoFile ? " from " + p.logoFile : "") + " prominently at the top of the white menu sheet, above the dish descriptions. Preserve the logo’s exact lettering, proportions and colours; integrate it as printed artwork on the paper, without a rectangular background.");
+    L.push("");
+    L.push("Use the dish descriptions and prices from " + (p.menuFile || "the menu reference") + ". Keep the menu sheet, printed logo and menu book physically consistent throughout the video. The paper stays flat on the book while the food emerges from its corresponding printed entry.");
+    L.push("");
+    L.push((p.lighting || "Warm restaurant lighting") + " reveals the book’s texture, paper fibres and the printed logo. The sheet and book remain visible as the continuous background anchor behind each floating dish. Compose the shots so that the logo stays visible and is clearly readable in the opening and final frames.");
+    L.push("");
+    var sc = 1;
+    if (t.I > 0) {
+      L.push("SCENE " + sc++ + " (" + fmt(0) + "–" + fmt(t.I) + "): LOGO AND MENU INTRO.");
+      L.push("Begin with an elegant oblique overhead view showing the white menu sheet resting on the closed " + (p.bookShort || "menu book") + ". Clearly establish the " + logo + " printed at the top of the sheet" + (p.plaque ? ", the exposed book plaque" : "") + " and the book’s border. The camera smoothly pushes toward the menu, gliding from the logo toward the first dish entry.");
+      L.push("");
+    }
+    p.dishes.forEach(function (d, i) {
+      var isLast = i === n - 1 && n > 1, mv = MOVES[d.move] ? d.move : "popout";
+      var head = isLast ? "HERO POP-OUT" : MOVES[mv].head;
+      var title = (d.title || d.menu || "Dish " + (i + 1)).toUpperCase();
+      L.push("SCENE " + sc++ + " (" + fmt(t.dishes[i][0]) + "–" + fmt(t.dishes[i][1]) + "): " + head + " — " + title + ".");
+      var parts = [lead(mv, d, p.dishes[i - 1], isLast), sentence(d.detail)];
+      if (!isLast) parts.push(anchor(i, p, d));
+      L.push(parts.filter(Boolean).join(" "));
+      if (isLast) {
+        L.push("");
+        L.push("The camera glides close across the " + (d.short || "dish") + ", then gently pulls back and rises into an elegant final composition: the " + (d.short || "dish") + " floats above the lower portion of the sheet, while the exact " + logo + " is clearly readable at the top. Show the white sheet resting on the " + (p.bookShort || "menu book") + (p.plaque ? ", with the book’s original plaque" : ", with its") + " and textured edges visible. End on a steady cinematic hero frame.");
+      }
+      L.push("");
+    });
+    L.push("CAMERA & STYLE:");
+    L.push(p.style || DEFAULT_STYLE);
+    L.push("");
+    L.push("REFERENCE ACCURACY:");
+    L.push("Show exactly the " + word(n) + " specified " + (n === 1 ? "dish" : "dishes") + ". Preserve the supplied logo’s spelling and design, the book’s texture" + (p.plaque ? " and plaque" : "") + ", and the menu’s dish descriptions and prices. Keep the sheet resting on the closed book throughout. All food pop-outs originate from the printed sheet. Ensure the logo remains unobstructed in the opening and final hero frames.");
+    return L.join("\n");
+  }
+
+  /* ---------- Rendering ---------- */
+  function renderProfiles() {
+    var sel = $("profileSelect");
+    sel.innerHTML = state.profiles.map(function (p) {
+      return '<option value="' + esc(p.id) + '"' + (p.id === state.currentId ? " selected" : "") + ">" + esc(p.brand || "Ohne Namen") + "</option>";
+    }).join("");
+    $("delProfile").disabled = state.profiles.length < 2;
+  }
+  function renderFields() {
+    var p = cur();
+    document.querySelectorAll("[data-k]").forEach(function (el) {
+      var v = p[el.dataset.k];
+      if (el.type === "checkbox") el.checked = !!v; else el.value = v == null ? "" : v;
+    });
+  }
+  function moveOptions(sel) {
+    return Object.keys(MOVES).map(function (k) { return '<option value="' + k + '"' + (k === sel ? " selected" : "") + ">" + MOVES[k].label + "</option>"; }).join("");
+  }
+  function renderDishes() {
+    var p = cur(), t = timing(p), n = p.dishes.length;
+    $("dishes").innerHTML = p.dishes.map(function (d, i) {
+      var color = "var(" + SEG[i % SEG.length] + ")";
+      var last = i === n - 1 && n > 1;
+      return '<div class="dish" data-i="' + i + '">' +
+        '<div class="dish-head"><span class="dish-num" style="background:' + color + '">' + (i + 1) + '</span>' +
+        '<span class="dish-title">' + esc(d.title || d.menu || "Neues Gericht") + (last ? ' <span class="hero-tag">Hero-Finale</span>' : "") + '</span>' +
+        '<span class="dish-time">' + fmt(t.dishes[i][0]) + "–" + fmt(t.dishes[i][1]) + '</span>' +
+        '<span class="dish-actions">' +
+        '<button type="button" class="icon" data-act="up" aria-label="Nach oben"' + (i === 0 ? " disabled" : "") + '>↑</button>' +
+        '<button type="button" class="icon" data-act="down" aria-label="Nach unten"' + (i === n - 1 ? " disabled" : "") + '>↓</button>' +
+        '<button type="button" class="icon danger" data-act="del" aria-label="Entfernen"' + (n < 2 ? " disabled" : "") + '>✕</button>' +
+        '</span></div>' +
+        '<div class="fields">' +
+        f(i, "menu", "Text auf der Karte (exakt)", d.menu, "full") +
+        f(i, "title", "Szenen-Titel (englisch)", d.title) +
+        f(i, "price", "Preis (optional)", d.price) +
+        f(i, "short", "Kurzname (englisch, z. B. pizza)", d.short) +
+        '<label class="f"><span>Kamerabewegung</span><select id="d' + i + '-move" data-d="move">' + moveOptions(d.move) + '</select></label>' +
+        f(i, "emerge", "Was aufsteigt (englisch)", d.emerge, "full") +
+        '<label class="f full"><span>Details, Zeitlupe, Textur (englisch)</span><textarea id="d' + i + '-detail" data-d="detail" rows="3">' + esc(d.detail) + '</textarea></label>' +
+        '</div></div>';
+    }).join("");
+    function f(i, k, label, v, cls) {
+      return '<label class="f' + (cls ? " " + cls : "") + '"><span>' + label + '</span><input type="text" id="d' + i + "-" + k + '" data-d="' + k + '" value="' + esc(v) + '"></label>';
+    }
+  }
+  function renderOutput() {
+    var p = cur(), t = timing(p), n = p.dishes.length;
+    var tl = "";
+    if (t.I > 0 && t.D > 0) tl += '<div class="seg intro" style="flex:' + t.I + '">Intro</div>';
+    p.dishes.forEach(function (d, i) {
+      tl += '<div class="seg" title="' + esc(d.title || d.menu) + '" style="flex:' + Math.max(t.per, 0.01) + ";background:var(" + SEG[i % SEG.length] + ')">' + (i + 1) + "</div>";
+    });
+    $("timeline").innerHTML = tl;
+    var warn = t.per < 2 ? ' <span class="warn">unter 2 s pro Gericht, wirkt hektisch</span>' : "";
+    $("stats").innerHTML = "<span><b>" + n + "</b> Gerichte</span><span><b>" + (Math.round(t.per * 100) / 100) + " s</b> je Gericht</span>" + warn;
+    var txt = buildPrompt(p);
+    $("prompt").textContent = txt;
+  }
+  function renderAll() { renderProfiles(); renderFields(); renderDishes(); renderOutput(); }
+
+  /* ---------- Events ---------- */
+  document.addEventListener("input", function (e) {
+    var el = e.target, p = cur();
+    if (el.dataset.k) {
+      var v = el.type === "checkbox" ? el.checked : el.value;
+      if (el.type === "number") v = el.value === "" ? "" : Number(el.value);
+      p[el.dataset.k] = v;
+      if (el.dataset.k === "brand") renderProfiles();
+      if (el.dataset.k === "duration" || el.dataset.k === "intro") updateDishTimes();
+    } else if (el.dataset.d) {
+      var box = el.closest(".dish"), i = Number(box.dataset.i);
+      p.dishes[i][el.dataset.d] = el.value;
+      if (el.dataset.d === "title" || el.dataset.d === "menu") {
+        var d = p.dishes[i], tEl = box.querySelector(".dish-title");
+        var tag = tEl.querySelector(".hero-tag");
+        tEl.textContent = (d.title || d.menu || "Neues Gericht") + (tag ? " " : "");
+        if (tag) tEl.appendChild(tag);
+      }
+    } else return;
+    save(); renderOutput();
+  });
+  document.addEventListener("change", function (e) {
+    if (e.target.dataset.d === "move" || e.target.dataset.k) { var ev = new Event("input", { bubbles: true }); e.target.dispatchEvent(ev); }
+  });
+  function updateDishTimes() {
+    var t = timing(cur());
+    document.querySelectorAll(".dish").forEach(function (box, i) { box.querySelector(".dish-time").textContent = fmt(t.dishes[i][0]) + "–" + fmt(t.dishes[i][1]); });
+  }
+  $("dishes").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-act]"); if (!b) return;
+    var p = cur(), i = Number(b.closest(".dish").dataset.i), a = b.dataset.act;
+    if (a === "del") p.dishes.splice(i, 1);
+    if (a === "up" && i > 0) p.dishes.splice(i - 1, 0, p.dishes.splice(i, 1)[0]);
+    if (a === "down" && i < p.dishes.length - 1) p.dishes.splice(i + 1, 0, p.dishes.splice(i, 1)[0]);
+    save(); renderDishes(); renderOutput();
+  });
+  $("addDish").addEventListener("click", function () {
+    var p = cur(); p.dishes.push(blankDish("swoop"));
+    save(); renderDishes(); renderOutput();
+    var last = document.querySelector('.dish:last-child input[data-d="menu"]'); if (last) last.focus();
+  });
+  $("profileSelect").addEventListener("change", function (e) { state.currentId = e.target.value; save(); renderAll(); });
+  $("newProfile").addEventListener("click", function () { var p = blankProfile(); state.profiles.push(p); state.currentId = p.id; save(); renderAll(); $("brand").focus(); $("brand").select(); });
+  $("dupProfile").addEventListener("click", function () {
+    var p = JSON.parse(JSON.stringify(cur())); p.id = uid(); p.brand = (p.brand || "") + " (Kopie)";
+    state.profiles.push(p); state.currentId = p.id; save(); renderAll();
+  });
+  $("delProfile").addEventListener("click", function () { if (state.profiles.length > 1) $("delConfirm").hidden = false; });
+  $("delNo").addEventListener("click", function () { $("delConfirm").hidden = true; });
+  $("delYes").addEventListener("click", function () {
+    state.profiles = state.profiles.filter(function (p) { return p.id !== state.currentId; });
+    state.currentId = state.profiles[0].id; $("delConfirm").hidden = true; save(); renderAll();
+  });
+
+  function flash(el, msg) { el.textContent = msg; clearTimeout(el._t); el._t = setTimeout(function () { el.textContent = ""; }, 2200); }
+  function selectText(el) {
+    if (el.select) { el.focus(); el.select(); return; }
+    var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  }
+  function copy(text, el, toast) {
+    try {
+      navigator.clipboard.writeText(text).then(function () { flash(toast, "Kopiert"); }, function () { selectText(el); flash(toast, "Markiert, mit Strg/Cmd+C kopieren"); });
+    } catch (e) { selectText(el); flash(toast, "Markiert, mit Strg/Cmd+C kopieren"); }
+  }
+  $("copyPrompt").addEventListener("click", function () { copy($("prompt").textContent, $("prompt"), $("copyToast")); });
+
+  $("exportBtn").addEventListener("click", function () {
+    $("ioBox").hidden = false; $("ioApply").hidden = true; $("ioCopy").hidden = false;
+    $("ioText").value = JSON.stringify(state.profiles, null, 2);
+  });
+  $("importBtn").addEventListener("click", function () {
+    $("ioBox").hidden = false; $("ioApply").hidden = false; $("ioCopy").hidden = true;
+    $("ioText").value = ""; $("ioText").placeholder = "Exportiertes JSON hier einfügen …"; $("ioText").focus();
+  });
+  $("ioCopy").addEventListener("click", function () { copy($("ioText").value, $("ioText"), $("ioToast")); });
+  function importJSON(text) {
+    try {
+      var data = JSON.parse(text);
+      var list = Array.isArray(data) ? data : (data && data.profiles) ? data.profiles : [data];
+      var added = 0;
+      list.forEach(function (p) {
+        if (!p || !Array.isArray(p.dishes)) return;
+        var base = sample(); base.dishes = [];
+        var np = Object.assign(base, p, { id: uid() });
+        np.dishes = p.dishes.map(function (d) { return Object.assign(blankDish(), d); });
+        if (!np.dishes.length) np.dishes.push(blankDish("popout"));
+        state.profiles.push(np); state.currentId = np.id; added++;
+      });
+      if (!added) throw new Error("Keine Restaurants mit Gerichten gefunden.");
+      save(); renderAll(); flash($("ioToast"), added + " Restaurant(s) importiert");
+    } catch (e) {
+      flash($("ioToast"), "Import fehlgeschlagen: " + (e.message || "ungültiges JSON"));
+    }
+  }
+  $("ioApply").addEventListener("click", function () { importJSON($("ioText").value); });
+  $("importFile").addEventListener("change", function (e) {
+    var file = e.target.files && e.target.files[0]; if (!file) return;
+    var r = new FileReader();
+    r.onload = function () { $("ioBox").hidden = false; $("ioApply").hidden = true; $("ioCopy").hidden = true; importJSON(String(r.result)); };
+    r.readAsText(file); e.target.value = "";
+  });
+
+  state = load();
+  renderAll();
+})();
+</script>
+</body>
+</html>
