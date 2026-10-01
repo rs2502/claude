@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ad Director Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: slate bar on top, numbered production steps, one working column of cards; prompts render as mono "script pages". */
+:root{
+  --bg:#ECEEF1; --surface:#FFFFFF; --sunk:#F4F5F7; --ink:#15171C; --muted:#5A6170; --line:#D4D8DF;
+  --tally:#C8102E; --tally-ink:#FFFFFF; --ok:#1E7A4C; --chip:#E4E7EC;
+  --f-display:'Barlow Condensed','Arial Narrow',sans-serif;
+  --f-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101216; --surface:#191C22; --sunk:#13161B; --ink:#E6E8ED; --muted:#9AA1AE; --line:#2C313A;
+  --tally:#FF4D5E; --tally-ink:#1A0609; --ok:#4CC38A; --chip:#252A32; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101216; --surface:#191C22; --sunk:#13161B; --ink:#E6E8ED; --muted:#9AA1AE; --line:#2C313A;
+  --tally:#FF4D5E; --tally-ink:#1A0609; --ok:#4CC38A; --chip:#252A32; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:0 64px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;letter-spacing:.02em;text-wrap:balance;margin:0}
+h2{font-size:1.6rem;text-transform:uppercase}
+h3{font-size:1.2rem;text-transform:uppercase}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+
+/* slate bar */
+.slate{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ink);color:var(--bg)}
+.slate .in{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-size:1.45rem;text-transform:uppercase;letter-spacing:.06em}
+.rec{width:11px;height:11px;border-radius:50%;background:var(--tally);box-shadow:0 0 0 3px color-mix(in srgb,var(--tally) 30%,transparent)}
+.slate .meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--f-mono);font-size:.82rem;align-items:center}
+.slate .meta b{font-weight:500;color:color-mix(in srgb,var(--bg) 60%,var(--ink))}
+.slate .tc{font-size:1.05rem;letter-spacing:.04em}
+.saved{margin-left:auto;font-family:var(--f-mono);font-size:.75rem;color:color-mix(in srgb,var(--bg) 55%,var(--ink))}
+
+/* steps */
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 22px}
+.steps button{font:600 .95rem var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:9px 16px;border-radius:999px;cursor:pointer;display:flex;gap:8px;align-items:center}
+.steps button .n{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.steps button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.steps button[aria-selected="true"] .n{color:color-mix(in srgb,var(--bg) 60%,var(--ink))}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--tally);outline-offset:2px}
+
+.intro{display:grid;gap:6px;margin-bottom:18px;max-width:70ch}
+.group{display:grid;gap:14px;margin-bottom:30px}
+.group-head{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:14px;min-width:0}
+.card-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.card-head .grow{flex:1 1 200px;min-width:0}
+.ref{font:500 .8rem var(--f-mono);background:var(--tally);color:var(--tally-ink);padding:2px 8px;border-radius:4px;white-space:nowrap}
+.ref.alt{background:var(--chip);color:var(--ink)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+label.f{display:grid;gap:5px;min-width:0}
+label.f>span{font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+input[type=text],select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--sunk);border:1px solid var(--line);border-radius:7px;padding:9px 11px}
+textarea{min-height:88px;resize:vertical;font-size:.92rem}
+.hint{font-size:.8rem;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.check{display:flex;gap:8px;align-items:center;font-size:.92rem;cursor:pointer}
+.check input{width:17px;height:17px;accent-color:var(--tally)}
+
+.btn{font:600 .88rem var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 13px;border-radius:7px;cursor:pointer}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--tally);border-color:var(--tally);color:var(--tally-ink)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--tally)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 .84rem var(--f-body);border:1px solid var(--line);background:var(--sunk);color:var(--ink);padding:5px 11px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.thumb{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.thumb img{width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid var(--line);background:var(--sunk)}
+.thumb .ph{width:72px;height:72px;border-radius:6px;border:1px dashed var(--line);display:grid;place-items:center;font:500 .7rem var(--f-mono);color:var(--muted);text-align:center;padding:4px}
+.file{position:relative;overflow:hidden}
+.file input{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+details.out{border-top:1px dashed var(--line);padding-top:10px}
+details.out>summary{cursor:pointer;font-weight:600;font-size:.9rem}
+.prompt{display:grid;gap:8px;margin-top:10px;min-width:0}
+.prompt-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.prompt-head b{font-family:var(--f-display);font-size:1.05rem;text-transform:uppercase;letter-spacing:.04em}
+pre.code{margin:0;background:var(--sunk);border:1px solid var(--line);border-left:3px solid var(--tally);border-radius:6px;padding:12px 14px;font:400 .82rem/1.6 var(--f-mono);white-space:pre-wrap;word-break:break-word;max-height:460px;overflow:auto}
+.note{font-size:.88rem;background:var(--sunk);border:1px solid var(--line);border-radius:7px;padding:10px 12px}
+
+/* acts timeline */
+.timeline{display:flex;border-radius:7px;overflow:hidden;border:1px solid var(--line);font:500 .78rem var(--f-mono)}
+.timeline div{flex:1;padding:7px 8px;background:var(--surface);border-right:1px solid var(--line);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.timeline div:last-child{border-right:0}
+.timeline .tr{flex:0 0 auto;background:var(--ink);color:var(--bg);padding:7px 6px}
+.act-tc{font:500 .85rem var(--f-mono);color:var(--muted)}
+
+.reflist{display:grid;gap:6px;margin:0;padding:0;list-style:none;counter-reset:r}
+.reflist li{display:flex;gap:10px;align-items:center;counter-increment:r;flex-wrap:wrap}
+.reflist li::before{content:counter(r);font:500 .78rem var(--f-mono);color:var(--muted);width:1.4em}
+.reflist img{width:34px;height:34px;object-fit:cover;border-radius:4px;border:1px solid var(--line)}
+
+.checklist{display:grid;gap:8px}
+.checklist label{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:11px 13px;cursor:pointer}
+.checklist input{margin-top:3px;width:17px;height:17px;accent-color:var(--ok);flex:0 0 auto}
+.checklist b{display:block}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:18px;color:var(--muted);font-size:.92rem}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:.88rem;z-index:20}
+@media (prefers-reduced-motion:no-preference){.toast{animation:pop .18s ease-out}@keyframes pop{from{transform:translate(-50%,8px);opacity:.4}}}
+@media (max-width:520px){.saved{margin-left:0}.slate .tc{font-size:.95rem}}
+</style>
+</head>
+<body>
+
+<header class="slate">
+  <div class="in">
+    <div class="logo"><span class="rec" aria-hidden="true"></span>Ad Director Studio</div>
+    <div class="meta">
+      <span><b>Projekt</b> <span id="m-name">–</span></span>
+      <span><b>Format</b> <span id="m-fmt">–</span></span>
+      <span class="tc"><b>TC</b> <span id="m-tc">00:00:00:00</span></span>
+    </div>
+    <span class="saved" id="m-saved">lokal gespeichert</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="steps" role="tablist" aria-label="Arbeitsschritte">
+    <button role="tab" id="t-kit" data-tab="kit"><span class="n">01</span>Kit</button>
+    <button role="tab" id="t-spot" data-tab="spot"><span class="n">02</span>Spot</button>
+    <button role="tab" id="t-prompts" data-tab="prompts"><span class="n">03</span>Prompts</button>
+    <button role="tab" id="t-check" data-tab="check"><span class="n">04</span>Prüfen</button>
+  </nav>
+  <main id="view"></main>
+</div>
+
+<script>
+(() => {
+'use strict';
+const KEY = 'adDirectorStudio.v1';
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 9);
+
+/* ---------- catalogs ---------- */
+const EFFECTS = [
+  {k:'splash', de:'Wasser-Explosion', en:'Huge realistic water splash, sparkling droplets suspended in the light.', r:'SPLASH'},
+  {k:'fly',    de:'Objekte fliegen zur Kamera', en:'Several pieces launch through the air toward the camera, spinning in slow motion.', r:'FLYING TOWARD LENS'},
+  {k:'toss',   de:'Pfannenschwung', en:'{He} performs a powerful professional pan toss; the food launches high above the pan and falls perfectly back.', r:'PAN TOSS'},
+  {k:'flame',  de:'Stichflamme', en:'A short controlled flame erupts and lights the scene for a moment.', r:'FLAME'},
+  {k:'steam',  de:'Dampf', en:'Dense volumetric steam rises and swirls in the light.', r:'STEAM'},
+  {k:'ramp',   de:'Speed Ramp', en:'SPEED RAMP: brief dramatic slow motion at the peak moment, then sudden acceleration back to full speed.', r:'SPEED RAMP'},
+  {k:'shake',  de:'Kamera-Shake', en:'Micro camera shake on every impact.', r:null},
+  {k:'rack',   de:'Rack Focus', en:'Rack focus from {his} eyes to the product.', r:'RACK FOCUS'},
+  {k:'laugh',  de:'Lachen in die Kamera', en:'{He} looks into the camera with a proud smile that breaks into a warm laugh.', r:'LAUGH'},
+  {k:'offer',  de:'Produkt in die Kamera', en:'{He} extends only {his} arms forward, offering the product toward the lens while {his} body stays in place.', r:'PRODUCT TO LENS'},
+  {k:'pushin', de:'Push-in', en:'The camera performs only a controlled straight push-in toward the product.', r:'PUSH-IN'},
+];
+const TRANSITIONS = {
+  lens:  {de:'Objekt füllt die Linse', obj:true,
+          out:(o,t)=>`One ${o} flies directly into the lens and completely covers 100% of the frame at exactly ${t} seconds.\nTRANSITION: the physical ${o} covers the lens. No fade, no normal cut.`,
+          into:o=>`Continue the exact motion: the same ${o} moves away from the lens, revealing`,
+          start:o=>`The shot begins with the frame completely covered by a ${o} pressed against the lens; it moves away, revealing`,
+          r:o=>`${o.toUpperCase()} FILLS LENS`},
+  steam: {de:'Dampf füllt die Linse', obj:false,
+          out:(o,t)=>`A massive blast of dense white steam rushes directly into the camera and completely covers 100% of the frame at exactly ${t} seconds.\nTRANSITION: real physical steam covers the lens. No fade, no normal cut.`,
+          into:()=>`Continue from the same dense white steam. The steam naturally dissolves and reveals`,
+          start:()=>`The shot begins with the frame completely filled by dense white steam. The steam naturally dissolves and reveals`,
+          r:()=>'WHITE STEAM FILLS LENS'},
+  whip:  {de:'Reißschwenk', obj:false,
+          out:(o,t)=>`At exactly ${t} seconds the camera whip-pans hard to the side; motion blur fills the whole frame.\nTRANSITION: whip-pan blur. No fade.`,
+          into:()=>`Continue out of the same whip-pan blur, revealing`,
+          start:()=>`The shot begins in heavy whip-pan motion blur that settles, revealing`,
+          r:()=>'WHIP PAN'},
+  match: {de:'Match Cut über Bewegung', obj:true,
+          out:(o,t)=>`At exactly ${t} seconds the ${o} falls toward the bottom of the frame.\nTRANSITION: match cut on the motion of the ${o}.`,
+          into:o=>`Match cut: the same ${o} continues falling into the new scene, revealing`,
+          start:o=>`The shot begins with the ${o} falling from the top of the frame, revealing`,
+          r:o=>`MATCH CUT ON ${o.toUpperCase()}`},
+  cut:   {de:'Harter Schnitt', obj:false,
+          out:(o,t)=>`Hard cut at exactly ${t} seconds.`,
+          into:()=>`After the hard cut we see`, start:()=>`The shot opens on`, r:()=>'CUT'},
+};
+const CHECKS = [
+  ['Gesicht','Ist die Person in jedem Akt dieselbe? Am kritischsten sind Nahaufnahmen am Ende.'],
+  ['Echte Orte','Stimmen Küche, Gastraum oder Laden mit euren Fotos überein? Nichts dazuerfunden: keine fremden Fliesen, Fenster oder Deko.'],
+  ['Schrift','Ist jeder Name im Bild exakt richtig geschrieben, etwa am Boot oder auf einem Schild? Sonst im Schnitt korrigieren.'],
+  ['Produkt','Sieht das Produkt echt aus? Muscheln zum Beispiel unordentlich und verschieden groß, nicht wie Weintrauben.'],
+  ['Übergänge','Füllen Objekt oder Dampf die Linse genau auf der Sekunde, an der der Akt endet?'],
+  ['Hände','Keine Fehler an Fingern beim Greifen, Schwenken und Halten.'],
+  ['Licht','Passt das Licht zum Ort? Edelstahl bleibt silbern und wird nicht kupferfarben.'],
+  ['Abgelehnt?','Erst unverändert nochmal abschicken. Die Filter entscheiden nicht immer gleich.'],
+  ['Logo','Logo und Slogan im Schnitt als Originaldatei einsetzen, nie generieren lassen.'],
+];
+
+/* ---------- example project ---------- */
+function example(){
+  const c = uid(), o1 = uid(), o2 = uid(), s1 = uid(), s2 = uid(), s3 = uid(), p1 = uid();
+  return {
+    v:1, example:true, name:'Da Mimmo', brand:'Da Mimmo', slogan:'Heute Morgen noch im Meer.', logo:null,
+    characters:[{id:c, name:'Mimmo', pron:'he', real:true, img:null,
+      look:'A man in his early fifties, tanned olive skin, Mediterranean features, oval face with defined cheekbones, dark brown eyes with deep laugh lines, straight prominent nose, full ears, short salt-and-pepper hair, textured and swept up on top, receding at the temples, a short neatly kept gray-white stubble beard, a wide warm smile. Compact medium build, strong shoulders. Thin gold chain necklace.',
+      outfits:[
+        {id:o1, name:'Boot', desc:'bright orange waterproof fishing bib overalls with black straps over a dark navy wool fisherman\'s sweater, sleeves pushed up, black knee-high rubber boots, orange rubber work gloves'},
+        {id:o2, name:'Küche', desc:'a crisp white double-breasted chef\'s jacket with black buttons, sleeves rolled to the forearms, a long black apron, black trousers, black clogs, a white towel tucked at the left hip, no chef\'s hat'}]}],
+    scenes:[
+      {id:s1, name:'Deck', real:false, img:null, desc:'the deck of a traditional Mediterranean wooden fishing boat at sunrise: wet varnished teak deck with puddles, navy-blue painted bulwarks with a varnished wood rail, a steel rope winch with a pulley on the left rail, stacked blue plastic crates and coiled ropes, long rows of orange mussel-farm buoys to the horizon, hazy hills, the sun low on the left, peach-pink sky, golden reflections, cool blue shadows'},
+      {id:s2, name:'Küche', real:true, img:null, desc:'the real restaurant kitchen: a professional all-stainless-steel kitchen with a large extractor hood with baffle filters, a steel rail with long black ladles, a slotted spoon and a wire mesh sieve, stainless wall shelves, a tall stainless fridge on the right, a gas range with heavy black cast-iron pan supports and black steel pans over small blue flames, a flat-top griddle at front left, a wok burner at front right; warm glow from the flames, the steel stays silver'},
+      {id:s3, name:'Gastraum', real:true, img:null, desc:'the real restaurant dining room: a bright conservatory-style room with large glass walls, heavy dark burgundy velvet curtains, a beige natural-stone wall with a white decorative flower ornament, a glossy white slatted ceiling, dark wood-look plank floor with sunlight across it, square dark wooden tables with small plants in glass jars and small cordless table lamps, gray velvet chairs with quilted backs, a green hedge and trees outside'}],
+    products:[{id:p1, name:'Cozze al pomodoro', real:true, img:null,
+      desc:'a wide, deep round white porcelain plate of about twenty-five opened glossy blue-black mussels with plump golden-orange meat in a glossy chunky red tomato sauce with garlic slices, red chili flakes, a shine of olive oil and chopped flat-leaf parsley, gently steaming',
+      notes:'Muscheln immer geöffnet. Teller mit beiden Händen am Rand halten. Dampf nur in Nahaufnahmen.'}],
+    spot:{fmt:'9:16', len:5, mode:'one', energy:'high', acts:[
+      {id:uid(), scene:s1, char:c, outfit:o1, products:[], super:'05:30', final:false,
+        action:'IMPORTANT: a heavy net packed with mussels starts completely submerged underwater beside the boat, never on the deck. A wet rope runs from his hands over the winch and the rail down into the sea. He pulls hard: the net bursts vertically up through the sea surface, packed with dozens of fresh, irregular, glossy blue-black mussels of mixed sizes with seaweed and byssus threads. Using the momentum he swings the full net over the rail and 15–20 mussels launch into the air toward the camera.',
+        fx:['splash','fly','ramp','shake'], tr:'lens', obj:'large glossy black mussel'},
+      {id:uid(), scene:s2, char:c, outfit:o2, products:[], super:'12:00', final:false,
+        action:'The flying mussels rain directly into his large black steel sauté pan of bubbling red tomato sauce with garlic. CLACK — immediate violent sizzle and explosive realistic steam. Afterwards he snaps the pan forward without leaving his position.',
+        fx:['toss','ramp','flame'], tr:'steam', obj:''},
+      {id:uid(), scene:s3, char:c, outfit:o2, products:[p1], super:'', final:true,
+        action:'He stands in the open space between the tables, already holding the finished dish.',
+        fx:['rack','laugh','offer','ramp','pushin'], tr:'cut', obj:''}]},
+    checks:{}
+  };
+}
+function blank(){
+  return {v:1, name:'Neues Projekt', brand:'', slogan:'', logo:null, characters:[], scenes:[], products:[],
+    spot:{fmt:'9:16', len:5, mode:'one', energy:'high', acts:[]}, checks:{}};
+}
+
+/* ---------- state ---------- */
+let S, tab = 'kit';
+function load(){
+  try { const raw = localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch (e) {}
+  return example();
+}
+let saveT;
+function save(){
+  clearTimeout(saveT);
+  saveT = setTimeout(() => {
+    try { localStorage.setItem(KEY, JSON.stringify(S)); $('#m-saved').textContent = 'lokal gespeichert'; }
+    catch (e) { $('#m-saved').textContent = 'nicht gespeichert, Projekt kopieren'; }
+  }, 250);
+}
+S = load();
+try { const t = localStorage.getItem(KEY + '.tab'); if (t) tab = t; } catch (e) {}
+if (['kit','spot','prompts','check'].indexOf(tab) < 0) tab = 'kit';
+if (/^#(kit|spot|prompts|check)$/.test(location.hash)) tab = location.hash.slice(1);
+
+/* ---------- refs ---------- */
+function refs(){
+  const m = {}; let b = 0;
+  S.characters.forEach((c, i) => { m[c.id] = 'A' + (i + 1); c.outfits.forEach(o => { m[o.id] = 'B' + (++b); }); });
+  S.scenes.forEach((s, i) => m[s.id] = 'D' + (i + 1));
+  S.products.forEach((p, i) => m[p.id] = 'P' + (i + 1));
+  return m;
+}
+const byId = (list, id) => list.find(x => x.id === id);
+function charOf(id){ return byId(S.characters, id); }
+function outfitOf(c, id){ return c ? byId(c.outfits, id) : null; }
+function pron(c){
+  const p = c && c.pron === 'she' ? {He:'She', he:'she', his:'her', him:'her', man:'woman'} :
+            c && c.pron === 'they' ? {He:'They', he:'they', his:'their', him:'them', man:'person'} :
+            {He:'He', he:'he', his:'his', him:'him', man:'man'};
+  return p;
+}
+const sub = (t, p) => t.replace(/\{He\}/g, p.He).replace(/\{he\}/g, p.he).replace(/\{his\}/g, p.his);
+const fmtWord = f => f === '16:9' ? 'horizontal widescreen' : f === '1:1' ? 'square' : 'vertical';
+const frameLine = f => f === '16:9' ? 'Wide 16:9 frame.' : f === '1:1' ? 'Square 1:1 frame.' : 'Vertical 9:16 frame.';
+const tc = s => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+const tcFull = s => '00:' + String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0') + ':00';
+const trim = s => String(s || '').trim();
+const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+const dot = s => { s = trim(s); return s && !/[.!?]$/.test(s) ? s + '.' : s; };
+
+/* ---------- kit prompts ---------- */
+function charPrompts(c){
+  const R = refs(), look = trim(c.look) || '[Person beschreiben]', out = [], f = S.spot.fmt;
+  const face = c.real ? `${R[c.id]} (echtes Foto)` : `${R[c.id]} (Face Lock)`;
+  if (!c.real) out.push({t:`${R[c.id]} · Face Lock`, att:'keins', p:
+`Photorealistic studio headshot of ${look.replace(/\.$/, '')}. Head-and-shoulders framing, facing the camera straight on, neutral relaxed expression, eyes looking directly into the lens, hair styled exactly as in the ad and clear of the face. Plain light-gray crew-neck t-shirt, no jewelry. Plain mid-gray seamless studio background, soft even frontal key light with gentle fill, no dramatic shadows. 85mm portrait lens look, sharp focus on the eyes, natural skin texture with visible pores, not retouched. Square 1:1 frame. No text, no watermark, no logo, no props, no hands in frame.`});
+  c.outfits.forEach(o => out.push({t:`${R[o.id]} · Outfit ${o.name || ''}`, att:face, p:
+`The same person as in the reference image, identical face, hair and features, full-body photograph standing in a relaxed natural pose, facing the camera, arms loose so the outfit reads clearly. ${dot(look)} Wearing ${trim(o.desc).replace(/\.$/, '') || '[Outfit beschreiben]'}. Plain mid-gray seamless studio background, soft even frontal studio light, no dramatic shadows. Photorealistic, natural fabric texture. ${f === '9:16' ? 'Vertical 9:16 frame.' : 'Vertical 2:3 frame.'} No text, no watermark, no logos on the clothing.`}));
+  if (c.outfits[0]) {
+    const o = c.outfits[0];
+    out.push({t:`Character Sheet (${o.name || 'Outfit 1'})`, att:`${face} + ${R[o.id]}`, p:
+`Character reference sheet of the same person from the reference images, identical face, hair and outfit in every view. Clean light-gray background, even soft lighting. Top row: full-body turnaround in six views – front, three-quarter left, left profile, back, three-quarter right, right profile – at the same scale with feet on the same baseline. Bottom row: head-and-shoulders close-ups – front, three-quarter, profile – and three expressions: a warm laugh, a focused look, a proud smile. ${dot(look)} Wearing ${trim(o.desc).replace(/\.$/, '')}. Photorealistic, consistent identity across all views. Wide 16:9 frame. No text labels, no grid numbers, no watermark.`});
+  }
+  return out;
+}
+function scenePrompts(s){
+  const R = refs(), d = trim(s.desc) || '[Ort beschreiben]', f = S.spot.fmt;
+  if (s.real) return [{t:`${R[s.id]} · Echter Ort, aufgeräumt`, att:'dein Foto vom Ort', p:
+`Edit the reference photo of the real location into a clean, cinematic, empty version of exactly this place. Keep the layout, architecture, furniture, materials and camera angle exactly as in the photo: ${d.replace(/\.$/, '')}. Remove all people, clutter, loose packaging and any on-screen badges or interface elements. Keep everything else real and recognisable. Cinematic light that suits the place; do not add any lamps, plants, tiles, windows or decor that are not in the original photo. Photorealistic, gentle film grain. ${frameLine(f)} No people, no readable text or labels, no watermark.`}];
+  return [{t:`${R[s.id]} · Kulisse`, att:'keins', p:
+`Photorealistic cinematic establishing shot of an empty location: ${d.replace(/\.$/, '')}. Clear foreground, midground and background with an open area where a person can stand and act. Shot on a cinema camera, 35mm lens, eye level, deep focus, gentle film grain. ${frameLine(f)} No people, no text, no signage with readable words, no watermark.`}];
+}
+function productPrompts(p){
+  const R = refs(), d = trim(p.desc) || '[Produkt beschreiben]';
+  if (p.real) return [];
+  return [{t:`${R[p.id]} · Produktbild`, att:'keins', p:
+`Photorealistic professional product photograph of ${d.replace(/\.$/, '')}. Shot from a 45-degree angle, 85mm lens, soft diffused studio light from the upper left with gentle fill, soft natural shadow, sharp focus. Clean pure white seamless background. Square 1:1 frame. No text unless printed on the product, no hands, no cutlery, no watermark.`}];
+}
+
+/* ---------- spot prompts ---------- */
+function actParts(a, i, acts, standalone){
+  const R = refs(), sp = S.spot, L = sp.len, start = i * L, end = start + L;
+  const sc = byId(S.scenes, a.scene), c = charOf(a.char), o = outfitOf(c, a.outfit), p = pron(c);
+  const prods = (a.products || []).map(id => byId(S.products, id)).filter(Boolean);
+  const lines = [];
+  const scName = sc ? sc.name : 'location';
+  const place = sc ? `${trim(sc.desc).replace(/\.$/, '')} (match the "${sc.name}" reference exactly${sc.real ? '; this is a real place, do not invent or change anything' : ''})` : 'the location';
+  const who = c ? `${c.name}` : 'the scene';
+  const prev = i > 0 ? acts[i - 1] : null;
+  if (prev) {
+    const T = TRANSITIONS[prev.tr] || TRANSITIONS.cut, ob = trim(prev.obj) || 'object';
+    const lead = standalone ? T.start(ob) : T.into(ob);
+    lines.push(`${lead} ${c ? `${who} already in position` : 'the next location'} in ${place}.`);
+  } else {
+    lines.push(`Location: ${place}.` + (c ? ` ${who} is in the scene.` : ``));
+  }
+  if (c && o) lines.push(`${p.He} wears ${trim(o.desc).replace(/\.$/, '')}${R[o.id] ? ` (outfit reference ${R[o.id]})` : ''}.`);
+  prods.forEach(pr => lines.push(`Product in this act: ${trim(pr.desc).replace(/\.$/, '')}.`));
+  if (trim(a.action)) lines.push(sub(trim(a.action), p));
+  (a.fx || []).forEach(k => { const e = EFFECTS.find(x => x.k === k); if (e) lines.push(sub(e.en, p)); });
+  if (a.final) {
+    lines.push(`LOCK THE LOCATION AND CAMERA. ${c ? `${p.He} does NOT walk. ${p.He} does NOT leave the frame. ` : ''}The camera does NOT travel into another room. Do NOT reveal any new environment.`);
+    const hero = prods[0] || S.products[0];
+    lines.push(`Finish on a premium commercial hero shot${hero ? ` of ${trim(hero.desc).replace(/\.$/, '')}` : ''}: moisture and highlights sparkling, natural steam or light, shallow depth of field${c ? `, ${p.his} smiling face softly visible behind it` : ''}, the ${scName.toLowerCase()} unchanged and softly blurred behind.`);
+  }
+  if (i < acts.length - 1) {
+    const T = TRANSITIONS[a.tr] || TRANSITIONS.cut;
+    lines.push(T.out(trim(a.obj) || 'object', end));
+  }
+  return {title:`ACT ${i + 1} — ${tc(start)}–${tc(end)} — ${scName.toUpperCase()}`, lines, start, end, sc, c, o, prods};
+}
+function faceLines(cs){
+  return cs.map(c => `Preserve the recognizable face of ${c.name} exactly as in ${c.real ? 'the real photo reference' : 'the face reference'}: ${trim(c.look).replace(/\.$/, '')}.`).join('\n');
+}
+function rhythm(acts){
+  const r = [];
+  acts.forEach((a, i) => {
+    const sc = byId(S.scenes, a.scene); r.push((sc ? sc.name : 'SCENE').toUpperCase());
+    (a.fx || []).forEach(k => { const e = EFFECTS.find(x => x.k === k); if (e && e.r) r.push(e.r); });
+    if (i < acts.length - 1) { const T = TRANSITIONS[a.tr] || TRANSITIONS.cut; r.push(T.r(trim(a.obj) || 'object')); }
+  });
+  return r.join(' → ');
+}
+function rules(acts, cs){
+  const r = [];
+  if (S.products.length) r.push('Large quantities and realistic, natural-looking product details throughout.');
+  cs.forEach(c => {
+    const used = acts.map((a, i) => a.char === c.id ? i + 1 : 0).filter(Boolean);
+    const outfits = {};
+    acts.forEach((a, i) => { if (a.char === c.id) { const o = outfitOf(c, a.outfit); if (o) (outfits[o.name || o.id] = outfits[o.name || o.id] || []).push(i + 1); } });
+    const ol = Object.keys(outfits).map(n => `${n.toLowerCase()} outfit in act ${outfits[n].join(' and ')}`).join(', ');
+    r.push(`${c.name} appears in act ${used.join(', ')}${ol ? ` (${ol})` : ''}. No character morphing, no face changes.`);
+  });
+  r.push('No extra people. No deformed hands. No fantasy portal. No background morphing.');
+  const real = acts.map((a, i) => { const sc = byId(S.scenes, a.scene); return sc ? `act ${i + 1} must match the "${sc.name}" reference` : ''; }).filter(Boolean);
+  if (real.length) r.push(`No invented rooms: ${real.join(', ')}.`);
+  if (acts.some(a => a.final)) r.push('No walking in the final act.');
+  r.push('No text, subtitles or generated logos.');
+  const trs = acts.slice(0, -1).map((a, i) => `${(TRANSITIONS[a.tr] || TRANSITIONS.cut).r(trim(a.obj) || 'object')} at ${(i + 1) * S.spot.len} sec`);
+  if (trs.length) r.push(`Transitions: ${trs.join(' → ')}.`);
+  return r.join(' ');
+}
+function energyLine(){
+  return S.spot.energy === 'calm'
+    ? 'Calm, elegant premium advertising, smooth controlled camera moves, natural light, unhurried pacing.'
+    : 'High-energy premium food advertising, spectacular action, realistic physics, fast pacing.';
+}
+function styleLine(acts){
+  const base = S.spot.energy === 'calm'
+    ? 'STYLE: photorealistic, premium commercial cinematography, smooth camera moves, natural light, shallow depth of field, gentle film grain.'
+    : 'STYLE: photorealistic, premium commercial cinematography, action-movie energy, realistic physics, cinematic motion blur, speed ramps, micro camera shake on impacts, volumetric steam and light, shallow depth of field, strong foreground parallax.';
+  const per = acts.map((a, i) => { const sc = byId(S.scenes, a.scene); return sc ? `Act ${i + 1}: light and color exactly as in the "${sc.name}" reference.` : ''; }).filter(Boolean).join(' ');
+  return base + (per ? ' ' + per : '');
+}
+function usedChars(acts){ const ids = []; acts.forEach(a => { if (a.char && ids.indexOf(a.char) < 0) ids.push(a.char); }); return ids.map(charOf).filter(Boolean); }
+function refList(acts){
+  const R = refs(), list = [], seen = {};
+  const add = (id, label, img) => { if (!id || seen[id]) return; seen[id] = 1; list.push({ref:R[id], label, img}); };
+  acts.forEach(a => { const c = charOf(a.char); if (c) add(c.id, `${c.name} · ${c.real ? 'echtes Foto' : 'Face Lock'}`, c.img); });
+  acts.forEach(a => { const c = charOf(a.char), o = outfitOf(c, a.outfit); if (o) add(o.id, `${c.name} · Outfit ${o.name}`, null); });
+  acts.forEach(a => { const s = byId(S.scenes, a.scene); if (s) add(s.id, `Ort · ${s.name}`, s.img); });
+  acts.forEach(a => (a.products || []).forEach(pid => { const p = byId(S.products, pid); if (p) add(p.id, `Produkt · ${p.name}`, p.img); }));
+  return list;
+}
+function oneShot(){
+  const acts = S.spot.acts, L = S.spot.len, n = acts.length, T = n * L, f = S.spot.fmt;
+  const cs = usedChars(acts);
+  const head = `Create a ${T}-second photorealistic cinematic ${fmtWord(f)} commercial${S.brand ? ` for ${S.brand}` : ''}, ${f}, exactly ${n} connected ${L}-second act${n > 1 ? 's' : ''}. ${energyLine()}`;
+  const same = cs.length === 1 && n > 1 && acts.every(a => a.char === cs[0].id) ? `\nThe same ${pron(cs[0]).man} appears in all ${n} acts.` : '';
+  const body = acts.map((a, i) => { const x = actParts(a, i, acts, false); return x.title + '\n' + x.lines.join('\n'); }).join('\n\n');
+  return [head + (cs.length ? '\n' + faceLines(cs) : '') + same, body, 'VISUAL RHYTHM:\n' + rhythm(acts), styleLine(acts), 'STRICT RULES: ' + rules(acts, cs)].join('\n\n');
+}
+function clipPrompt(i){
+  const acts = S.spot.acts, a = acts[i], L = S.spot.len, f = S.spot.fmt;
+  const x = actParts(a, i, acts, true), cs = x.c ? [x.c] : [];
+  const head = `Create a ${L}-second photorealistic cinematic ${fmtWord(f)} commercial shot${S.brand ? ` for ${S.brand}` : ''}, ${f}. ${energyLine()}`;
+  return [head + (cs.length ? '\n' + faceLines(cs) : ''), x.lines.join('\n'), styleLine([a]).replace(/Act 1:/, 'Light:'), 'STRICT RULES: ' + rules([a], cs).replace(/act 1/g, 'this shot')].join('\n\n');
+}
+function supers(){
+  const L = S.spot.len, rows = [];
+  S.spot.acts.forEach((a, i) => { if (trim(a.super)) rows.push(`${tc(i * L)}–${tc(i * L + 2)}  ${a.super}`); });
+  const T = S.spot.acts.length * L;
+  if (S.brand || S.slogan || S.logo) rows.push(`${tc(Math.max(0, T - 2))}–${tc(T)}  Logo ${S.brand ? '„' + S.brand + '“ ' : ''}(Originaldatei)${S.slogan ? ' + „' + S.slogan + '“' : ''}`);
+  return rows;
+}
+
+/* ---------- render ---------- */
+function promptBlock(x, key){
+  return `<div class="prompt"><div class="prompt-head"><b>${esc(x.t)}</b><span class="row"><span class="small muted">Anhängen: ${esc(x.att)}</span><button class="btn" data-copy="${esc(key)}">Kopieren</button></span></div><pre class="code" data-pre="${esc(key)}">${esc(x.p)}</pre></div>`;
+}
+function thumb(img, label, path){
+  return `<div class="thumb">${img ? `<img src="${img}" alt="${esc(label)}">` : `<div class="ph">kein Bild</div>`}
+    <span class="row"><span class="btn file">Bild wählen<input type="file" accept="image/*" data-img="${esc(path)}" aria-label="Bild für ${esc(label)}"></span>${img ? `<button class="btn ghost" data-clearimg="${esc(path)}">Entfernen</button>` : ''}</span></div>`;
+}
+function kitView(){
+  const R = refs();
+  const chars = S.characters.map((c, ci) => `
+    <article class="card">
+      <div class="card-head"><span class="ref">${R[c.id]}</span>
+        <label class="f grow"><span>Name</span><input type="text" id="c-${c.id}-name" data-k="characters.${ci}.name" value="${esc(c.name)}"></label>
+        <label class="f" style="width:150px"><span>Pronomen im Prompt</span><select id="c-${c.id}-pron" data-k="characters.${ci}.pron" data-re>
+          <option value="he"${c.pron === 'he' ? ' selected' : ''}>he / his</option><option value="she"${c.pron === 'she' ? ' selected' : ''}>she / her</option><option value="they"${c.pron === 'they' ? ' selected' : ''}>they / their</option></select></label>
+        <button class="btn danger" data-del="characters.${ci}">Löschen</button></div>
+      <label class="check"><input type="checkbox" id="c-${c.id}-real" data-k="characters.${ci}.real" data-re${c.real ? ' checked' : ''}> Echtes Foto vorhanden (ersetzt den Face Lock)</label>
+      ${thumb(c.img, c.name, `characters.${ci}.img`)}
+      <label class="f"><span>Feste Beschreibung (Englisch, wird wörtlich in jeden Shot kopiert)</span><textarea id="c-${c.id}-look" data-k="characters.${ci}.look">${esc(c.look)}</textarea></label>
+      <div class="group" style="margin:0">
+        ${c.outfits.map((o, oi) => `<div class="grid2" style="align-items:end"><label class="f"><span><span class="ref alt">${R[o.id]}</span> Outfit-Name</span><input type="text" id="o-${o.id}-name" data-k="characters.${ci}.outfits.${oi}.name" value="${esc(o.name)}"></label>
+          <label class="f"><span>Outfit (Englisch)</span><textarea id="o-${o.id}-desc" style="min-height:60px" data-k="characters.${ci}.outfits.${oi}.desc">${esc(o.desc)}</textarea></label>
+          <div><button class="btn danger" data-del="characters.${ci}.outfits.${oi}">Outfit löschen</button></div></div>`).join('')}
+        <div><button class="btn" data-add="outfit" data-ci="${ci}">+ Outfit</button></div>
+      </div>
+      <details class="out"><summary>Bild-Prompts für ${esc(c.name || 'diese Figur')}</summary><div data-out="char:${c.id}"></div></details>
+    </article>`).join('') || `<div class="empty">Noch keine Figur. Leg die Person an, die im Spot zu sehen ist.</div>`;
+
+  const scenes = S.scenes.map((s, si) => `
+    <article class="card">
+      <div class="card-head"><span class="ref">${R[s.id]}</span>
+        <label class="f grow"><span>Name</span><input type="text" id="s-${s.id}-name" data-k="scenes.${si}.name" value="${esc(s.name)}"></label>
+        <button class="btn danger" data-del="scenes.${si}">Löschen</button></div>
+      <label class="check"><input type="checkbox" id="s-${s.id}-real" data-k="scenes.${si}.real" data-re${s.real ? ' checked' : ''}> Echter Ort mit Foto (nichts dazuerfinden)</label>
+      ${thumb(s.img, s.name, `scenes.${si}.img`)}
+      <label class="f"><span>Feste Beschreibung (Englisch)</span><textarea id="s-${s.id}-desc" data-k="scenes.${si}.desc">${esc(s.desc)}</textarea></label>
+      <details class="out"><summary>Bild-Prompt für ${esc(s.name || 'diesen Ort')}</summary><div data-out="scene:${s.id}"></div></details>
+    </article>`).join('') || `<div class="empty">Noch kein Schauplatz. Am besten mit Fotos der echten Orte arbeiten.</div>`;
+
+  const prods = S.products.map((p, pi) => `
+    <article class="card">
+      <div class="card-head"><span class="ref">${R[p.id]}</span>
+        <label class="f grow"><span>Name</span><input type="text" id="p-${p.id}-name" data-k="products.${pi}.name" value="${esc(p.name)}"></label>
+        <button class="btn danger" data-del="products.${pi}">Löschen</button></div>
+      <label class="check"><input type="checkbox" id="p-${p.id}-real" data-k="products.${pi}.real" data-re${p.real ? ' checked' : ''}> Foto vorhanden (wird nur angehängt, nichts generieren)</label>
+      ${thumb(p.img, p.name, `products.${pi}.img`)}
+      <label class="f"><span>Feste Beschreibung (Englisch)</span><textarea id="p-${p.id}-desc" data-k="products.${pi}.desc">${esc(p.desc)}</textarea></label>
+      <label class="f"><span>Hinweise für die Regie</span><input type="text" id="p-${p.id}-notes" data-k="products.${pi}.notes" value="${esc(p.notes)}"></label>
+      <details class="out"><summary>Bild-Prompt</summary><div data-out="prod:${p.id}"></div></details>
+    </article>`).join('') || `<div class="empty">Noch kein Produkt. Ein Foto vom echten Gericht oder Produkt ist die beste Referenz.</div>`;
+
+  return `
+  ${S.example ? `<div class="note" style="margin-bottom:16px">Beispielprojekt „Da Mimmo“ geladen. Unter <b>04 Prüfen</b> legst du ein neues, leeres Projekt an.</div>` : ''}
+  <div class="intro"><h2>Kit</h2><p class="muted">Alles, was im Spot vorkommt: Marke, Figuren, Orte, Produkt. Die festen Beschreibungen werden später wörtlich in jeden Akt kopiert. So bleiben Gesicht, Ort und Produkt in jedem Shot gleich.</p></div>
+  <section class="group">
+    <div class="group-head"><h3>Marke</h3></div>
+    <div class="card"><div class="grid3">
+      <label class="f"><span>Projektname</span><input type="text" id="g-name" data-k="name" value="${esc(S.name)}"></label>
+      <label class="f"><span>Marke / Lokal</span><input type="text" id="g-brand" data-k="brand" value="${esc(S.brand)}"></label>
+      <label class="f"><span>Slogan (kommt im Schnitt dazu)</span><input type="text" id="g-slogan" data-k="slogan" value="${esc(S.slogan)}"></label></div>
+      <div><span class="small muted">Logo · REF L · wird im Schnitt als Originaldatei eingesetzt</span>${thumb(S.logo, 'Logo', 'logo')}</div>
+    </div>
+  </section>
+  <section class="group"><div class="group-head"><h3>Figuren</h3><button class="btn" data-add="char">+ Figur</button></div>${chars}</section>
+  <section class="group"><div class="group-head"><h3>Schauplätze</h3><button class="btn" data-add="scene">+ Schauplatz</button></div>${scenes}</section>
+  <section class="group"><div class="group-head"><h3>Produkt</h3><button class="btn" data-add="prod">+ Produkt</button></div>${prods}</section>`;
+}
+function opts(list, sel, empty){
+  return (empty ? `<option value="">${empty}</option>` : '') + list.map(x => `<option value="${x.id}"${x.id === sel ? ' selected' : ''}>${esc(x.name || 'ohne Namen')}</option>`).join('');
+}
+function spotView(){
+  const sp = S.spot, L = sp.len, acts = sp.acts;
+  const tl = acts.map((a, i) => { const sc = byId(S.scenes, a.scene);
+    return `<div title="Akt ${i + 1}">${tc(i * L)} ${esc(sc ? sc.name : 'Akt ' + (i + 1))}</div>` + (i < acts.length - 1 ? `<div class="tr" title="${esc((TRANSITIONS[a.tr] || TRANSITIONS.cut).de)}">↯</div>` : ''); }).join('');
+  const cards = acts.map((a, i) => {
+    const c = charOf(a.char), last = i === acts.length - 1, T = TRANSITIONS[a.tr] || TRANSITIONS.cut;
+    return `<article class="card">
+      <div class="card-head"><h3 class="grow">Akt ${i + 1}</h3><span class="act-tc">${tc(i * L)}–${tc(i * L + L)}</span>
+        <button class="btn ghost" data-move="${i}" data-dir="-1"${i === 0 ? ' disabled' : ''} aria-label="Akt nach vorne">↑</button>
+        <button class="btn ghost" data-move="${i}" data-dir="1"${last ? ' disabled' : ''} aria-label="Akt nach hinten">↓</button>
+        <button class="btn danger" data-del="spot.acts.${i}">Löschen</button></div>
+      <div class="grid3">
+        <label class="f"><span>Schauplatz</span><select id="a-${a.id}-scene" data-k="spot.acts.${i}.scene" data-re>${opts(S.scenes, a.scene, '– wählen –')}</select></label>
+        <label class="f"><span>Figur</span><select id="a-${a.id}-char" data-k="spot.acts.${i}.char" data-re>${opts(S.characters, a.char, 'keine Figur')}</select></label>
+        <label class="f"><span>Outfit</span><select id="a-${a.id}-outfit" data-k="spot.acts.${i}.outfit" data-re${c ? '' : ' disabled'}>${c ? opts(c.outfits, a.outfit, '– wählen –') : '<option>–</option>'}</select></label>
+      </div>
+      ${S.products.length ? `<div class="f"><span class="small muted">PRODUKT IN DIESEM AKT</span><div class="chips">${S.products.map(p => `<button class="chip" data-toggle="spot.acts.${i}.products" data-val="${p.id}" aria-pressed="${(a.products || []).indexOf(p.id) >= 0}">${esc(p.name)}</button>`).join('')}</div></div>` : ''}
+      <label class="f"><span>Aktion (Englisch, in zeitlicher Reihenfolge)</span><textarea id="a-${a.id}-action" data-k="spot.acts.${i}.action">${esc(a.action)}</textarea></label>
+      <div class="f"><span class="small muted">WOW-EFFEKTE</span><div class="chips">${EFFECTS.map(e => `<button class="chip" data-toggle="spot.acts.${i}.fx" data-val="${e.k}" aria-pressed="${(a.fx || []).indexOf(e.k) >= 0}">${esc(e.de)}</button>`).join('')}</div></div>
+      <div class="grid3" style="align-items:end">
+        ${last ? `<label class="check"><input type="checkbox" id="a-${a.id}-final" data-k="spot.acts.${i}.final" data-re${a.final ? ' checked' : ''}> Finale: Ort und Kamera sperren, Hero-Shot vom Produkt</label>` :
+        `<label class="f"><span>Übergang zum nächsten Akt</span><select id="a-${a.id}-tr" data-k="spot.acts.${i}.tr" data-re>${Object.keys(TRANSITIONS).map(k => `<option value="${k}"${a.tr === k ? ' selected' : ''}>${TRANSITIONS[k].de}</option>`).join('')}</select></label>
+         ${T.obj ? `<label class="f"><span>Welches Objekt? (Englisch)</span><input type="text" id="a-${a.id}-obj" data-k="spot.acts.${i}.obj" value="${esc(a.obj)}" placeholder="large glossy black mussel"></label>` : '<span></span>'}`}
+        <label class="f"><span>Einblendung im Schnitt</span><input type="text" id="a-${a.id}-super" data-k="spot.acts.${i}.super" value="${esc(a.super)}" placeholder="z. B. 05:30"></label>
+      </div>
+    </article>`; }).join('');
+  return `
+  <div class="intro"><h2>Spot</h2><p class="muted">Der Spot läuft in Akten, in der Reihenfolge der Geschichte. Jeder Akt hat einen Ort, eine Aktion und einen Höhepunkt. Zwischen zwei Akten verdeckt ein echtes Objekt die Linse, zum Beispiel ein Gegenstand, der in die Kamera fliegt, oder Dampf. So wirkt der Übergang wie aus einem Guss.</p></div>
+  <section class="card" style="margin-bottom:18px"><div class="grid3">
+    <label class="f"><span>Format</span><select id="sp-fmt" data-k="spot.fmt" data-re>${['9:16','16:9','1:1'].map(v => `<option${sp.fmt === v ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
+    <label class="f"><span>Länge pro Akt (kürzester Clip deines Generators)</span><select id="sp-len" data-k="spot.len" data-num data-re>${[4,5,6,8,10].map(v => `<option value="${v}"${sp.len === v ? ' selected' : ''}>${v} Sekunden</option>`).join('')}</select></label>
+    <label class="f"><span>Generieren als</span><select id="sp-mode" data-k="spot.mode" data-re><option value="one"${sp.mode === 'one' ? ' selected' : ''}>Ein Durchlauf (alle Akte)</option><option value="clips"${sp.mode === 'clips' ? ' selected' : ''}>Einzelclips pro Akt</option></select></label>
+    <label class="f"><span>Tempo</span><select id="sp-energy" data-k="spot.energy" data-re><option value="high"${sp.energy === 'high' ? ' selected' : ''}>Action, schnell</option><option value="calm"${sp.energy === 'calm' ? ' selected' : ''}>Ruhig, edel</option></select></label>
+  </div></section>
+  ${acts.length ? `<div class="timeline" style="margin-bottom:16px" aria-label="Zeitleiste">${tl}</div>` : ''}
+  <section class="group">${cards || `<div class="empty">Noch kein Akt. Ein guter Spot hat 2 bis 4 Akte, etwa Herkunft, Zubereitung und Servieren.</div>`}
+    <div><button class="btn primary" data-add="act">+ Akt</button></div></section>`;
+}
+function promptsView(){
+  const acts = S.spot.acts;
+  if (!acts.length) return `<div class="intro"><h2>Prompts</h2></div><div class="empty">Leg unter <b>02 Spot</b> mindestens einen Akt an. Dann erscheinen hier die fertigen Video-Prompts.</div>`;
+  const list = refList(acts);
+  const refsHtml = `<ol class="reflist">${list.map(r => `<li>${r.img ? `<img src="${r.img}" alt="">` : ''}<span class="ref">${esc(r.ref)}</span><span>${esc(r.label)}</span></li>`).join('')}</ol>`;
+  const sup = supers();
+  const main = S.spot.mode === 'one'
+    ? `<section class="card"><div class="card-head"><h3 class="grow">Video-Prompt · ${acts.length * S.spot.len} Sekunden · ${S.spot.fmt}</h3><button class="btn primary" data-copy="one">Prompt kopieren</button></div>
+       <div><span class="small muted">REFERENZEN IN DIESER REIHENFOLGE ANHÄNGEN</span>${refsHtml}</div>
+       <pre class="code" data-pre="one" style="max-height:none">${esc(oneShot())}</pre></section>`
+    : acts.map((a, i) => { const l = refList([a]);
+        return `<section class="card"><div class="card-head"><h3 class="grow">Clip ${i + 1} · ${tc(i * S.spot.len)}–${tc(i * S.spot.len + S.spot.len)}</h3><button class="btn primary" data-copy="clip:${i}">Kopieren</button></div>
+        <p class="small muted">Anhängen: ${l.map(r => `${esc(r.ref)} ${esc(r.label)}`).join(' · ') || 'keine Referenz'}</p>
+        <pre class="code" data-pre="clip:${i}">${esc(clipPrompt(i))}</pre></section>`; }).join('');
+  return `
+  <div class="intro"><h2>Prompts</h2><p class="muted">Fertig zum Einfügen in deinen Videogenerator. Wenn ein Akt misslingt, stell unter <b>02 Spot</b> auf „Einzelclips“ um und generier nur diesen Akt neu.</p></div>
+  <div class="group">${main}</div>
+  <section class="group"><h3>Schnitt</h3><div class="card">
+    ${sup.length ? `<pre class="code" style="border-left-color:var(--ink)">${esc(sup.join('\n'))}</pre>` : '<p class="muted">Keine Einblendungen eingetragen.</p>'}
+    <p class="small muted">Wenn du einzeln generierst: Die Übergänge über Objekt oder Dampf funktionieren auch im Schnitt. Häng jeden Clip direkt an das Ende des vorherigen.</p></div></section>`;
+}
+function checkView(){
+  return `
+  <div class="intro"><h2>Prüfen</h2><p class="muted">Bevor du den Spot zeigst: diese Punkte gehen bei generierten Videos am häufigsten schief.</p></div>
+  <section class="checklist group">${CHECKS.map((c, i) => `<label><input type="checkbox" id="chk-${i}" data-check="${i}"${S.checks && S.checks[i] ? ' checked' : ''}><span><b>${esc(c[0])}</b><span class="muted">${esc(c[1])}</span></span></label>`).join('')}</section>
+  <section class="group"><h3>Projekt</h3><div class="card">
+    <p class="small muted">Das Projekt bleibt in diesem Browser gespeichert. Zum Sichern oder Weitergeben kopierst du es als Text und fügst es später hier wieder ein.</p>
+    <div class="row"><button class="btn" data-act="export">Projekt kopieren</button><button class="btn" data-act="new">Neues leeres Projekt</button><button class="btn" data-act="example">Beispiel „Da Mimmo“ laden</button></div>
+    <label class="f"><span>Projekt einfügen</span><textarea id="imp" placeholder="Kopierten Projekttext hier einfügen"></textarea></label>
+    <div class="row"><button class="btn primary" data-act="import">Einfügen und öffnen</button><span class="small muted" id="imp-msg"></span></div>
+    <div id="confirm"></div>
+  </div></section>`;
+}
+function fillOutputs(){
+  S.characters.forEach(c => { const el = document.querySelector(`[data-out="char:${c.id}"]`); if (el) el.innerHTML = charPrompts(c).map((x, j) => promptBlock(x, `char:${c.id}:${j}`)).join(''); });
+  S.scenes.forEach(s => { const el = document.querySelector(`[data-out="scene:${s.id}"]`); if (el) el.innerHTML = scenePrompts(s).map((x, j) => promptBlock(x, `scene:${s.id}:${j}`)).join(''); });
+  S.products.forEach(p => { const el = document.querySelector(`[data-out="prod:${p.id}"]`); if (el) { const x = productPrompts(p); el.innerHTML = x.length ? x.map((y, j) => promptBlock(y, `prod:${p.id}:${j}`)).join('') : '<p class="note">Dein Foto ist die Referenz. Hier muss nichts generiert werden.</p>'; } });
+}
+function header(){
+  $('#m-name').textContent = S.name || '–';
+  $('#m-fmt').textContent = S.spot.fmt;
+  $('#m-tc').textContent = tcFull(S.spot.acts.length * S.spot.len);
+}
+function render(){
+  const open = [...document.querySelectorAll('details.out[open] [data-out]')].map(el => el.dataset.out);
+  document.querySelectorAll('[role=tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+  const v = $('#view');
+  v.innerHTML = tab === 'kit' ? kitView() : tab === 'spot' ? spotView() : tab === 'prompts' ? promptsView() : checkView();
+  open.forEach(k => { const el = document.querySelector(`[data-out="${k}"]`); if (el) el.closest('details').open = true; });
+  fillOutputs(); header();
+}
+function refreshText(){
+  fillOutputs(); header();
+  if (tab === 'prompts') {
+    const one = document.querySelector('[data-pre="one"]'); if (one) one.textContent = oneShot();
+    S.spot.acts.forEach((a, i) => { const el = document.querySelector(`[data-pre="clip:${i}"]`); if (el) el.textContent = clipPrompt(i); });
+  }
+}
+
+/* ---------- mutations ---------- */
+function at(path){ const ks = path.split('.'); let o = S; for (let i = 0; i < ks.length - 1; i++) o = o[ks[i]]; return [o, ks[ks.length - 1]]; }
+function setPath(path, val){ const [o, k] = at(path); o[k] = val; }
+function getPath(path){ const [o, k] = at(path); return o[k]; }
+function touch(){ S.example = false; save(); }
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.tab) { tab = t.dataset.tab; try { localStorage.setItem(KEY + '.tab', tab); } catch (x) {} render(); window.scrollTo({top:0}); return; }
+  if (t.dataset.copy) { copy(t.dataset.copy); return; }
+  if (t.dataset.toggle) {
+    const arr = getPath(t.dataset.toggle) || []; const v = t.dataset.val; const i = arr.indexOf(v);
+    if (i >= 0) arr.splice(i, 1); else arr.push(v); setPath(t.dataset.toggle, arr);
+    t.setAttribute('aria-pressed', String(i < 0)); touch(); refreshText(); return;
+  }
+  if (t.dataset.add) {
+    const a = t.dataset.add;
+    if (a === 'char') S.characters.push({id:uid(), name:'Neue Figur', pron:'he', real:false, img:null, look:'', outfits:[{id:uid(), name:'Outfit 1', desc:''}]});
+    if (a === 'outfit') S.characters[+t.dataset.ci].outfits.push({id:uid(), name:'Outfit ' + (S.characters[+t.dataset.ci].outfits.length + 1), desc:''});
+    if (a === 'scene') S.scenes.push({id:uid(), name:'Neuer Ort', real:true, img:null, desc:''});
+    if (a === 'prod') S.products.push({id:uid(), name:'Neues Produkt', real:true, img:null, desc:'', notes:''});
+    if (a === 'act') { const prev = S.spot.acts[S.spot.acts.length - 1]; if (prev) prev.final = false;
+      S.spot.acts.push({id:uid(), scene:S.scenes[0] ? S.scenes[0].id : '', char:prev ? prev.char : (S.characters[0] ? S.characters[0].id : ''), outfit:prev ? prev.outfit : '', products:[], action:'', fx:[], tr:'steam', obj:'', super:'', final:true}); }
+    touch(); render(); return;
+  }
+  if (t.dataset.del) {
+    const ks = t.dataset.del.split('.'); const idx = +ks.pop();
+    ks.reduce((o, k) => o[k], S).splice(idx, 1);
+    S.spot.acts.forEach(a => {
+      if (a.scene && !byId(S.scenes, a.scene)) a.scene = '';
+      if (a.char && !charOf(a.char)) { a.char = ''; a.outfit = ''; }
+      const c = charOf(a.char); if (c && a.outfit && !outfitOf(c, a.outfit)) a.outfit = '';
+      a.products = (a.products || []).filter(id => byId(S.products, id));
+    });
+    const acts = S.spot.acts; if (acts.length && !acts.some(a => a.final)) acts[acts.length - 1].final = true;
+    acts.forEach((a, i) => { if (i < acts.length - 1) a.final = false; });
+    touch(); render(); return;
+  }
+  if (t.dataset.move) {
+    const i = +t.dataset.move, j = i + (+t.dataset.dir), acts = S.spot.acts; if (j < 0 || j >= acts.length) return;
+    const wasFinal = acts[acts.length - 1].final; [acts[i], acts[j]] = [acts[j], acts[i]];
+    acts.forEach(a => a.final = false); acts[acts.length - 1].final = wasFinal; touch(); render(); return;
+  }
+  if (t.dataset.clearimg) { setPath(t.dataset.clearimg, null); touch(); render(); return; }
+  if (t.dataset.act) action(t.dataset.act);
+});
+document.addEventListener('input', e => {
+  const el = e.target; if (!el.dataset || !el.dataset.k) return;
+  if (el.type === 'checkbox' || el.tagName === 'SELECT') return;
+  setPath(el.dataset.k, el.value); touch(); refreshText();
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.dataset && el.dataset.check !== undefined) { S.checks = S.checks || {}; S.checks[el.dataset.check] = el.checked; save(); return; }
+  if (el.dataset && el.dataset.img) { readImg(el); return; }
+  if (!el.dataset || !el.dataset.k) return;
+  let v = el.type === 'checkbox' ? el.checked : el.value;
+  if (el.dataset.num !== undefined) v = +v;
+  setPath(el.dataset.k, v);
+  if (/^spot\.acts\.\d+\.char$/.test(el.dataset.k)) { const a = getPath(el.dataset.k.replace(/\.char$/, '')); const c = charOf(a.char); a.outfit = c && c.outfits[0] ? c.outfits[0].id : ''; }
+  touch(); if (el.dataset.re !== undefined) render(); else refreshText();
+});
+function readImg(input){
+  const f = input.files && input.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => { const im = new Image(); im.onload = () => {
+    const m = 256, sc = Math.min(1, m / Math.max(im.width, im.height)), cv = document.createElement('canvas');
+    cv.width = Math.round(im.width * sc); cv.height = Math.round(im.height * sc);
+    cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
+    setPath(input.dataset.img, cv.toDataURL('image/jpeg', .8)); touch(); render(); };
+    im.src = r.result; };
+  r.readAsDataURL(f);
+}
+function textFor(key){
+  if (key === 'one') return oneShot();
+  if (key.indexOf('clip:') === 0) return clipPrompt(+key.slice(5));
+  const pre = document.querySelector(`[data-pre="${CSS.escape(key)}"]`); return pre ? pre.textContent : '';
+}
+function copy(key){
+  const txt = textFor(key);
+  const done = () => toast('Kopiert');
+  const fallback = () => { const pre = document.querySelector(`[data-pre="${CSS.escape(key)}"]`); if (pre) { const rg = document.createRange(); rg.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(rg); } toast('Text markiert, jetzt Strg/⌘ + C'); };
+  try { navigator.clipboard.writeText(txt).then(done, fallback); } catch (e) { fallback(); }
+}
+function copyText(txt, msg){
+  const ta = $('#imp');
+  const fb = () => { if (ta) { ta.value = txt; ta.select(); } toast('Text steht im Feld, jetzt Strg/⌘ + C'); };
+  try { navigator.clipboard.writeText(txt).then(() => toast(msg), fb); } catch (e) { fb(); }
+}
+function confirmBox(msg, fn){
+  const box = $('#confirm'); if (!box) return;
+  box.innerHTML = `<div class="note row" style="justify-content:space-between"><span>${esc(msg)}</span><span class="row"><button class="btn danger" id="cf-yes">Ja, ersetzen</button><button class="btn" id="cf-no">Abbrechen</button></span></div>`;
+  $('#cf-yes').onclick = () => { box.innerHTML = ''; fn(); };
+  $('#cf-no').onclick = () => { box.innerHTML = ''; };
+}
+function action(a){
+  if (a === 'export') copyText(JSON.stringify(S), 'Projekt kopiert');
+  if (a === 'new') confirmBox('Das aktuelle Projekt wird durch ein leeres ersetzt.', () => { S = blank(); save(); tab = 'kit'; render(); toast('Neues Projekt angelegt'); });
+  if (a === 'example') confirmBox('Das aktuelle Projekt wird durch das Beispiel ersetzt.', () => { S = example(); save(); tab = 'kit'; render(); toast('Beispiel geladen'); });
+  if (a === 'import') {
+    const msg = $('#imp-msg');
+    try { const d = JSON.parse($('#imp').value); if (!d || !d.spot || !Array.isArray(d.characters)) throw 0;
+      S = d; save(); tab = 'kit'; render(); toast('Projekt geöffnet'); }
+    catch (e) { msg.textContent = 'Das ist kein gültiger Projekttext. Kopier ihn erneut über „Projekt kopieren“.'; }
+  }
+}
+let toastT;
+function toast(m){
+  let t = $('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+  t.textContent = m; clearTimeout(toastT); toastT = setTimeout(() => t.remove(), 1800);
+}
+render();
+})();
+</script>
+</body>
+</html>
