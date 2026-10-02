@@ -7,7 +7,8 @@ at `.claude/instagram/voice.md` (channel @reinartsworld, presenter "Nova"). Befo
 running any `ig-*` skill, copy it into place if it is missing:
 
 ```bash
-mkdir -p ~/.claude/instagram && cp -n .claude/instagram/voice.md ~/.claude/instagram/voice.md
+mkdir -p ~/.claude/instagram && cp -n .claude/instagram/voice.md .claude/instagram/log.md ~/.claude/instagram/
 ```
 
-When the voice file is edited, edit the repo copy and commit it.
+When the voice file or `log.md` changes, update the repo copy in `.claude/instagram/` and commit it.
+Approved reel scripts are kept in `.claude/instagram/reels/`.
