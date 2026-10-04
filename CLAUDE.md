@@ -12,3 +12,9 @@ mkdir -p ~/.claude/instagram && cp -n .claude/instagram/voice.md .claude/instagr
 
 When the voice file or `log.md` changes, update the repo copy in `.claude/instagram/` and commit it.
 Approved reel scripts are kept in `.claude/instagram/reels/`.
+
+## Antworten
+
+Nach jedem Commit/Push immer die genauen GitHub-Links angeben (Branch und jede
+geänderte/neue Datei), z. B.
+`https://github.com/rs2502/claude/blob/<branch>/<pfad>`.
