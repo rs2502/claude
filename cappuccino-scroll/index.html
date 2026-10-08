@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crema & Co. – Scroll-Cappuccino</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,700..900,100&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f3e6d6;
+    --bg-2: #ecd5bb;
+    --ink: #3a2113;
+    --accent: #cf8a62;
+    --accent-soft: #e0b08f;
+    --display: "Fraunces", "Cooper Black", Georgia, serif;
+    --body: "Inter", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { background: var(--bg); }
+  body { font-family: var(--body); color: var(--ink); background: var(--bg); -webkit-font-smoothing: antialiased; }
+
+  /* ---------- nav ---------- */
+  .nav {
+    position: fixed; inset: 0 0 auto 0; z-index: 20;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px clamp(16px, 4vw, 48px);
+    font-size: 13px; font-weight: 500;
+  }
+  .brand { font-weight: 600; letter-spacing: .02em; }
+  .brand span { font-weight: 400; opacity: .6; }
+  .nav nav { display: flex; gap: 22px; align-items: center; }
+  .nav a { color: inherit; text-decoration: none; }
+  .nav .pill { background: var(--ink); color: var(--bg); padding: 8px 16px; border-radius: 99px; }
+  @media (max-width: 640px) { .nav nav a:not(.pill) { display: none; } }
+
+  /* ---------- scroll stage ---------- */
+  .scrolly { height: 650vh; position: relative; }
+  .sticky {
+    position: sticky; top: 0; height: 100vh; overflow: hidden;
+    display: grid; place-items: center;
+    background:
+      radial-gradient(120% 80% at 50% 0%, #fbf1e4 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  }
+
+  /* big background words */
+  .words { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+  .word {
+    grid-area: 1 / 1;
+    font-family: var(--display); font-weight: 900;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+    font-size: clamp(5.5rem, 27vw, 24rem); line-height: .9; letter-spacing: -.03em;
+    color: var(--accent); opacity: 0; will-change: transform, opacity;
+    transform: translateY(0);
+  }
+
+  #scene { position: relative; z-index: 2; height: min(86vh, 112vw); width: auto; max-width: 100vw; overflow: visible; }
+
+  /* captions */
+  .caps { position: absolute; z-index: 3; left: clamp(16px, 5vw, 72px); bottom: clamp(24px, 9vh, 90px); width: min(340px, 78vw); }
+  .cap { position: absolute; left: 0; bottom: 0; width: 100%; opacity: 0; will-change: transform, opacity; }
+  .cap small { display: block; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; opacity: .6; margin-bottom: 10px; font-weight: 600; }
+  .cap h2 { font-family: var(--display); font-weight: 800; font-variation-settings: "SOFT" 100; font-size: clamp(1.7rem, 3.4vw, 2.6rem); line-height: 1.05; margin-bottom: 10px; }
+  .cap p { font-size: 15px; line-height: 1.5; opacity: .75; }
+  @media (max-width: 760px) {
+    .caps { left: 0; right: 0; margin: 0 auto; width: calc(100% - 40px); bottom: 20px; text-align: center; }
+    #scene { height: min(66vh, 110vw); margin-top: -8vh; }
+    .words { align-items: start; padding-top: 13vh; }
+    .word { font-size: 31vw; }
+    .hint { display: none !important; }
+  }
+
+  /* final call to action */
+  .cta { position: absolute; z-index: 4; right: clamp(16px, 6vw, 90px); top: 50%; width: min(360px, 80vw); opacity: 0; pointer-events: none; transform: translateY(-50%); }
+  .cta h2 { font-family: var(--display); font-weight: 900; font-variation-settings: "SOFT" 100; font-size: clamp(2rem, 4.4vw, 3.4rem); line-height: 1; margin-bottom: 14px; }
+  .cta p { opacity: .75; line-height: 1.5; margin-bottom: 22px; }
+  .cta a { display: inline-block; background: var(--ink); color: var(--bg); text-decoration: none; padding: 14px 26px; border-radius: 99px; font-weight: 600; font-size: 14px; }
+  @media (max-width: 760px) {
+    .cta { right: 0; left: 0; margin: 0 auto; top: auto; bottom: 28px; transform: none; text-align: center; width: calc(100% - 40px); }
+    .cta h2 { font-size: 2rem; }
+    .cta p { margin-bottom: 16px; font-size: 14px; }
+  }
+
+  /* progress + hint */
+  .progress { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(58,33,19,.08); }
+  .progress i { display: block; height: 100%; width: 0; background: var(--ink); }
+  .hint { position: absolute; z-index: 5; right: clamp(16px, 4vw, 48px); bottom: 24px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .hint::after { content: ""; width: 1px; height: 34px; background: var(--ink); transform-origin: top; animation: hint 1.6s ease-in-out infinite; }
+  @keyframes hint { 0% { transform: scaleY(0); } 60% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+
+  /* steam */
+  .steam path { fill: none; stroke: #fff; stroke-width: 5; stroke-linecap: round; opacity: 0; animation: steam 3.2s ease-in-out infinite; }
+  .steam path:nth-child(2) { animation-delay: -1.1s; }
+  .steam path:nth-child(3) { animation-delay: -2.1s; }
+  @keyframes steam {
+    0%   { opacity: 0;   transform: translateY(14px); }
+    30%  { opacity: .65; }
+    100% { opacity: 0;   transform: translateY(-34px); }
+  }
+
+  .after { min-height: 60vh; display: grid; place-items: center; text-align: center; padding: 80px 24px; }
+  .after h3 { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 6vw, 4rem); }
+  .after p { opacity: .7; margin-top: 10px; }
+
+  @media (prefers-reduced-motion: reduce) { .hint::after, .steam path { animation: none; } }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="brand">CREMA <span>/ CO.</span></div>
+  <nav><a href="#">Bohnen</a><a href="#">Maschinen</a><a href="#" class="pill">Anmelden</a></nav>
+</header>
+
+<main>
+<section class="scrolly" id="scrolly">
+  <div class="sticky">
+
+    <div class="words" aria-hidden="true">
+      <div class="word" data-word="0">BREW</div>
+      <div class="word" data-word="1">POUR</div>
+      <div class="word" data-word="2">SIP</div>
+    </div>
+
+    <svg id="scene" viewBox="0 0 600 640" role="img" aria-label="Eine Espressomaschine füllt eine Tasse zum Cappuccino">
+      <defs>
+        <linearGradient id="steel" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" stop-color="#9c9da4"/><stop offset=".12" stop-color="#e9eaed"/>
+          <stop offset=".35" stop-color="#c3c4ca"/><stop offset=".7" stop-color="#e4e5e8"/><stop offset="1" stop-color="#8d8e96"/>
+        </linearGradient>
+        <linearGradient id="steelV" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stop-color="#f4f4f6" stop-opacity=".75"/><stop offset=".25" stop-color="#fff" stop-opacity="0"/>
+          <stop offset="1" stop-color="#000" stop-opacity=".18"/>
+        </linearGradient>
+        <linearGradient id="graphite" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#3b3b41"/><stop offset="1" stop-color="#1d1d20"/></linearGradient>
+        <linearGradient id="alcove" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#1b1b1e"/><stop offset="1" stop-color="#46464c"/></linearGradient>
+        <linearGradient id="ceramic" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" stop-color="#d8c4a8"/><stop offset=".22" stop-color="#fffaf0"/><stop offset=".6" stop-color="#f1e3cd"/><stop offset="1" stop-color="#cbb593"/>
+        </linearGradient>
+        <linearGradient id="glaze" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#b36f45" stop-opacity="0"/><stop offset=".55" stop-color="#b36f45" stop-opacity=".0"/><stop offset=".62" stop-color="#a65f36" stop-opacity=".95"/><stop offset="1" stop-color="#7e4524"/></linearGradient>
+        <linearGradient id="interior" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8f7a64"/><stop offset="1" stop-color="#dac9b3"/></linearGradient>
+        <linearGradient id="coffee" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#3a1c0c"/><stop offset="1" stop-color="#1e0d05"/></linearGradient>
+        <radialGradient id="crema" cx=".5" cy=".45" r=".6"><stop offset="0" stop-color="#e0a463"/><stop offset=".7" stop-color="#a8622f"/><stop offset="1" stop-color="#6b3a1c"/></radialGradient>
+        <radialGradient id="foam" cx=".5" cy=".4" r=".65"><stop offset="0" stop-color="#fffaf0"/><stop offset=".8" stop-color="#f3e3c8"/><stop offset="1" stop-color="#e2c9a4"/></radialGradient>
+        <filter id="blur" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+
+        <!-- visible area for the stream: above the rim line, or inside the cup opening -->
+        <clipPath id="streamClip"><rect x="0" y="0" width="600" height="392"/><ellipse cx="300" cy="392" rx="102" ry="28"/></clipPath>
+        <clipPath id="openingClip"><ellipse cx="300" cy="392" rx="102" ry="28"/></clipPath>
+      </defs>
+
+      <!-- floor shadow -->
+      <ellipse id="shadow" cx="300" cy="520" rx="250" ry="16" fill="#3a2113" opacity=".22" filter="url(#blur)"/>
+
+      <!-- ================= MACHINE ================= -->
+      <g id="machine">
+        <g id="machineShake">
+          <!-- cup warmer rail -->
+          <rect x="120" y="8" width="360" height="14" rx="7" fill="url(#graphite)"/>
+          <g stroke="#6a6a72" stroke-width="2" opacity=".8"><path d="M140 15h320"/></g>
+          <!-- body -->
+          <rect x="70" y="20" width="460" height="482" rx="34" fill="url(#steel)"/>
+          <rect x="70" y="20" width="460" height="482" rx="34" fill="url(#steelV)"/>
+          <!-- alcove -->
+          <rect x="190" y="200" width="220" height="272" fill="url(#alcove)"/>
+          <rect x="190" y="200" width="220" height="14" fill="#000" opacity=".35"/>
+          <!-- tray -->
+          <rect x="176" y="472" width="248" height="18" rx="4" fill="url(#graphite)"/>
+          <g stroke="#6d6d75" stroke-width="2"><path d="M192 481h216" stroke-dasharray="10 6"/></g>
+
+          <!-- top panel -->
+          <text x="300" y="75" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="800" font-size="26" letter-spacing="6" fill="#2a2a2f">CREMA</text>
+          <text x="300" y="98" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="10" letter-spacing="5" fill="#55555d">ESPRESSO · 9 BAR</text>
+          <!-- gauge -->
+          <g transform="translate(150 118)">
+            <circle r="38" fill="url(#graphite)"/><circle r="32" fill="#f6efe2"/>
+            <g stroke="#3a2113" stroke-width="2" stroke-linecap="round">
+              <path d="M-22 18 L-26 21"/><path d="M-27 4 L-31 5"/><path d="M-22 -14 L-26 -17"/><path d="M-8 -26 L-10 -31"/>
+              <path d="M8 -26 L10 -31"/><path d="M22 -14 L26 -17"/><path d="M27 4 L31 5"/><path d="M22 18 L26 21"/>
+            </g>
+            <path d="M-20 14 A24 24 0 0 1 20 14" fill="none" stroke="#cf8a62" stroke-width="3" opacity=".7"/>
+            <g id="needle"><path d="M0 4 L0 -24" stroke="#b3361f" stroke-width="2.6" stroke-linecap="round"/></g>
+            <circle r="4.5" fill="#2a2a2f"/>
+          </g>
+          <!-- buttons + LED -->
+          <g transform="translate(440 100)">
+            <circle r="22" fill="url(#graphite)"/><circle r="17" fill="#d7d8dc"/><path d="M0 -17V-6" stroke="#2a2a2f" stroke-width="3" stroke-linecap="round"/>
+          </g>
+          <g transform="translate(440 160)">
+            <circle r="14" fill="url(#graphite)"/><circle id="led" r="6" fill="#e7a23a" opacity=".25"/>
+          </g>
+          <rect x="226" y="140" width="148" height="32" rx="16" fill="#222226"/>
+          <circle id="ledStrip" cx="244" cy="156" r="5" fill="#74d680" opacity=".25"/>
+          <text x="262" y="160" font-family="Inter, sans-serif" font-weight="600" font-size="11" letter-spacing="2" fill="#bdbdc4">READY</text>
+
+          <!-- group head, portafilter, spouts -->
+          <rect x="248" y="200" width="104" height="34" rx="8" fill="url(#steel)"/>
+          <rect x="248" y="200" width="104" height="34" rx="8" fill="url(#steelV)"/>
+          <rect x="256" y="232" width="88" height="16" rx="6" fill="url(#graphite)"/>
+          <rect x="278" y="246" width="12" height="10" rx="2" fill="#2a2a2f"/>
+          <rect x="310" y="246" width="12" height="10" rx="2" fill="#2a2a2f"/>
+          <path d="M262 240 L206 262" stroke="#26262a" stroke-width="13" stroke-linecap="round"/>
+          <path d="M222 256 L206 262" stroke="#b4693d" stroke-width="13" stroke-linecap="round"/>
+
+          <!-- steam wand -->
+          <path d="M458 214 V330 Q458 350 442 356" fill="none" stroke="url(#steel)" stroke-width="8" stroke-linecap="round"/>
+          <path d="M458 214 V330 Q458 350 442 356" fill="none" stroke="#8d8e96" stroke-width="1.5" stroke-linecap="round" opacity=".6"/>
+          <circle cx="458" cy="206" r="9" fill="url(#graphite)"/>
+        </g>
+      </g>
+
+      <!-- ================= CUP ================= -->
+      <g id="cup">
+        <!-- saucer -->
+        <ellipse cx="300" cy="474" rx="156" ry="15" fill="#cdb694"/>
+        <ellipse cx="300" cy="471" rx="156" ry="15" fill="url(#ceramic)"/>
+        <ellipse cx="300" cy="469" rx="112" ry="9" fill="#d9c5a6" opacity=".7"/>
+        <!-- handle -->
+        <path d="M404 402 C458 392 466 450 396 452" fill="none" stroke="#cbb593" stroke-width="15" stroke-linecap="round"/>
+        <path d="M404 400 C458 390 466 448 396 450" fill="none" stroke="url(#ceramic)" stroke-width="12" stroke-linecap="round"/>
+        <!-- body -->
+        <path d="M188 392 C188 452 226 480 300 480 C374 480 412 452 412 392 Z" fill="url(#ceramic)"/>
+        <path d="M188 392 C188 452 226 480 300 480 C374 480 412 452 412 392 Z" fill="url(#glaze)"/>
+        <!-- rim -->
+        <ellipse cx="300" cy="392" rx="112" ry="34" fill="url(#ceramic)"/>
+        <ellipse cx="300" cy="392" rx="112" ry="34" fill="none" stroke="#c4ad8a" stroke-width="1.5" opacity=".7"/>
+        <!-- interior -->
+        <ellipse cx="300" cy="392" rx="102" ry="28" fill="url(#interior)"/>
+
+        <!-- liquid, clipped to opening -->
+        <g clip-path="url(#openingClip)">
+          <ellipse id="surface" cx="300" cy="454" rx="102" ry="28" fill="url(#crema)"/>
+          <ellipse id="surfaceEdge" cx="300" cy="454" rx="102" ry="28" fill="none" stroke="#2a1306" stroke-width="2" opacity=".6"/>
+          <!-- ripples at the impact point -->
+          <ellipse id="rip1" cx="300" cy="454" rx="10" ry="3" fill="none" stroke="#f0c28a" stroke-width="1.6" opacity="0"/>
+          <ellipse id="rip2" cx="300" cy="454" rx="10" ry="3" fill="none" stroke="#f0c28a" stroke-width="1.6" opacity="0"/>
+          <!-- milk foam + art -->
+          <g id="foamGroup" transform="translate(300 392) scale(0)">
+            <ellipse rx="92" ry="25" fill="url(#foam)"/>
+            <ellipse rx="92" ry="25" fill="none" stroke="#e6cfa9" stroke-width="2"/>
+          </g>
+          <g id="art" transform="translate(300 394) scale(1 .27)" fill="none" stroke="#9c5a2f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity=".92">
+            <path pathLength="1" d="M0 52 C-70 6 -52 -44 0 -14 C52 -44 70 6 0 52 Z" stroke-dasharray="1" stroke-dashoffset="1"/>
+            <path pathLength="1" d="M0 34 C-42 6 -32 -26 0 -8 C32 -26 42 6 0 34 Z" stroke-dasharray="1" stroke-dashoffset="1"/>
+            <path pathLength="1" d="M0 18 C-20 4 -15 -10 0 -2 C15 -10 20 4 0 18 Z" stroke-dasharray="1" stroke-dashoffset="1"/>
+          </g>
+        </g>
+        <!-- inner lip highlight -->
+        <path d="M200 398 A102 28 0 0 0 400 398" fill="none" stroke="#fff" stroke-width="2" opacity=".35"/>
+
+        <!-- steam -->
+        <g id="steam" class="steam" opacity="0">
+          <path d="M266 338 q-12 -22 0 -42 t0 -42"/>
+          <path d="M302 332 q-12 -24 0 -46 t0 -46"/>
+          <path d="M338 338 q-12 -22 0 -42 t0 -42"/>
+        </g>
+      </g>
+
+      <!-- ================= STREAM (above cup body, below nothing) ================= -->
+      <g id="streamGroup" clip-path="url(#streamClip)">
+        <path id="s1" pathLength="1" d="M284 256 L300 400" fill="none" stroke="#2c1508" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="0 2"/>
+        <path id="s2" pathLength="1" d="M316 256 L300 400" fill="none" stroke="#2c1508" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="0 2"/>
+        <path id="s1h" pathLength="1" d="M284 256 L300 400" fill="none" stroke="#a8622f" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="0 2" opacity=".7" transform="translate(-1 0)"/>
+        <path id="s2h" pathLength="1" d="M316 256 L300 400" fill="none" stroke="#a8622f" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="0 2" opacity=".7" transform="translate(-1 0)"/>
+        <circle id="drop1" cx="287" cy="258" r="0" fill="#2c1508"/>
+        <circle id="drop2" cx="313" cy="258" r="0" fill="#2c1508"/>
+      </g>
+    </svg>
+
+    <div class="caps">
+      <div class="cap" data-cap="0"><small>01 · Brühen</small><h2>Druck aufbauen.</h2><p>Neun Bar, ein Moment Geduld. Die Maschine ist warm, der Siebträger sitzt.</p></div>
+      <div class="cap" data-cap="1"><small>02 · Gießen</small><h2>Der Espresso läuft.</h2><p>Zäh wie Honig, dunkel wie Mokka – die Crema legt sich in die Tasse.</p></div>
+      <div class="cap" data-cap="2"><small>03 · Genießen</small><h2>Samtiger Milchschaum.</h2><p>Ein Herz obendrauf. Fast fertig, noch einmal scrollen.</p></div>
+    </div>
+
+    <div class="cta" id="cta">
+      <h2>Dein Cappuccino ist fertig.</h2>
+      <p>Frisch gebrüht, mit Herz. Jetzt die passenden Bohnen für zu Hause finden.</p>
+      <a href="#">Bohnen entdecken</a>
+    </div>
+
+    <div class="hint" id="hint">Scroll</div>
+    <div class="progress"><i id="bar"></i></div>
+  </div>
+</section>
+
+<section class="after">
+  <div><h3>Und jetzt: die Bohnen.</h3><p>Hier geht die Seite weiter.</p></div>
+</section>
+</main>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const seg = (p, a, b) => clamp((p - a) / (b - a));
+  const easeIO = (t) => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+
+  const scrolly = $("scrolly");
+  const el = {
+    shake: $("machineShake"), machine: $("machine"), shadow: $("shadow"), cup: $("cup"),
+    needle: $("needle"), led: $("led"), ledStrip: $("ledStrip"),
+    s: ["s1", "s2", "s1h", "s2h"].map($),
+    drop: [$("drop1"), $("drop2")],
+    surface: $("surface"), edge: $("surfaceEdge"), rip: [$("rip1"), $("rip2")],
+    foam: $("foamGroup"), art: [...$("art").children], steam: $("steam"),
+    bar: $("bar"), hint: $("hint"), cta: $("cta"),
+    words: [...document.querySelectorAll(".word")],
+    caps: [...document.querySelectorAll(".cap")],
+  };
+
+  // geometry of the cup opening
+  const CUP_Y = 392, SPOUT_Y = 256, OPEN_RY = 28;
+
+  // timeline (0..1 over the sticky section)
+  const T = {
+    drops: [.05, .13], stream: [.13, .26], fill: [.26, .62], cut: [.62, .69],
+    foam: [.68, .79], art: [.77, .88], steam: [.82, .94], finale: [.86, 1],
+  };
+  // which word / caption is active
+  const PHASES = [[0, .26], [.26, .66], [.66, 1]];
+
+  let target = 0, current = 0;
+  const readScroll = () => {
+    const r = scrolly.getBoundingClientRect();
+    const total = scrolly.offsetHeight - innerHeight;
+    target = clamp(-r.top / total);
+  };
+  addEventListener("scroll", readScroll, { passive: true });
+  addEventListener("resize", readScroll);
+  readScroll(); current = target;
+
+  // dash a normalised (pathLength=1) path from `tail` to `head`
+  const dash = (node, tail, head) => {
+    const len = Math.max(0, head - tail);
+    node.style.strokeDasharray = `${len} 2`;
+    node.style.strokeDashoffset = -tail;
+    node.style.opacity = len > 0.001 ? "" : 0;
+  };
+
+  function render(p, t) {
+    // --- machine life ---
+    const pressure = seg(p, .02, .14) * (1 - .85 * seg(p, .6, .7));
+    el.needle.setAttribute("transform", `rotate(${-70 + pressure * 150})`);
+    const running = p > T.stream[0] - .02 && p < T.cut[1];
+    el.led.setAttribute("opacity", running ? .95 : .25);
+    el.ledStrip.setAttribute("opacity", p > .03 ? 1 : .25);
+    const jx = running ? Math.sin(t * 90) * .5 : 0, jy = running ? Math.cos(t * 70) * .35 : 0;
+    el.shake.setAttribute("transform", `translate(${jx} ${jy})`);
+
+    // --- espresso stream ---
+    const fill = easeIO(seg(p, ...T.fill));
+    const surfaceCy = CUP_Y + (1 - fill) * 62;
+    const yEnd = Math.min(surfaceCy, CUP_Y + OPEN_RY);        // stops at the surface (or vanishes behind the front lip)
+    el.s[0].setAttribute("d", `M284 ${SPOUT_Y} L300 ${yEnd}`);
+    el.s[1].setAttribute("d", `M316 ${SPOUT_Y} L300 ${yEnd}`);
+    el.s[2].setAttribute("d", `M284 ${SPOUT_Y} L300 ${yEnd}`);
+    el.s[3].setAttribute("d", `M316 ${SPOUT_Y} L300 ${yEnd}`);
+    const head = easeOut(seg(p, ...T.stream));
+    const tail = easeIO(seg(p, ...T.cut));
+    el.s.forEach((n) => dash(n, tail, head));
+
+    // drops at the spouts before the stream
+    const dropsOn = seg(p, ...T.drops) * (1 - seg(p, T.stream[0], T.stream[0] + .02));
+    el.drop.forEach((d, i) => {
+      const ph = (t * 1.5 + i * .5) % 1;
+      const r = ph < .55 ? 1 + ph * 4.5 : 3.3;
+      const y = ph < .55 ? 258 + ph * 7 : 262 + Math.pow((ph - .55) / .45, 2) * 130;
+      d.setAttribute("r", dropsOn > 0 ? r * dropsOn : 0);
+      d.setAttribute("cy", y);
+      d.setAttribute("opacity", ph > .95 ? 0 : 1);
+    });
+
+    // --- liquid surface ---
+    el.surface.setAttribute("cy", surfaceCy);
+    el.edge.setAttribute("cy", surfaceCy);
+    el.surface.style.opacity = fill > 0 ? 1 : 0;
+    el.edge.style.opacity = fill > 0 ? .6 : 0;
+
+    // ripples while the stream hits the surface
+    const hitting = head > .98 && tail < .02 && fill > 0;
+    el.rip.forEach((r, i) => {
+      const ph = (t * 1.3 + i * .5) % 1;
+      r.setAttribute("cy", surfaceCy);
+      r.setAttribute("rx", 8 + ph * 46);
+      r.setAttribute("ry", (8 + ph * 46) * .27);
+      r.setAttribute("opacity", hitting ? (1 - ph) * .75 : 0);
+    });
+
+    // --- milk foam + latte art ---
+    const m = easeIO(seg(p, ...T.foam));
+    el.foam.setAttribute("transform", `translate(300 ${CUP_Y}) scale(${m})`);
+    const a = seg(p, ...T.art);
+    el.art.forEach((path, i) => {
+      const k = clamp((a - i * .22) / .56);
+      path.style.strokeDashoffset = 1 - easeOut(k);
+    });
+    el.steam.setAttribute("opacity", seg(p, ...T.steam));
+
+    // --- finale: machine leaves, cup moves to the front ---
+    const f = easeIO(seg(p, ...T.finale));
+    el.machine.setAttribute("transform", `translate(0 ${-f * 90})`);
+    el.machine.style.opacity = 1 - seg(f, 0, .8);
+    el.shadow.style.opacity = .22 * (1 - f * .4);
+    const s = 1 + f * .55, cy = 440;
+    const wide = innerWidth / innerHeight > 1.15;
+    el.cup.setAttribute("transform", `translate(${300 - (wide ? f * 85 : 0)} ${cy + f * 40}) scale(${s}) translate(-300 ${-cy})`);
+
+    // --- big words, captions, cta ---
+    const vis = (i) => {
+      const [a0, a1] = PHASES[i];
+      const inn = i === 0 ? 1 : seg(p, a0 + .01, a0 + .04);
+      const out = i === PHASES.length - 1 ? 1 : 1 - seg(p, a1 - .04, a1 - .01);
+      return inn * out;
+    };
+    el.words.forEach((w, i) => {
+      const [a0, a1] = PHASES[i], v = vis(i);
+      const local = (p - a0) / (a1 - a0);
+      w.style.opacity = v;
+      w.style.transform = `translateY(${(0.5 - local) * 120}px) scale(${1 + (local - .5) * .08})`;
+    });
+    // last word fades behind the CTA
+    el.words[2].style.opacity = vis(2) * (1 - f * .65);
+    el.caps.forEach((c, i) => {
+      const v = vis(i) * (i === 2 ? 1 - seg(p, .88, .93) : 1);
+      c.style.opacity = v;
+      c.style.transform = `translateY(${(1 - v) * 16}px)`;
+    });
+    el.cta.style.opacity = seg(p, .9, .97);
+    el.cta.style.pointerEvents = p > .93 ? "auto" : "none";
+
+    el.bar.style.width = p * 100 + "%";
+    el.hint.style.opacity = 1 - seg(p, .01, .05);
+  }
+
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function frame(ms) {
+    current += (target - current) * (reduce ? 1 : .12);
+    if (Math.abs(target - current) < .00005) current = target;
+    render(current, ms / 1000);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // allows ?p=0.5 for a fixed frame (handy for screenshots)
+  const q = new URLSearchParams(location.search).get("p");
+  if (q !== null) { target = current = clamp(parseFloat(q) || 0); removeEventListener("scroll", readScroll); }
+})();
+</script>
+</body>
+</html>
