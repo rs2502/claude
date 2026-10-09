@@ -682,3 +682,12 @@ details.block .inhalt{padding:0 13px 13px}
   .app-head .tools .btn{font-size:11px;padding:8px 3px}
   .buehne-inhalt{padding:12px 6px}
 }
+
+/* Helle Extra Karte: Kopf, Einleitung und Fuß dunkel auf hellem Grund, ohne dunklen Sockel */
+.blatt.extra-referenz .karte-kopf .adresse{color:#574E43}
+.blatt.extra-referenz .karte-intro{color:#7A4710}
+.blatt.extra-referenz .karte-fuss{color:#574E43}
+.blatt.extra-referenz .karte-fuss::before{display:none}
+.blatt.extra-referenz .karte-fuss .hinweise{color:#574E43;border-color:#DCCFB8}
+.blatt.extra-referenz .karte-fuss .hinweise b{color:#241D14}
+.blatt.extra-referenz .preis-hinweis{color:#574E43}

@@ -28,8 +28,10 @@ const HINWEISE_STANDARD =
 /* Feste Beschriftungen in beiden Sprachen */
 const TEXTE = {
   de:{ speisen:'Speisen', getraenke:'Empfohlene Getränke', ruf:'Tisch reservieren',
+       preis:'Alle Preise in € inklusive Mehrwertsteuer und Dienstleistung, vorbehaltlich von Änderungen',
        hinweis:'WICHTIGE HINWEISE:', bis:'bis' },
   en:{ speisen:'Food', getraenke:'Recommended Drinks', ruf:'Reserve a table',
+       preis:'All prices include VAT and service. Prices are subject to change.',
        hinweis:'PLEASE NOTE:', bis:'to' },
 };
 function istEnglisch(){ return (studio && studio.sprache) === 'en'; }
@@ -786,7 +788,7 @@ function szeneDaten(){
     title: eng(daten.title, daten.titleEn),
     zeitraum:    daten.datumZeigen === false ? '' : zeitraumAnzeige(),
     wochentage:  daten.tageZeigen  === false ? '' : wochentageText(),
-    rufText: T('ruf'), hinweisPraefix: T('hinweis'),
+    rufText: T('ruf'), hinweisPraefix: T('hinweis'), preisHinweis: T('preis'),
     layout: daten.layout || 'symbole',
     fusszeile: true,
     logoZeigen: daten.logoZeigen !== false,

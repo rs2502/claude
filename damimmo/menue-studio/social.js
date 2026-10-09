@@ -470,8 +470,19 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
   const fussZeile = !ohneFuss && mitQR;
   /* Die Zeile muss samt QR-Feld innerhalb des Zierrahmens (W*0.035) bleiben. */
   const zeileHalb = rufGr*2.4 * 1.06;
-  const rufY   = fussZeile ? Math.min(H - H*0.068, H - W*0.035 - zeileHalb - H*0.012)
-                           : H - (hoch ? H*0.068 : H*0.072);
+
+  /* Preishinweis: steht immer ganz unten im Rahmen, auch wenn die Fußzeile entfällt. */
+  const phGr = Math.round(22*fussS);
+  mess.font = `400 ${phGr}px Poppins, Inter, sans-serif`;
+  const phZeilen = daten.preisHinweis ? ausgewogen(mess, daten.preisHinweis, W-rand*2) : [];
+  const phHoehe  = phZeilen.length*phGr*1.35;
+  const phOben   = H - W*0.035 - H*0.014 - phHoehe;
+  if(phZeilen.length){
+    teile.push({typ:'preishinweis', zeilen:phZeilen, x:W/2, y:phOben, groesse:phGr, ab:ab+0.4});
+  }
+  /* Alles darüber (QR-Code, Hinweise) endet vor dem Preishinweis. */
+  const untenRef = phZeilen.length ? phOben - 16*fussS : H - W*0.035 - H*0.012;
+  const rufY   = fussZeile ? untenRef - zeileHalb : untenRef - phGr*0.5;
   if(fussZeile){
     teile.push({typ:'ruf', qr: true,
                 x:W/2, y:rufY, groesse:rufGr,
@@ -486,7 +497,7 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
   const fussHoch = rufHoehe*1.0;
   let hinweisOben = ohneFuss ? H - H*0.03
                   : fussZeile ? rufY - fussHoch - 34*fussS
-                  : rufY;          /* ohne Logo und QR rückt der Hinweis nach unten */
+                  : untenRef;      /* ohne QR-Code rückt der Hinweis nach unten */
   if(daten.footnote && !ohneFuss){
     mess.font = `400 ${hinweisGr}px Poppins, Inter, sans-serif`;
     const stuecke = hinweisZeilen(daten.footnote);
@@ -513,7 +524,7 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
            /* Ohne Fußzeile darf der Satz bis kurz über den Zierrahmen laufen —
               sonst bleibt unten Platz ungenutzt und die Schrift wird grundlos
               kleiner gerechnet. */
-           zielHoehe: ohneFuss ? H*0.962
+           zielHoehe: ohneFuss ? Math.min(H*0.962, untenRef - 24*s)
                     : (daten.claim ? claimY - 150*s : hinweisOben - 90*s) };
 }
 
@@ -891,6 +902,15 @@ function teilZeichnen(ctx, teil, t, P, format, szene, daten){
     ctx.bezierCurveTo(hx+hg*0.9, hy+hg*0.9, hx+hg*1.35, hy+hg*0.68, hx+hg*1.35, hy+hg*0.38);
     ctx.bezierCurveTo(hx+hg*1.35, hy+hg*0.05, hx+hg*0.9, hy+hg*0.05, hx+hg*0.9, hy+hg*0.35);
     ctx.stroke();
+    ctx.restore(); break;
+  }
+
+  /* Preishinweis ganz unten: klein, mittig, in zwei Zeilen wenn nötig */
+  case 'preishinweis': {
+    ctx.save(); ctx.globalAlpha = auf*0.8;
+    ctx.fillStyle = P.weich; ctx.textAlign = 'center';
+    ctx.font = `400 ${teil.groesse}px Poppins, Inter, sans-serif`;
+    teil.zeilen.forEach((z,i)=> ctx.fillText(z, teil.x, teil.y + teil.groesse*0.95 + i*teil.groesse*1.35));
     ctx.restore(); break;
   }
 

@@ -14,6 +14,7 @@ const Woerterbuch = (()=>{
 
 /* Ganze Beschreibungen, die so auf der Karte stehen ----------------------- */
 const SAETZE = {
+  'frisch, saisonal und jede woche neu für sie zusammengestellt': 'fresh, seasonal and put together anew every week, just for you',
   'werfen sie gerne einen blick auf unsere dessertkarte für süße highlights': 'feel free to take a look at our dessert menu for sweet highlights',
   'werfen sie gerne einen blick auf unsere dessertkarte': 'feel free to take a look at our dessert menu',
   'guten appetit': 'enjoy your meal',
@@ -689,6 +690,13 @@ const BEGRIFFE = {
   'einen': 'a',
   'dessertkarte für süße highlights': 'dessert menu for sweet highlights',
   'süsse': 'sweet',
+
+  'laktosefrei': 'lactose-free',
+  'frisch': 'fresh',
+  'zusammengestellt': 'put together',
+  'zusammengestellte': 'put together',
+  'zusammengestellten': 'put together',
+  'für sie': 'for you',
 
   /* --- Bindewörter ganz zum Schluss --- */
   'sowie': 'as well as',
