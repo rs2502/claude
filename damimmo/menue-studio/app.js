@@ -832,11 +832,11 @@ function szeneBauen(){
     if(fest.hoehe > fest.zielHoehe*1.02){
       const ohne = Object.assign({}, d, {fusszeileAus:true});
       const versuch = Social.szeneKarte(format, ohne, bilder, welt, 1);
-      if(versuch.hoehe <= versuch.zielHoehe*1.02) return ausmitteln(versuch, format);
+      if(versuch.hoehe <= versuch.zielHoehe*1.02) return versuch;
       fest = versuch;
       d = ohne;
     }
-    if(fest.hoehe <= fest.zielHoehe) return ausmitteln(fest, format);
+    if(fest.hoehe <= fest.zielHoehe) return fest;
 
     /* Größtmögliche Schrift suchen, die noch passt (Intervallhalbierung) —
        grobe Schritte ließen sonst Platz ungenutzt. */
@@ -847,7 +847,7 @@ function szeneBauen(){
       if(versuch.hoehe <= versuch.zielHoehe){ beste = versuch; unten = mitte; }
       else oben = mitte;
     }
-    return ausmitteln(beste || Social.szeneKarte(format, d, bilder, welt, 0.36), format);
+    return beste || Social.szeneKarte(format, d, bilder, welt, 0.36);
   }
 
   /* Maßstab so lange nachjustieren, bis der Satz die Fläche füllt. */
@@ -982,26 +982,6 @@ function meldung(text){
   meldung._takt = setTimeout(()=> box.hidden = true, 9000);
 }
 
-
-/* Den Satz senkrecht ausmitteln: oben soll genauso viel Luft bleiben wie
-   unten. Fußzeile und Hinweise hängen am unteren Rand und bleiben stehen. */
-function ausmitteln(bau, format){
-  if(!bau || !bau.teile) return bau;
-  const H = format.h;
-  const inhalt = bau.teile.filter(t=>
-    ['gerichtZ','absatz','legende','trennlinie','gang','titel','titelbild','marke','text','datum','band'].includes(t.typ)
-    && typeof t.y === 'number');
-  if(!inhalt.length) return bau;
-  const oben  = Math.min(...inhalt.map(t=> t.y));
-  const unten = Math.max(...inhalt.map(t=> t.y + (t.hoehe||0)));
-  const grenze = bau.zielHoehe;
-  const platzUnten = grenze - unten;
-  const versatz = (platzUnten - oben) / 2;
-  if(Math.abs(versatz) < 4) return bau;
-  inhalt.forEach(t=> t.y += versatz);
-  bau.hoehe += versatz;
-  return bau;
-}
 
 /* --------------------------------------------------- Blatt einpassen --- */
 const A4_BREIT = 210 * 96 / 25.4;   /* 210 mm in CSS-Pixeln */
