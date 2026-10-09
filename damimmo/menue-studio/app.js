@@ -194,9 +194,17 @@ function laden(){
   }catch(e){ console.warn('Konnte nicht laden:',e); }
   return null;
 }
+let sicherungsFehlerGemeldet = false;
 function sichern(){
-  try{ localStorage.setItem(SPEICHER_V2, JSON.stringify(studio)); }
-  catch(e){ console.warn('Konnte nicht sichern:',e); }
+  try{ localStorage.setItem(SPEICHER_V2, JSON.stringify(studio)); sicherungsFehlerGemeldet = false; }
+  catch(e){
+    console.warn('Konnte nicht sichern:',e);
+    /* Meist ist der Browserspeicher voll (eigene Fotos, Logo). Nicht still weitermachen. */
+    if(!sicherungsFehlerGemeldet && typeof meldung === 'function'){
+      sicherungsFehlerGemeldet = true;
+      meldung('Achtung: Der Browser konnte die Karte nicht speichern (Speicher voll?). Bitte jetzt „Karte sichern“ drücken und große Fotos entfernen.');
+    }
+  }
 }
 
 /* Karte wechseln (Wochenkarte / Mittagstisch) */
@@ -666,7 +674,7 @@ function hinweisAnzeige(){
   return roh.split('\n').map(zeile=>
     zeile.split(/(\s·\s)/).map(teil=>
       teil.trim() && teil !== ' · '
-        ? teil.split(/(?<=\.)\s+/).map(satz=> window.Woerterbuch ? window.Woerterbuch.uebersetzen(satz) : satz).join(' ')
+        ? teil.replace(/\.\s+/g,'.\n').split('\n').map(satz=> window.Woerterbuch ? window.Woerterbuch.uebersetzen(satz) : satz).join(' ')
         : teil).join('')
   ).join('\n');
 }
@@ -1099,7 +1107,7 @@ async function drucken(){
 }
 
 function neueWoche(){
-  if(!confirm('Neue Woche beginnen?\n\nDie Gänge bleiben erhalten, alle Gerichte werden geleert.\nSichere vorher die aktuelle Karte über „JSON sichern“, wenn du sie behalten willst.')) return;
+  if(!confirm('Neue Woche beginnen?\n\nDie Gänge bleiben erhalten, alle Gerichte werden geleert.\nSichere vorher die aktuelle Karte über „Karte sichern“, wenn du sie behalten willst.')) return;
   daten.sections.forEach(s=> s.items = []);
   const montag = naechsterMontag();
   daten.from = iso(montag);
@@ -1139,6 +1147,18 @@ function exportieren(){
   setTimeout(()=>URL.revokeObjectURL(link.href),1000);
 }
 
+/* Was auf den Server geht: Die Sprache im Studio ist nur die Vorschau (Gäste sollen
+   immer auf Deutsch starten), und Gerichtsfotos werden nirgends gezeigt — sie würden
+   nur das Upload-Limit füllen. Die Karte im Browser bleibt unverändert. */
+function veroeffentlichungsDaten(){
+  const kopie = JSON.parse(JSON.stringify(studio));
+  kopie.sprache = 'de';
+  Object.values(kopie.karten||{}).forEach(k=> (k.sections||[]).forEach(s=> (s.items||[]).forEach(i=>{
+    if(typeof i.bild === 'string' && i.bild.startsWith('data:')) delete i.bild;
+  })));
+  return kopie;
+}
+
 async function onlineStellen(){
   const dialog = $('#publishDialog');
   const button = $('#publishSenden');
@@ -1148,8 +1168,9 @@ async function onlineStellen(){
   try{
     const response = await fetch(new URL('publish.php', location.href), {
       method:'POST',
-      headers:{'Content-Type':'application/json','X-Publish-Key':$('#publishKey').value.trim()},
-      body:JSON.stringify(studio),
+      headers:{'Content-Type':'application/json','X-Publish-Key':$('#publishKey').value.trim(),
+               'X-Base-Stand':studio.stand || ''},
+      body:JSON.stringify(veroeffentlichungsDaten()),
       cache:'no-store',
       credentials:'same-origin',
     });
@@ -1164,6 +1185,10 @@ async function onlineStellen(){
         payload_too_large:'Die Karte ist für den PHP-Upload zu groß (maximal 9 MB).',
         backup_failed:'Die Sicherung der bisherigen Karte ist fehlgeschlagen.',
         write_failed:'Der Server durfte menu.json nicht schreiben.',
+        origin_not_allowed:'Der Browser hat keine gültige Herkunft mitgeschickt. Bitte das Studio direkt über https://www.damimmo.de/menue-studio/ öffnen (nicht aus einem Lesezeichen-Frame oder per Weiterleitung).',
+        invalid_json:'Die Karte konnte nicht gelesen werden (ungültiges JSON). Bitte „Karte sichern“ drücken und die Seite neu laden.',
+        stale_menu:'Die Karte wurde inzwischen von einem anderen Gerät veröffentlicht. Bitte „Karte sichern“ drücken, die Seite neu laden (der neue Stand wird geholt, deiner bleibt im Browser gesichert) und die Änderungen übertragen.',
+        method_not_allowed:'Der Server erwartet eine andere Anfrageart — bitte publish.php prüfen.',
       };
       throw new Error(meldungen[result.error] || 'Der Server hat die Veröffentlichung abgelehnt.');
     }

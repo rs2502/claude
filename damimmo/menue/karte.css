@@ -1,0 +1,684 @@
+/* ==========================================================================
+   Da Mimmo · Gästeseite (karte.html)
+   Wie styles.css des Studios, aber ohne die Druckregeln: dort wird beim Drucken alles
+   außer dem Studio-Druckbild ausgeblendet, die Gästeseite käme sonst leer aus dem Drucker.
+   ========================================================================== */
+:root{
+  --gold:#D3A24A;
+  --gold-hell:#F0D28C;
+  --gold-tief:#A8701C;
+  --bronze:#9C561D;
+  --tinte:#221C15;
+  --tinte-weich:#6B6054;
+  --creme:#FBF6EC;
+  --papier:#FFFFFF;
+  --linie:#E2D8C6;
+
+  --ui-bg:#17130F;
+  --ui-panel:#211B15;
+  --ui-panel-2:#2B231B;
+  --ui-linie:#3A3025;
+  --ui-text:#F2E9DB;
+  --ui-text-weich:#C8B9A3;
+  --ui-text-schwach:#A2937F;
+
+  --serif:"Playfair Display","Cormorant Garamond",Georgia,serif;
+  --sans:"Poppins","Inter",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --hand:"Dancing Script",cursive;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--sans);
+  background:var(--ui-bg);
+  color:var(--ui-text);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- Kopfleiste ---------- */
+.app-head{
+  display:flex;align-items:center;gap:20px;
+  padding:14px 22px;
+  background:linear-gradient(180deg,#221B14,#19140F);
+  border-bottom:1px solid var(--ui-linie);
+  position:sticky;top:0;z-index:40;
+}
+.app-head .marke{display:flex;align-items:center;gap:12px}
+.app-head .marke svg{height:30px;width:auto;display:block}
+.app-head .claim{
+  font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ui-text-schwach);border-left:1px solid var(--ui-linie);padding-left:20px;
+}
+.app-head .tools{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+
+.btn{
+  font:inherit;font-size:13px;font-weight:500;
+  padding:9px 14px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--ui-linie);background:var(--ui-panel-2);color:var(--ui-text);
+  transition:background .15s,border-color .15s,transform .08s;
+}
+.btn:hover{background:#362B20;border-color:#4C3E2E}
+.btn:active{transform:translateY(1px)}
+.btn--gold{
+  background:linear-gradient(180deg,var(--gold-hell),var(--gold));
+  border-color:var(--gold-tief);color:#2A1D08;font-weight:600;
+}
+.btn--gold:hover{background:linear-gradient(180deg,#F6DCA0,#DDAE55)}
+.btn--klein{padding:5px 9px;font-size:12px}
+.btn--icon{padding:5px 8px;font-size:13px;line-height:1;min-width:30px}
+.btn--gefahr:hover{background:#4A211B;border-color:#7A392E;color:#FFD7CE}
+
+.publish-dialog{
+  width:min(430px,calc(100vw - 28px));padding:26px;border:1px solid #6D5432;
+  border-radius:16px;background:#211B15;color:var(--ui-text);
+  box-shadow:0 24px 80px rgba(0,0,0,.55);font:inherit
+}
+.publish-dialog::backdrop{background:rgba(8,6,4,.72);backdrop-filter:blur(3px)}
+.publish-dialog h2{margin:0 0 8px;font:600 23px var(--serif);color:var(--gold-hell)}
+.publish-dialog p{margin:0 0 18px;color:var(--ui-text-weich);font-size:13px;line-height:1.55}
+.publish-dialog label{display:block;margin:14px 0 6px;font-size:12px;color:var(--ui-text-weich)}
+.publish-dialog input{width:100%;padding:11px 12px;border:1px solid var(--ui-linie);border-radius:8px;background:#17130F;color:var(--ui-text);font:inherit}
+.publish-dialog input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.publish-dialog .publish-status{margin:12px 0 0;color:#FFD7CE}
+.publish-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:22px}
+
+/* ---------- Layout ---------- */
+.layout{
+  display:grid;
+  grid-template-columns:minmax(340px,400px) 1fr;
+  height:calc(100vh - 60px);
+}
+@media (max-width:960px){
+  .layout{grid-template-columns:1fr;height:auto}
+}
+
+/* ---------- Editor ---------- */
+.editor{
+  overflow-y:auto;padding:20px 20px 80px;
+  background:var(--ui-panel);border-right:1px solid var(--ui-linie);
+}
+.editor h2{
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gold);margin:26px 0 10px;font-weight:600;
+}
+.editor h2:first-child{margin-top:0}
+
+.feld{margin-bottom:12px}
+.feld label{
+  display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ui-text-schwach);margin-bottom:5px;
+}
+.feld input,.feld textarea,.feld select{
+  width:100%;font:inherit;font-size:14px;
+  padding:9px 11px;border-radius:7px;
+  background:#15110D;border:1px solid var(--ui-linie);color:var(--ui-text);
+}
+.feld input:focus,.feld textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(211,162,74,.15)}
+.feld textarea{resize:vertical;min-height:62px;line-height:1.5}
+.feld-reihe{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+details.block{
+  border:1px solid var(--ui-linie);border-radius:10px;
+  background:var(--ui-panel-2);margin-bottom:10px;overflow:hidden;
+}
+details.block>summary{
+  cursor:pointer;padding:11px 13px;font-size:13px;font-weight:500;
+  list-style:none;display:flex;align-items:center;gap:8px;
+}
+details.block>summary::-webkit-details-marker{display:none}
+details.block>summary::before{content:'▸';color:var(--gold);transition:transform .15s}
+details.block[open]>summary::before{transform:rotate(90deg)}
+details.block .inhalt{padding:0 13px 13px}
+
+/* Sektionen & Gerichte */
+.sektion{
+  border:1px solid var(--ui-linie);border-radius:10px;
+  background:var(--ui-panel-2);margin-bottom:12px;
+}
+.sektion-kopf{
+  display:flex;align-items:center;gap:6px;
+  padding:9px 10px;border-bottom:1px solid var(--ui-linie);
+}
+.sektion-kopf input{
+  flex:1;font:inherit;font-size:13px;font-weight:600;letter-spacing:.04em;
+  background:transparent;border:1px solid transparent;color:var(--gold);
+  padding:5px 7px;border-radius:6px;
+}
+.sektion-kopf input:focus{outline:none;background:#15110D;border-color:var(--ui-linie)}
+.sektion-body{padding:10px}
+
+.gericht{
+  border:1px solid #33291F;border-radius:8px;background:#1B1611;
+  padding:10px;margin-bottom:9px;min-width:0;
+}
+.gericht-kopf{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.gericht-kopf input.name{
+  flex:1 1 0;min-width:0;            /* sonst drängt es den Preis aus dem Feld */
+  font-weight:600;font-size:14px;
+  background:#15110D;border:1px solid var(--ui-linie);color:var(--ui-text);
+  padding:7px 9px;border-radius:6px;font-family:inherit;
+}
+/* Platzhalter dezent — wie die Beschreibung darunter */
+.gericht-kopf input.name::placeholder{
+  font-weight:400;color:var(--ui-text-schwach);
+}
+.gericht-kopf input.preis::placeholder{font-weight:400;color:var(--ui-text-schwach)}
+.gericht-kopf input.preis{
+  width:74px;flex:0 0 74px;text-align:right;font-variant-numeric:tabular-nums;
+  background:#15110D;border:1px solid var(--ui-linie);color:var(--gold-hell);
+  padding:7px 9px;border-radius:6px;font:inherit;font-size:14px;
+}
+.gericht textarea{
+  width:100%;font:inherit;font-size:13px;line-height:1.5;min-height:48px;resize:vertical;
+  background:#15110D;border:1px solid var(--ui-linie);color:var(--ui-text-schwach);
+  padding:7px 9px;border-radius:6px;
+}
+.gericht textarea:focus,.gericht input:focus{outline:none;border-color:var(--gold)}
+
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.tag-schalter{
+  font-size:11px;padding:4px 9px;border-radius:20px;cursor:pointer;
+  border:1px solid var(--ui-linie);background:transparent;color:var(--ui-text-schwach);
+  user-select:none;transition:.15s;
+}
+.tag-schalter:hover{border-color:#5A4A36}
+.tag-schalter.an{background:rgba(211,162,74,.16);border-color:var(--gold);color:var(--gold-hell)}
+
+.gericht-fuss{display:flex;justify-content:flex-end;gap:5px;margin-top:8px}
+
+.hinweis{
+  font-size:12px;line-height:1.55;color:var(--ui-text-schwach);
+  background:rgba(211,162,74,.07);border-left:2px solid var(--gold);
+  padding:9px 11px;border-radius:0 6px 6px 0;margin:10px 0 14px;
+}
+.logo-vorschau{
+  display:flex;align-items:center;gap:10px;margin-top:8px;
+  padding:9px;border-radius:7px;background:#15110D;border:1px solid var(--ui-linie);
+}
+.logo-vorschau img{max-height:38px;max-width:150px;object-fit:contain}
+
+/* ---------- Bühne / Vorschau ---------- */
+.buehne{
+  overflow-y:auto;padding:0 0 60px;
+  background:
+    radial-gradient(1200px 500px at 50% -10%,rgba(211,162,74,.09),transparent 60%),
+    #100D0A;
+}
+.buehne-leiste{
+  position:sticky;top:0;z-index:30;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:12px 22px;
+  background:rgba(16,13,10,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--ui-linie);
+}
+.reiter{display:flex;gap:4px;background:var(--ui-panel);padding:4px;border-radius:9px;border:1px solid var(--ui-linie)}
+.reiter button{
+  font:inherit;font-size:13px;padding:7px 14px;border-radius:6px;cursor:pointer;
+  background:transparent;border:0;color:var(--ui-text-schwach);
+}
+.reiter button.aktiv{background:var(--gold);color:#2A1D08;font-weight:600}
+.buehne-leiste .rechts{margin-left:auto;display:flex;gap:8px;align-items:center}
+.warnung{
+  font-size:12px;padding:6px 11px;border-radius:20px;white-space:nowrap;
+  background:rgba(196,105,60,.16);border:1px solid rgba(196,105,60,.5);color:#F0B694;
+}
+.warnung::before{content:'⚠ ';}
+.stil-wahl{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--ui-text-schwach)}
+.stil-wahl select{
+  font:inherit;font-size:13px;padding:7px 10px;border-radius:7px;
+  background:var(--ui-panel);border:1px solid var(--ui-linie);color:var(--ui-text);
+}
+.buehne-inhalt{display:flex;justify-content:center;padding:28px 22px;overflow-x:auto}
+
+/* ==========================================================================
+   DIE KARTE (A4 / Gästeansicht)
+   ========================================================================== */
+.blatt{
+  --s:1;                        /* Füllfaktor, von der App gesetzt */
+  width:210mm;min-height:297mm;
+  padding:14mm 13mm 11mm;
+  position:relative;flex-shrink:0;
+  display:flex;flex-direction:column;
+  color:#F4ECDD;
+  background:#120E0A center/cover no-repeat;
+  box-shadow:0 30px 70px rgba(0,0,0,.55);
+  overflow:hidden;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+/* Dunkler Schleier: oben deckend für den Kopf, unten offen fürs Foto */
+.blatt::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(12,9,6,.94) 0%,rgba(12,9,6,.9) 34%,
+                    rgba(12,9,6,.72) 52%,rgba(12,9,6,.34) 68%,rgba(12,9,6,.12) 82%,
+                    rgba(12,9,6,.30) 100%),
+    radial-gradient(120% 60% at 50% 0%,rgba(227,184,95,.10),transparent 60%);
+}
+.blatt>*{position:relative;z-index:1}
+
+/* Zierrahmen */
+.blatt::after{
+  content:'';position:absolute;inset:6mm;z-index:2;
+  border:.8pt solid rgba(214,171,96,.55);
+  pointer-events:none;
+}
+.blatt.ohne-rahmen::after{display:none}
+
+.karte-kopf{text-align:center;margin-bottom:calc(3mm * var(--s))}
+.karte-marke{
+  display:flex;align-items:center;justify-content:center;
+  gap:calc(4mm * var(--s));margin-bottom:calc(4.5mm * var(--s));
+}
+.karte-kopf .logo-bild{
+  height:calc(17mm * var(--s));width:auto;max-width:140mm;
+  margin:0 auto;display:block;object-fit:contain;
+}
+.karte-kopf .adresse{
+  font-size:calc(12.5pt * var(--s));letter-spacing:.005em;color:#DCD2C2;line-height:1.5;
+  max-width:100%;
+}
+.karte-kopf .adresse span+span::before{content:'·';margin:0 .6em;color:var(--gold)}
+
+.wochen-band{margin:calc(1mm * var(--s)) 0 calc(4mm * var(--s));text-align:center}
+.wochen-band .titel{
+  display:inline-block;font-family:var(--serif);
+  font-size:calc(70pt * var(--s));font-weight:600;
+  letter-spacing:.04em;line-height:1;text-transform:uppercase;
+  background:linear-gradient(180deg,#F5DFA8 0%,#E0B463 45%,#C2873A 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+.wochen-datum{
+  display:flex;align-items:center;justify-content:center;gap:calc(4mm * var(--s));
+  margin-top:calc(1.6mm * var(--s));
+}
+.wochen-datum .strich{
+  flex:0 0 calc(26mm * var(--s));height:.7pt;background:rgba(214,171,96,.6);
+}
+.wochen-datum .spanne{
+  font-family:var(--serif);font-size:calc(30pt * var(--s));font-weight:600;
+  color:#EFD9A6;letter-spacing:.02em;white-space:nowrap;
+}
+.wochen-band .zeitraum{
+  font-size:calc(12pt * var(--s));letter-spacing:.22em;text-transform:uppercase;
+  color:#E3BE79;margin-top:calc(1.4mm * var(--s));font-weight:600;
+}
+.karte-intro{
+  text-align:center;font-family:var(--hand);font-size:calc(17pt * var(--s));
+  color:#EFD9A6;margin:0 0 calc(3mm * var(--s));
+}
+
+.gang{margin-bottom:calc(4mm * var(--s));break-inside:avoid}
+/* Zierlinie links und rechts der Blocküberschrift, mit kleiner Raute */
+.gang-titel .zier{
+  position:relative;flex:1 1 auto;max-width:calc(26mm * var(--s));height:1.4px;
+  background:linear-gradient(90deg,transparent,rgba(224,180,99,.85));
+}
+.gang-titel .zier:last-child{
+  background:linear-gradient(90deg,rgba(224,180,99,.85),transparent);
+}
+.gang-titel .zier::after{
+  content:'';position:absolute;top:50%;left:50%;width:5px;height:5px;
+  transform:translate(-50%,-50%) rotate(45deg);background:rgba(224,180,99,.9);
+}
+.blatt.stil-hell .gang-titel .zier{background:linear-gradient(90deg,transparent,rgba(122,71,16,.8))}
+.blatt.stil-hell .gang-titel .zier:last-child{background:linear-gradient(90deg,rgba(122,71,16,.8),transparent)}
+.blatt.stil-hell .gang-titel .zier::after{background:rgba(122,71,16,.9)}
+
+.gang-titel{
+  display:flex;align-items:center;justify-content:center;
+  gap:calc(4mm * var(--s));
+  text-align:center;font-family:var(--serif);
+  font-size:calc(17pt * var(--s));letter-spacing:.16em;text-transform:uppercase;
+  color:#F0E4CE;font-weight:500;margin:0 0 calc(5.5mm * var(--s));
+}
+
+.speise{
+  display:grid;grid-template-columns:calc(12mm * var(--s)) 1fr auto;
+  align-items:start;gap:calc(2mm * var(--s));
+  margin-bottom:calc(3.4mm * var(--s));break-inside:avoid;
+}
+.speise-symbol{
+  width:calc(10mm * var(--s));height:calc(10mm * var(--s));
+  color:#E0B463;margin-top:calc(.6mm * var(--s));stroke-width:1.5;
+}
+.speise-text{min-width:0}
+.speise-name{text-wrap:balance;
+  font-family:var(--sans);font-size:calc(16.5pt * var(--s));font-weight:600;
+  line-height:1.15;letter-spacing:-.005em;color:#FFFFFF;
+}
+.speise-desc{text-wrap:balance;font-style:italic;white-space:pre-line;
+  font-size:calc(11.5pt * var(--s));line-height:1.35;color:#CFC3B0;
+  margin-top:calc(.9mm * var(--s));
+}
+.speise-preis{
+  font-family:var(--sans);font-size:calc(16.5pt * var(--s));font-weight:600;
+  color:#E8C173;white-space:nowrap;padding-left:calc(3mm * var(--s));
+}
+.marker{display:inline-flex;gap:1.5mm;margin-left:2mm;vertical-align:middle}
+.marker i{
+  font-style:normal;font-size:calc(7.5pt * var(--s));font-weight:600;letter-spacing:.06em;
+  padding:.5mm 1.8mm;border-radius:10px;
+  background:rgba(224,180,99,.16);color:#E8C173;border:1px solid rgba(224,180,99,.45);
+}
+
+/* Umrahmter Block */
+.gang.rahmen{
+  border:.8pt solid rgba(214,171,96,.4);border-radius:1.5mm;
+  padding:calc(4mm * var(--s)) 6mm calc(1.5mm * var(--s));
+  margin-bottom:calc(4mm * var(--s));
+}
+
+/* Fuß: Claim, Hinweise, Reservierung */
+.karte-fuss{
+  margin-top:auto;padding-top:calc(3mm * var(--s));text-align:center;
+  font-size:calc(10pt * var(--s));line-height:1.5;color:#C3B7A4;
+  position:relative;
+}
+/* Dunkler Sockel, damit Spruch und Hinweise auf dem Foto lesbar bleiben */
+.karte-fuss::before{
+  content:'';position:absolute;left:-13mm;right:-13mm;top:0;bottom:-11mm;z-index:-1;
+  background:linear-gradient(180deg,rgba(10,7,5,0),rgba(10,7,5,.55) 30%,rgba(10,7,5,.82));
+  pointer-events:none;
+}
+.blatt.stil-hell .karte-fuss::before{display:none}
+.karte-claim{
+  font-family:var(--hand);font-size:calc(40pt * var(--s));line-height:.95;
+  color:#EFD192;text-align:left;transform:rotate(-8deg);
+  margin:calc(4mm * var(--s)) 0 calc(6mm * var(--s)) calc(8mm * var(--s));
+  max-width:70mm;
+}
+.karte-claim .herz{display:block;font-size:.5em;line-height:1;margin-top:.15em;margin-left:1.6em}
+.karte-fuss .legende{
+  margin-bottom:calc(2mm * var(--s));color:#E0B463;letter-spacing:.05em;font-weight:500;
+}
+.karte-fuss .hinweise{
+  border:.8pt solid rgba(214,171,96,.3);border-radius:1.5mm;
+  padding:calc(2mm * var(--s)) 4mm;color:#B7AB99;
+}
+.karte-fuss .hinweise b{color:#E0D4C0;letter-spacing:.06em}
+.karte-ruf{
+  display:flex;align-items:center;justify-content:center;gap:calc(3mm * var(--s));
+  margin:calc(3.5mm * var(--s)) auto 0;padding:calc(3mm * var(--s)) 12mm;
+  border-radius:3mm;width:fit-content;max-width:100%;
+  background:rgba(12,9,6,.55);border:.6mm solid #E7C27A;
+  color:#E7C27A;font-weight:600;font-size:calc(13pt * var(--s));
+  letter-spacing:.01em;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+.karte-ruf svg{width:calc(5mm * var(--s));height:calc(5mm * var(--s));flex:0 0 auto;color:#D9573F;fill:currentColor}
+.karte-ruf span{white-space:nowrap}
+.karte-ruf .trenner{width:.4mm;align-self:stretch;background:currentColor;margin:0 calc(1.5mm * var(--s))}
+
+/* Variante: ohne Foto — ruhiges Dunkel */
+.blatt.stil-dunkel{background-image:none!important;background-color:#14100B}
+.blatt.stil-dunkel::before{
+  background:linear-gradient(180deg,rgba(20,16,11,.2),rgba(20,16,11,.6)),
+             radial-gradient(120% 60% at 50% 0%,rgba(227,184,95,.12),transparent 62%);
+}
+
+/* Variante: hell — Creme statt Foto, für den sparsamen Druck.
+   Gold wird hier zu Bronze, sonst verschwindet es auf dem hellen Grund. */
+.blatt.stil-hell{
+  background-image:none!important;background-color:#FBF6EC;color:#241D14;
+}
+.blatt.stil-hell::before{background:none}
+.blatt.stil-hell .speise-name{color:#161210}
+.blatt.stil-hell .speise-desc{color:#574E43}
+.blatt.stil-hell .speise-preis{color:#7A4710}
+.blatt.stil-hell .gang-titel{color:#241D14}
+.blatt.stil-hell .karte-kopf .adresse{color:#574E43}
+.blatt.stil-hell .wochen-band .titel{
+  background:linear-gradient(180deg,#A5651B,#6B3C08);
+  -webkit-background-clip:text;background-clip:text;
+}
+.blatt.stil-hell .wochen-datum .spanne{color:#6B3C08}
+.blatt.stil-hell .wochen-datum .strich{background:rgba(122,71,16,.5)}
+.blatt.stil-hell .wochen-band .zeitraum{color:#7A4710}
+.blatt.stil-hell .speise-symbol{color:#7A4710;stroke-width:1.8}
+.blatt.stil-hell .karte-claim{color:#8A5214}
+.blatt.stil-hell .karte-fuss{color:#574E43}
+.blatt.stil-hell .karte-fuss .hinweise{color:#574E43;border-color:#DCCFB8}
+.blatt.stil-hell .karte-fuss .hinweise b{color:#241D14}
+.blatt.stil-hell .gang.rahmen{border-color:rgba(122,71,16,.35)}
+.blatt.stil-hell::after{border-color:rgba(122,71,16,.4)}
+.blatt.stil-hell .karte-ruf{
+  background:transparent;border-color:#6B3A1A;color:#6B3A1A;
+}
+.blatt.stil-hell .karte-ruf svg{color:#A8322A
+}
+
+/* Canvas-Vorschau (Social) */
+.canvas-huelle{
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+}
+.canvas-huelle canvas{
+  box-shadow:0 30px 70px rgba(0,0,0,.55);border-radius:2px;
+  max-width:min(92vw,430px);height:auto;
+}
+.canvas-huelle canvas.a4{max-width:min(92vw,600px)}
+.canvas-info{font-size:12px;color:var(--ui-text-schwach);text-align:center;line-height:1.6}
+
+/* ---------- Zwei Karten: Wochenkarte | Mittagstisch ---------- */
+.karten-reiter{
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 18px;
+  background:#15110D;border:1px solid var(--ui-linie);border-radius:10px;padding:5px;
+}
+.karten-reiter button{
+  font:inherit;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  padding:11px 8px;border:0;border-radius:7px;cursor:pointer;
+  background:transparent;color:var(--ui-text-schwach);
+}
+.karten-reiter button.an{background:rgba(211,162,74,.18);color:var(--gold-hell)}
+
+/* Englische Fassung eines Gerichts */
+.gericht-en{
+  margin-top:9px;padding:9px 10px 10px;border-radius:8px;
+  background:rgba(211,162,74,.06);border:1px dashed rgba(211,162,74,.35);
+  display:flex;flex-direction:column;gap:7px;
+}
+.gericht-en .en-marke{
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);
+}
+.gericht-en input, .gericht-en textarea{width:100%}
+
+/* ---------- Foto-Auswahl & Bewegung ---------- */
+.bild-zeile{display:flex;align-items:center;gap:7px;margin-top:9px}
+.symbol-schau{
+  width:30px;height:30px;flex:0 0 30px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;border:1px solid var(--ui-linie);background:#15110D;color:var(--gold);
+}
+.symbol-schau svg{width:20px;height:20px}
+.symbol-schau.eigenes{border-color:var(--gold);box-shadow:0 0 0 2px rgba(211,162,74,.22)}
+.bild-zeile .btn.an{background:rgba(211,162,74,.2);border-color:var(--gold);color:var(--gold-hell)}
+.bild-zeile select{
+  flex:1;font:inherit;font-size:12px;padding:6px 8px;border-radius:6px;
+  background:#15110D;border:1px solid var(--ui-linie);color:var(--ui-text-schwach);
+}
+.bild-zeile select:focus{outline:none;border-color:var(--gold)}
+.stern{color:var(--ui-text-schwach);font-size:14px;line-height:1;padding:6px 9px}
+.stern.an{background:rgba(211,162,74,.2);border-color:var(--gold);color:var(--gold-hell)}
+
+.meldung{
+  font-size:13px;color:#2A1D08;background:linear-gradient(180deg,var(--gold-hell),var(--gold));
+  padding:9px 16px;border-radius:8px;text-align:center;max-width:430px;line-height:1.5;
+}
+#btnVideo:disabled{opacity:.7;cursor:progress}
+
+/* ---------- Fotos auf der Karte ---------- */
+.speise-bild{
+  width:17mm;height:17mm;flex:0 0 17mm;border-radius:50%;
+  overflow:hidden;display:block;align-self:center;
+  border:.5pt solid rgba(168,112,28,.5);
+  box-shadow:0 1mm 2mm rgba(0,0,0,.10);
+  background:#FFF;
+}
+.speise-bild img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transform:scale(1.22);          /* näher ans Gericht heran */
+}
+.blatt.stil-dunkel .speise-bild{box-shadow:0 1mm 3mm rgba(0,0,0,.5)}
+.schalter{
+  display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ui-text-schwach);
+  padding:7px 11px;border:1px solid var(--ui-linie);border-radius:8px;background:var(--ui-panel);
+  cursor:pointer;user-select:none;
+}
+.schalter input{accent-color:var(--gold);cursor:pointer}
+
+/* ---------- Abschnitts-Überschrift im Editor ---------- */
+.sektion-feld{flex:1;display:block}
+.sektion-feld>span{
+  display:block;font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ui-text-schwach);margin-bottom:3px;
+}
+.sektion-feld input{
+  width:100%;font:inherit;font-size:14px;font-weight:600;
+  background:#15110D;border:1px solid var(--ui-linie);color:var(--gold-hell);
+  padding:7px 9px;border-radius:6px;
+}
+.sektion-feld input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(211,162,74,.15)}
+.sektion-kopf{align-items:flex-end}
+.sektion-kopf .btn.an{background:rgba(211,162,74,.2);border-color:var(--gold);color:var(--gold-hell)}
+
+/* ---------- Hintergrund-Galerie ---------- */
+.hg-wahl{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.hg-wahl button{
+  padding:0;border:1px solid var(--ui-linie);border-radius:8px;overflow:hidden;
+  background:#15110D;cursor:pointer;display:block;position:relative;
+}
+.hg-wahl img{width:100%;height:58px;object-fit:cover;display:block;opacity:.75;transition:.15s}
+.hg-wahl button:hover img{opacity:1}
+.hg-wahl span{
+  display:block;font:inherit;font-size:10px;letter-spacing:.04em;
+  color:var(--ui-text-schwach);padding:4px 2px;
+}
+.hg-wahl button.an{border-color:var(--gold);box-shadow:0 0 0 2px rgba(211,162,74,.25)}
+.hg-wahl button.an img{opacity:1}
+.hg-wahl button.an span{color:var(--gold-hell)}
+
+/* ---------- Feste Bereiche im Editor ---------- */
+/* Kasten mit den zwei Umschaltern — die Leiste bleibt beim Blättern stehen */
+.bereich-box{
+  border:1px solid var(--ui-linie);border-radius:12px;
+  background:var(--ui-panel-2);
+  /* kein overflow:hidden — das würde das Mitwandern der Leiste aufheben */
+}
+.bereich-reiter{
+  display:flex;overflow-x:auto;scrollbar-width:none;
+  border-bottom:1px solid var(--ui-linie);
+  position:sticky;top:-1px;z-index:6;
+  background:var(--ui-panel-2);
+  border-radius:11px 11px 0 0;
+  box-shadow:0 6px 14px -8px rgba(0,0,0,.75);
+}
+/* deckt beim Blättern ab, was sonst über der Leiste durchscheint */
+.bereich-reiter::before{
+  content:'';position:absolute;left:-1px;right:-1px;bottom:100%;height:16px;
+  background:var(--ui-panel);
+}
+.bereich-reiter::-webkit-scrollbar{display:none}
+.bereich-reiter button{
+  font:inherit;font-family:var(--serif-ui,inherit);
+  font-size:14px;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;
+  flex:1 0 auto;padding:13px 14px;cursor:pointer;
+  background:transparent;border:0;color:var(--ui-text-schwach);
+  transition:color .15s,background .15s;
+}
+.bereich-reiter button+button{border-left:1px solid var(--ui-linie)}
+.bereich-reiter button:hover{color:var(--gold-hell)}
+.bereich-reiter button.an{
+  color:var(--gold-hell);
+  background:linear-gradient(180deg,rgba(211,162,74,.18),rgba(211,162,74,.05));
+  box-shadow:inset 0 -2px 0 var(--gold);
+}
+.bereich-reiter button:first-child{border-radius:11px 0 0 0}
+.bereich-reiter button.neu{flex:0 0 auto;font-size:18px;letter-spacing:0;padding:13px 16px;color:var(--gold)}
+.bereich-reiter button.neu:hover{background:rgba(211,162,74,.12)}
+.bereich-body{padding:12px;border-radius:0 0 11px 11px}
+.btn--zufuegen{width:100%;border-style:dashed;margin-top:2px}
+
+/* ---------- Merkmale je Gericht ---------- */
+.merkmal-zeile{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.btn--merkmal{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;padding:6px 10px}
+.btn--merkmal svg{width:15px;height:15px;flex:0 0 auto}
+.btn--merkmal.an{background:rgba(211,162,74,.2);border-color:var(--gold);color:var(--gold-hell)}
+
+/* ---------- Schalter: Datum / Wochentage zeigen ---------- */
+.schalter-reihe{display:flex;gap:18px;flex-wrap:wrap;margin:-4px 0 14px}
+.schalter{
+  display:flex;align-items:center;gap:7px;cursor:pointer;
+  font-size:12.5px;letter-spacing:.02em;color:var(--ui-text-schwach);
+}
+.schalter input{width:16px;height:16px;accent-color:var(--gold);cursor:pointer}
+
+/* ---------- Kopf eines Blocks ---------- */
+.block-kopf{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 12px;border-bottom:1px solid var(--ui-linie);
+  background:rgba(211,162,74,.05);
+}
+.block-kopf .block-name{
+  flex:1;min-width:0;font:inherit;font-size:13px;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;
+  background:#15110D;border:1px solid var(--ui-linie);border-radius:7px;
+  padding:9px 10px;color:var(--ui-text);
+}
+.block-kopf .block-name:focus{outline:none;border-color:var(--gold)}
+.block-werkzeuge{display:flex;gap:5px;flex:0 0 auto}
+.block-werkzeuge .btn.an{background:rgba(211,162,74,.22);border-color:var(--gold);color:var(--gold-hell)}
+
+/* Ruhiger Hinweis statt Warnung */
+.warnung--ruhig{
+  background:rgba(211,162,74,.12);border-color:rgba(211,162,74,.4);color:var(--gold-hell);
+}
+.warnung--ruhig::before{content:'ℹ ';}
+
+/* ==========================================================================
+   Handy und Tablet — Bearbeiten und Vorschau im Wechsel statt untereinander
+   ========================================================================== */
+.nur-handy{display:none}
+
+@media (max-width:960px){
+  .nur-handy{display:inline-flex}
+
+  .app-head{padding:9px 12px;gap:10px;flex-wrap:wrap}
+  .app-head .marke svg{height:22px}
+  .app-head .claim{display:none}
+  .app-head .tools{width:100%;margin-left:0;gap:6px}
+  .app-head .tools .btn{flex:1 1 0;min-width:0;padding:9px 4px;font-size:12px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .app-head .tools .btn--gold{flex:1.3 1 0}
+
+  /* Immer nur eines von beiden zeigen */
+  body:not(.zeigt-vorschau) .buehne{display:none}
+  body.zeigt-vorschau .editor{display:none}
+
+  .layout{display:block;height:auto}
+  .editor{border-right:0;padding:16px 14px 90px;min-height:calc(100dvh - 120px)}
+  .buehne{min-height:calc(100dvh - 120px)}
+
+  .buehne-leiste{padding:10px 12px;gap:6px}
+  .buehne-leiste .reiter button{padding:8px 11px;font-size:12px}
+  .buehne-leiste .rechts{gap:6px}
+  .buehne-leiste .btn{padding:8px 11px;font-size:12px}
+  .stil-wahl label{display:none}
+  .buehne-inhalt{padding:14px 10px}
+
+  /* Größere Ziele für den Finger */
+  .gericht-kopf input.name,.gericht-kopf input.preis,
+  .gericht textarea,.bild-zeile select{font-size:16px;padding:10px}
+  .btn--icon{min-width:38px;padding:8px 10px}
+  .bereich-reiter button{padding:15px 8px;font-size:14px}
+  .hg-wahl img{height:64px}
+
+  /* Die Umschalter kleben unter der Kopfleiste */
+  .bereich-reiter{top:0}
+  .bereich-reiter::before{display:none}
+}
+
+@media (max-width:420px){
+  .app-head .tools .btn{font-size:11px;padding:8px 3px}
+  .buehne-inhalt{padding:12px 6px}
+}

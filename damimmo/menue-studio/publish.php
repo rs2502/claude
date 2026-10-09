@@ -30,7 +30,8 @@ function valid_card(mixed $card): bool {
     if (isset($card['hintergrund'])) {
         $background = $card['hintergrund'];
         if (!is_string($background) || !preg_match('/^[A-Za-z0-9_-]+\.(?:jpe?g|png|webp)$/i', $background)) return false;
-        if (!is_file(__DIR__ . '/bilder/' . $background)) return false;
+        /* The guest page lives in /menue, so the image must exist there. */
+        if (!is_file(dirname(__DIR__) . '/menue/bilder/' . $background)) return false;
     }
 
     /* The editor stores uploaded logos inline. Disallow remote or executable URLs. */
@@ -87,6 +88,19 @@ foreach (['wochenkarte', 'mittagstisch'] as $key) {
     }
 }
 
+/* The editor language is only the editor's preview; guests always start in German.
+   Photos of single dishes are never shown, so they are not stored. */
+$studio['sprache'] = 'de';
+foreach (['wochenkarte', 'mittagstisch'] as $key) {
+    foreach (($studio['karten'][$key]['sections'] ?? []) as $si => $section) {
+        foreach (($section['items'] ?? []) as $ii => $item) {
+            if (isset($item['bild']) && is_string($item['bild']) && str_starts_with($item['bild'], 'data:')) {
+                unset($studio['karten'][$key]['sections'][$si]['items'][$ii]['bild']);
+            }
+        }
+    }
+}
+
 /* Make the new revision visible to the editor's existing stale-data check. */
 $studio['stand'] = gmdate('Y-m-d\TH:i:s\Z');
 $encoded = json_encode($studio, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
@@ -97,10 +111,34 @@ if (!is_dir($publicDirectory) || !is_writable($publicDirectory)) {
 }
 $target = $publicDirectory . '/menu.json';
 $temporary = $publicDirectory . '/.menu-upload-' . bin2hex(random_bytes(8)) . '.tmp';
-$backup = __DIR__ . '/.menu-backup.json';
 
-if (is_file($target) && !@copy($target, $backup)) {
-    answer(500, ['ok' => false, 'error' => 'backup_failed']);
+/* Refuse to overwrite a card that somebody else published in the meantime. */
+$baseStand = $_SERVER['HTTP_X_BASE_STAND'] ?? null;
+if ($baseStand !== null && is_file($target)) {
+    $current = json_decode((string)@file_get_contents($target), true);
+    $currentStand = is_array($current) ? (string)($current['stand'] ?? '') : '';
+    if ($currentStand !== (string)$baseStand) {
+        answer(409, ['ok' => false, 'error' => 'stale_menu', 'stand' => $currentStand]);
+    }
+}
+
+/* Dated backups in a folder that the web server does not hand out. Keep the last 30. */
+$backupDirectory = __DIR__ . '/backups';
+if (is_file($target)) {
+    if (!is_dir($backupDirectory) && !@mkdir($backupDirectory, 0755)) {
+        answer(500, ['ok' => false, 'error' => 'backup_failed']);
+    }
+    $guard = $backupDirectory . '/.htaccess';
+    if (!is_file($guard)) {
+        @file_put_contents($guard, "Require all denied\n<IfModule !mod_authz_core.c>\nOrder allow,deny\nDeny from all\n</IfModule>\n");
+    }
+    $backup = $backupDirectory . '/menu-' . gmdate('Ymd\THis\Z') . '.json';
+    if (!@copy($target, $backup)) {
+        answer(500, ['ok' => false, 'error' => 'backup_failed']);
+    }
+    $old = glob($backupDirectory . '/menu-*.json') ?: [];
+    sort($old);
+    foreach (array_slice($old, 0, max(0, count($old) - 30)) as $file) @unlink($file);
 }
 if (@file_put_contents($temporary, $encoded, LOCK_EX) === false || !@rename($temporary, $target)) {
     @unlink($temporary);

@@ -98,18 +98,19 @@ const SYMBOLE = {
   ]},
 };
 
-/* Welches Symbol passt? Reihenfolge ist Absicht — Genaueres zuerst. */
+/* Welches Symbol passt? Reihenfolge ist Absicht — Genaueres zuerst.
+   Kurze Wörter (eis, ente, pute) nur am Wortanfang, sonst trifft „eis“ auch Reis und Preis. */
 const SYMBOL_REGELN = [
   [/pizza|calzone|steinofen|focaccia/, 'pizza'],
   [/nudel|pasta|spaghetti|tagliatelle|penne|lasagne|gnocchi|tortellini|ravioli|risotto|linguine/, 'pasta'],
-  [/garnel|scampi|krabbe|muschel|tintenfisch|calamar|meeresfrücht|frutti di mare|vongole/, 'muschel'],
+  [/garnel|scampi|krabbe|muschel|cozze|moules|auster|ostriche|tintenfisch|calamar|meeresfrücht|frutti di mare|vongole/, 'muschel'],
   [/fisch|lachs|dorade|wolfsbarsch|thunfisch|pesce|forelle|zander/, 'fisch'],
-  [/huhn|hähnchen|pollo|pute|ente|geflügel/, 'huhn'],
+  [/huhn|hähnchen|pollo|\bpute|\bente\b|\benten|geflügel/, 'huhn'],
   [/schwein|filetspitzen vom schwein|schnitzel|porchetta/, 'schwein'],
   [/steak|rump|rind|lamm|kalb|entrecote|filet|fleisch|carne|braten/, 'steak'],
   [/suppe|minestrone|brühe|zuppa/, 'suppe'],
   [/salat|insalata|rucola|caprese/, 'salat'],
-  [/dessert|dolci|nachtisch|tiramisu|panna|eis|sorbet|kuchen/, 'dessert'],
+  [/dessert|dolci|nachtisch|tiramisu|panna|\beis|sorbet|kuchen/, 'dessert'],
   [/käse|formaggio|parmesan pur|gorgonzola/, 'kaese'],
   [/brot|bruschetta|antipast|vorspeise|focaccia|grissini/, 'brot'],
   [/spritz|aperol|cocktail|limonade|saft|alkoholfrei|drink/, 'spritz'],

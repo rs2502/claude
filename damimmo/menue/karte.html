@@ -10,9 +10,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Dancing+Script:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=160">
-<script src="woerterbuch.js?v=160"></script>
-<script src="symbole.js?v=160"></script>
+<link rel="stylesheet" href="karte.css?v=161">
+<script src="woerterbuch.js?v=161"></script>
+<script src="symbole.js?v=161"></script>
 <style>
   body{background:#f2efe6;padding:0}
   .gaeste{display:flex;justify-content:center;padding:20px 12px 50px}
@@ -38,6 +38,7 @@
     .karte-ruf .trenner{margin:0 2px}
     .karte-fuss{font-size:13px}
   }
+  @media print{ .gaeste-wahl{display:none} body{background:#fff} .blatt{box-shadow:none} }
   .fehler{color:#C8B9A3;font-family:Inter,sans-serif;text-align:center;padding:60px 20px;line-height:1.7}
 
   /* Helle Extrakarte nach der Referenzvorlage; vorhandene Schriftgrade bleiben unverändert. */
@@ -388,7 +389,7 @@ function hinweisText(d){
   return roh.split('\n').map(zeile=>
     zeile.split(/(\s·\s)/).map(teil=>
       teil.trim() && teil !== ' · '
-        ? teil.split(/(?<=\.)\s+/).map(satz=> Woerterbuch.uebersetzen(satz)).join(' ')
+        ? teil.replace(/\.\s+/g,'.\n').split('\n').map(satz=> Woerterbuch.uebersetzen(satz)).join(' ')
         : teil).join('')).join('\n');
 }
 
@@ -432,7 +433,7 @@ function starten(roh){
     const anderer = ['wochenkarte','mittagstisch'].find(k=> gefuellt(studio.karten[k]));
     if(anderer) aktiv = anderer;
   }
-  if(roh && roh.sprache === 'en') sprache = 'en';
+  /* Die Sprache im Studio ist nur dessen Vorschau — Gäste starten immer auf Deutsch. */
   wahlAufbauen();
   anzeigen();
 }

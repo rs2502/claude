@@ -17,7 +17,7 @@ function bildRaten(gangName, gericht){
     [/fisch|meer|lachs|dorade|garnel|scampi|pesce|muschel|tintenfisch|thunfisch/, 'pesce'],
     [/fleisch|steak|filet|rump|schwein|rind|lamm|kalb|huhn|hähnchen|pollo|carne/, 'carne'],
     [/salat|insalata|vorspeise|antipast/, 'insalate'],
-    [/dessert|dolci|nachtisch|tiramisu|panna|eis/, 'dolci'],
+    [/dessert|dolci|nachtisch|tiramisu|panna|\beis/, 'dolci'],
   ];
   for(const [muster,schluessel] of regeln) if(muster.test(text)) return schluessel;
   return null;

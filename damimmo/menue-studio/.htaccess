@@ -1,0 +1,11 @@
+# Versteckte Dateien (.publish-secret.php usw.) nie ausliefern; publish.php liest sie direkt vom Dateisystem.
+<FilesMatch "^\.">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+Header set X-Robots-Tag "noindex, nofollow"
