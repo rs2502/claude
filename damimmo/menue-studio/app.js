@@ -239,11 +239,8 @@ function editorAufbauen(){
   $('#fDatumZeigen').checked = daten.datumZeigen !== false;
   $('#fTageZeigen').checked  = daten.tageZeigen  !== false;
   $('#fAdresse').checked     = daten.adresseZeigen !== false;
-  $('#fFussZeigen').checked  = daten.fusszeile !== false;
   $('#fQR').checked          = daten.qrZeigen === true;
-  $('#fKnopf').checked       = daten.knopfZeigen !== false;
   $('#fLinien').checked      = daten.linienZeigen === true;
-  $('#fBlockTitel').checked  = daten.blockTitel !== false;
   $('#fUeberschrift').value  = daten.ueberschrift || 'keine';
   $('#fLogoUnten').checked   = !!daten.logoUnten;
   logoVorschauSetzen();
@@ -773,7 +770,7 @@ function blockTitel(s){
 
 function szeneDaten(){
   const sections = daten.sections.map(s=>({
-    label: (daten.blockTitel !== false && s.titelZeigen) ? blockTitel(s) : '',
+    label: s.titelZeigen ? blockTitel(s) : '',
     rahmen: !!s.rahmen,
     links: !!s.links,
     items: (s.items||[]).filter(i=>i.name||i.desc).map(i=>({
@@ -792,7 +789,7 @@ function szeneDaten(){
     wochentage:  daten.tageZeigen  === false ? '' : wochentageText(),
     rufText: T('ruf'), hinweisPraefix: T('hinweis'),
     layout: daten.layout || 'symbole',
-    fusszeile: daten.fusszeile !== false,
+    fusszeile: true,
     logoUnten: !!daten.logoUnten,
     adresseZeigen: daten.adresseZeigen !== false,
     claim: '',                    /* Spruch auf Wunsch entfernt */
@@ -802,7 +799,6 @@ function szeneDaten(){
     logoBild: daten.logo ? bilder['logo:'+kurzHash(daten.logo)] : (bilder['logo'] || null),
     qrBild: !qrExportAusblenden && !!FORMATE[ansicht].papier && daten.qrZeigen === true
       ? (bilder['qr'] || null) : null,
-    knopfZeigen: daten.knopfZeigen !== false,
     linienZeigen: daten.linienZeigen === true,
     ueberschrift: daten.ueberschrift || 'keine',
     titelBild: bilder['titelbild'] || null,
@@ -835,7 +831,7 @@ function szeneBauen(){
     let fest = Social.szeneKarte(format, d, bilder, welt, 1);
     /* Reicht der Platz nicht, fliegt zuerst die Fußzeile raus —
        erst danach wird die Schrift kleiner als 9,5 pt. */
-    if(fest.hoehe > fest.zielHoehe*1.02 && d.fusszeile !== false){
+    if(fest.hoehe > fest.zielHoehe*1.02){
       const ohne = Object.assign({}, d, {fusszeileAus:true});
       const versuch = Social.szeneKarte(format, ohne, bilder, welt, 1);
       if(versuch.hoehe <= versuch.zielHoehe*1.02) return ausmitteln(versuch, format);
@@ -1254,24 +1250,12 @@ function verdrahten(){
     daten.ueberschrift = e.target.value; aktualisieren();
   });
 
-  $('#fBlockTitel').addEventListener('change',e=>{
-    daten.blockTitel = e.target.checked; aktualisieren();
-  });
-
   $('#fLinien').addEventListener('change',e=>{
     daten.linienZeigen = e.target.checked; aktualisieren(false);
   });
 
-  $('#fKnopf').addEventListener('change',e=>{
-    daten.knopfZeigen = e.target.checked; aktualisieren(false);
-  });
-
   $('#fQR').addEventListener('change',e=>{
     daten.qrZeigen = e.target.checked; aktualisieren(false);
-  });
-
-  $('#fFussZeigen').addEventListener('change',e=>{
-    daten.fusszeile = e.target.checked; aktualisieren(false);
   });
 
   $('#fAdresse').addEventListener('change',e=>{

@@ -169,9 +169,9 @@
 let studio = null, aktiv = 'wochenkarte', sprache = 'de';
 const EN = ()=> sprache === 'en';
 const TEXTE = {
-  de:{ getraenke:'Empfohlene Getränke', ruf:'Tisch reservieren', hinweis:'WICHTIGE HINWEISE:',
+  de:{ getraenke:'Empfohlene Getränke', hinweis:'WICHTIGE HINWEISE:',
        bis:'bis', karte:{wochenkarte:'Extra Karte', mittagstisch:'Mittagstisch'} },
-  en:{ getraenke:'Recommended Drinks', ruf:'Reserve a table', hinweis:'PLEASE NOTE:',
+  en:{ getraenke:'Recommended Drinks',  hinweis:'PLEASE NOTE:',
        bis:'to', karte:{wochenkarte:'Specials', mittagstisch:'Lunch Menu'} },
 };
 const T = k => TEXTE[EN()?'en':'de'][k];
@@ -221,8 +221,6 @@ function spanneText(d){
   }
   return kurz(d.from||d.to||'');
 }
-
-const TELEFON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1.1z"/></svg>';
 
 function zeichnen(d){
   const blatt = document.getElementById('blatt');
@@ -285,7 +283,7 @@ function zeichnen(d){
 
   blatt.innerHTML = `
     <header class="karte-kopf">
-      ${d.logoUnten ? '' : `<div class="karte-marke">${marke}</div>`}
+      
       ${adresse?`<div class="adresse">${adresse}</div>`:''}
     </header>
     <div class="wochen-band">
@@ -305,7 +303,6 @@ function zeichnen(d){
         return `<div class="hinweise">${zeilen.map((z,i)=>
           `<span class="zeile">${i===0?`<b>${esc(T('hinweis'))}</b> `:''}${esc(z)}</span>`).join('')}</div>`; })():''}
       ${d.logoUnten ? `<div class="fuss-marke">${marke}</div>` : ''}
-      ${r.phone?`<div class="karte-ruf">${TELEFON}<span>${esc(T('ruf'))}</span><span class="trenner"></span><span>${esc(r.phone)}</span></div>`:''}
       <div class="qr-speisekarte"><img src="bilder/qr-code-speisekarte-kompakt.png" alt="QR-Code zur Speisekarte" loading="lazy"></div>
       <div class="preis-hinweis">${esc(EN()?'All prices include VAT and service. Prices are subject to change.':preisHinweis)}</div>
     </footer>`}`;

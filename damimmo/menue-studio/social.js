@@ -187,12 +187,7 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
   /* ---------------- Kopf ---------------- */
   let y = hoch ? H*0.075 : H*0.075;      /* etwas mehr Luft oben */
 
-  /* Das Logo steht oben — oder unten neben der Telefonnummer */
-  if(!daten.logoUnten){
-    teile.push({typ:'marke', x:W/2, y, hoehe:84*sk, ab:0.12});
-    /* Text steht auf der Grundlinie — die Schriftgröße gehört mit in den Abstand */
-    y += 84*sk + 16*sk + 28*sk;
-  }
+  /* Das Logo steht (wenn gewählt) unten in der Fußzeile, nicht mehr im Kopf. */
 
   const adresse = daten.adresseZeigen === false ? '' :
                   [daten.restaurant.street, daten.restaurant.city]
@@ -462,10 +457,16 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
      Der Spruch wächst nach unten — seine Höhe wird deshalb vorher gerechnet. */
   const fussS  = Math.min(sk, 1.12);       /* der Fuß wächst nur gedämpft mit */
   const rufGr  = Math.round(32*fussS);
-  const rufY   = H - (hoch ? H*0.068 : H*0.072);
-  if(daten.restaurant.phone && !ohneFuss && daten.knopfZeigen !== false){
-    teile.push({typ:'ruf', text:daten.rufText || 'Tisch reservieren', nummer:daten.restaurant.phone,
-                marke: !!daten.logoUnten, qr: !!daten.qrBild,
+  /* Unten steht nur noch eine Zeile mit Logo und/oder QR-Code. */
+  const mitLogo  = !!(daten.logoUnten && daten.logoBild);
+  const mitQR    = !!daten.qrBild;
+  const fussZeile = !ohneFuss && (mitLogo || mitQR);
+  /* Die Zeile muss samt QR-Feld innerhalb des Zierrahmens (W*0.035) bleiben. */
+  const zeileHalb = rufGr*2.4 * (mitQR ? 1.06 : 0.43);
+  const rufY   = fussZeile ? Math.min(H - H*0.068, H - W*0.035 - zeileHalb - H*0.012)
+                           : H - (hoch ? H*0.068 : H*0.072);
+  if(fussZeile){
+    teile.push({typ:'ruf', marke: mitLogo, qr: mitQR,
                 x:W/2, y:rufY, groesse:rufGr,
                 breite:Math.min(W-rand*2, 780*fussS), ab:ab+0.35});
   }
@@ -475,8 +476,10 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
   /* Der QR-Code ist höher als der Knopf — die Hinweiszeile muss darüber
      bleiben, sonst klebt sie am weißen Feld des Codes. */
   const rufHoehe = rufGr*2.4;
-  const fussHoch = (daten.qrBild && !ohneFuss) ? rufHoehe*1.0 : rufHoehe*0.58;
-  let hinweisOben = ohneFuss ? H - H*0.03 : rufY - fussHoch - 34*fussS;
+  const fussHoch = mitQR ? rufHoehe*1.0 : rufHoehe*0.58;
+  let hinweisOben = ohneFuss ? H - H*0.03
+                  : fussZeile ? rufY - fussHoch - 34*fussS
+                  : rufY;          /* ohne Logo und QR rückt der Hinweis nach unten */
   if(daten.footnote && !ohneFuss){
     mess.font = `400 ${hinweisGr}px Poppins, Inter, sans-serif`;
     const stuecke = hinweisZeilen(daten.footnote);
@@ -908,74 +911,32 @@ function teilZeichnen(ctx, teil, t, P, format, szene, daten){
     ctx.restore(); break;
   }
 
-  /* Goldener Knopf mit Telefonhörer */
-  /* Schlichter Reservierungsknopf: Kontur, Hörer, Text | Nummer */
+  /* Fußzeile: Logo links, QR-Code rechts daneben, beides mittig */
   case 'ruf': {
     ctx.save(); ctx.globalAlpha=auf;
     ctx.translate(teil.x, teil.y);
-    const hell = P.hell;
-    const farbe = hell ? '#6B3A1A' : '#E7C27A';
     const g = teil.groesse, h = g*2.4;
-
-    ctx.font = `600 ${g}px Poppins, Inter, sans-serif`;
-    const lb = ctx.measureText(teil.text).width;
-    const nb = teil.nummer ? ctx.measureText(teil.nummer).width : 0;
-    const iconG = g*1.2, luft = g*0.9;
-    const inhalt = iconG + g*0.6 + lb + (teil.nummer ? luft*2 + nb : 0);
-    const b = Math.min(teil.breite, inhalt + g*2.6);
-
-    /* Fußzeile von links nach rechts: Schriftzug, Knopf, QR-Code */
     const logo = (teil.marke && daten.logoBild) ? daten.logoBild : null;
     const qr   = teil.qr ? daten.qrBild : null;
-    if(logo || qr){
-      const abstand = g*1.2;
-      let lw = 0, lh = 0;
-      if(logo){
-        /* Der Schriftzug ist breit — über die Breite begrenzen, sonst
-           wirkt er größer als der Knopf daneben. */
-        lh = h*0.85; lw = lh * (logo.width/logo.height);
-        const maxB = teil.breite*0.32;
-        if(lw > maxB){ lw = maxB; lh = lw * (logo.height/logo.width); }
-      }
-      const qs = qr ? h*2.0 : 0;                 /* QR ist quadratisch */
-      const gesamt = (logo ? lw + abstand : 0) + b + (qr ? abstand + qs : 0);
-      /* Alles zusammen darf nie breiter als die Karte sein */
-      const verfuegbar = W*0.90;
-      if(gesamt > verfuegbar) ctx.scale(verfuegbar/gesamt, verfuegbar/gesamt);
-
-      let x = -gesamt/2;
-      if(logo){ ctx.drawImage(logo, x, -lh/2, lw, lh); x += lw + abstand; }
-      if(qr){
-        /* weißes Feld unter dem Code, sonst ist er auf dem Foto nicht lesbar */
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(x + b + abstand - qs*0.06, -qs/2 - qs*0.06, qs*1.12, qs*1.12);
-        ctx.drawImage(qr, x + b + abstand, -qs/2, qs, qs);
-      }
-      /* ab hier zeichnet der Knopf um seine eigene Mitte */
-      ctx.translate(x + b/2, 0);
+    const abstand = g*2;
+    let lw = 0, lh = 0;
+    if(logo){
+      lh = h*0.85; lw = lh * (logo.width/logo.height);
+      const maxB = W*0.5;
+      if(lw > maxB){ lw = maxB; lh = lw * (logo.height/logo.width); }
     }
-
-    /* leicht abgedunkelt, damit die Schrift auf dem Foto trägt */
-    if(!hell){ ctx.fillStyle='rgba(12,9,6,.55)'; pille(ctx,-b/2,-h/2,b,h,h*0.22); ctx.fill(); }
-    ctx.strokeStyle = farbe; ctx.lineWidth = Math.max(2, g*0.09);
-    pille(ctx,-b/2,-h/2,b,h,h*0.22); ctx.stroke();
-
-    let x = -inhalt/2;
-    ctx.save();
-    ctx.translate(x, -iconG/2); ctx.scale(iconG/24, iconG/24);
-    ctx.fillStyle = hell ? '#A8322A' : '#D9573F';
-    ctx.fill(new Path2D(TELEFON_PFAD));
-    ctx.restore();
-    x += iconG + g*0.6;
-
-    ctx.fillStyle = farbe; ctx.textAlign='left';
-    ctx.fillText(teil.text, x, g*0.35);
-    x += lb;
-    if(teil.nummer){
-      x += luft;
-      ctx.fillRect(x - ctx.lineWidth/2, -h*0.28, Math.max(1.5, g*0.06), h*0.56);
-      x += luft;
-      ctx.fillText(teil.nummer, x, g*0.35);
+    const qs = qr ? h*2.0 : 0;                 /* QR ist quadratisch */
+    const gesamt = lw + (logo && qr ? abstand : 0) + qs;
+    /* Alles zusammen darf nie breiter als die Karte sein */
+    const verfuegbar = W*0.90;
+    if(gesamt > verfuegbar) ctx.scale(verfuegbar/gesamt, verfuegbar/gesamt);
+    let x = -gesamt/2;
+    if(logo){ ctx.drawImage(logo, x, -lh/2, lw, lh); x += lw + abstand; }
+    if(qr){
+      /* weißes Feld unter dem Code, sonst ist er auf dem Foto nicht lesbar */
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(x - qs*0.06, -qs/2 - qs*0.06, qs*1.12, qs*1.12);
+      ctx.drawImage(qr, x, -qs/2, qs, qs);
     }
     ctx.restore(); break;
   }
