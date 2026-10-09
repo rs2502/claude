@@ -822,8 +822,8 @@ function szeneBauen(){
   let d = szeneDaten();
   const welt = weltFuerStil();
 
-  /* Mittiges Layout auf Papier: feste 9,5 pt. Der Satz wird dann nicht
-     vergrößert, sondern höchstens verkleinert, wenn die Karte zu lang ist. */
+  /* Mittiges Layout auf Papier: Start bei 9,5 pt. Ist die Karte zu lang, wird die Schrift
+     kleiner; bleibt Platz, wächst sie bis höchstens 14 pt. */
   const festeSchrift = !!format.papier && d.layout === 'zentriert';
   if(festeSchrift){
     let fest = Social.szeneKarte(format, d, bilder, welt, 1);
@@ -836,7 +836,17 @@ function szeneBauen(){
       fest = versuch;
       d = ohne;
     }
-    if(fest.hoehe <= fest.zielHoehe) return fest;
+    if(fest.hoehe <= fest.zielHoehe){
+      /* Bleibt Platz übrig, wächst die Schrift — von 9,5 pt bis höchstens 14 pt. */
+      let unten = 1, oben = Social.FEST_MAX, groesste = fest;
+      for(let i=0;i<10;i++){
+        const mitte = (unten+oben)/2;
+        const versuch = Social.szeneKarte(format, d, bilder, welt, mitte);
+        if(versuch.hoehe <= versuch.zielHoehe){ groesste = versuch; unten = mitte; }
+        else oben = mitte;
+      }
+      return groesste;
+    }
 
     /* Größtmögliche Schrift suchen, die noch passt (Intervallhalbierung) —
        grobe Schritte ließen sonst Platz ungenutzt. */

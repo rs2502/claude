@@ -45,6 +45,9 @@ const WELTEN = {
            schleier:null, foto:false, grund:'#FFFFFF', hell:true, schlicht:true },
 };
 
+/* Mittiges Layout auf Papier: Start bei 9,5 pt, bei wenig Text wächst die Schrift bis höchstens 14 pt. */
+const FEST_MAX = 14/9.5;
+
 /* ------------------------------------------------------------ Körnung --- */
 let kornMuster = null;
 function korn(ctx){
@@ -181,7 +184,7 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
   /* Bei fester Schriftgröße (mittig auf Papier) darf der Kopf nicht
      mitwachsen — sonst steht ein riesiger Titel über winzigen Zeilen. */
   const festerSatz = daten.layout === 'zentriert' && !!format.papier;
-  const sk = festerSatz ? s*0.6 : s;
+  const sk = festerSatz ? Math.min(1,s)*0.6 : s;     /* der Kopf wächst nicht mit der Schrift */
   const ohneFuss = daten.fusszeileAus === true || daten.fusszeile === false;
 
   /* ---------------- Kopf ---------------- */
@@ -269,7 +272,7 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
     /* 9,5 pt ist die Wunschgröße und zugleich die Obergrenze: passt der Satz
        nicht auf die Seite, geht er gemeinsam herunter — abgeschnitten wird
        nichts. Die wirkliche Größe steht unter der Vorschau. */
-    const gr    = fest ? 9.5*ptPx*Math.min(1,s) : 33*s;
+    const gr    = fest ? 9.5*ptPx*Math.min(FEST_MAX,s) : 33*s;
     const nameZ = Math.round(gr);
     /* Wie auf der Vorlage: die Beschreibung ist sogar eine Spur größer als
        der Gerichtname (dort 9,6 gegen 9,41 pt) — Versalien wirken ohnehin
@@ -442,7 +445,7 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
     if(!benutzt.includes(m)) benutzt.push(m);
   })));
   if(benutzt.length && typeof MERKMALE !== 'undefined'){
-    const lg = Math.round((daten.layout === 'zentriert' && format.papier ? 9.5*(W/595.28)*Math.min(1,s) : 26*s) * 0.92);
+    const lg = Math.round((daten.layout === 'zentriert' && format.papier ? 9.5*(W/595.28)*Math.min(FEST_MAX,s) : 26*s) * 0.92);
     const hoehe = lg*1.9 + 16*s;
     if(schlussTeile.length){
       /* Die Erklärung steht über dem Preishinweis, nicht darunter */
@@ -947,5 +950,5 @@ function teilZeichnen(ctx, teil, t, P, format, szene, daten){
   }
 }
 
-return { szeneKarte, zeichnen, WELTEN, hinweisZeilen };
+return { szeneKarte, zeichnen, WELTEN, hinweisZeilen, FEST_MAX };
 })();
