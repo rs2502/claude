@@ -283,7 +283,7 @@ function zeichnen(d){
 
   blatt.innerHTML = `
     <header class="karte-kopf">
-      
+      ${d.logoZeigen !== false ? `<div class="karte-marke">${marke}</div>` : ''}
       ${adresse?`<div class="adresse">${adresse}</div>`:''}
     </header>
     <div class="wochen-band">
@@ -302,8 +302,7 @@ function zeichnen(d){
       ${d.footnote?(()=>{ const zeilen = hinweisZeilen(hinweisText(d));
         return `<div class="hinweise">${zeilen.map((z,i)=>
           `<span class="zeile">${i===0?`<b>${esc(T('hinweis'))}</b> `:''}${esc(z)}</span>`).join('')}</div>`; })():''}
-      ${d.logoUnten ? `<div class="fuss-marke">${marke}</div>` : ''}
-      <div class="qr-speisekarte"><img src="bilder/qr-code-speisekarte-kompakt.png" alt="QR-Code zur Speisekarte" loading="lazy"></div>
+      ${d.qrZeigen === true ? `<div class="qr-speisekarte"><img src="bilder/qr-code-speisekarte-kompakt.png" alt="QR-Code zur Speisekarte" loading="lazy"></div>` : ''}
       <div class="preis-hinweis">${esc(EN()?'All prices include VAT and service. Prices are subject to change.':preisHinweis)}</div>
     </footer>`}`;
   if(r.name) document.title = `${kartenTitel(d)} · ${r.name}`;

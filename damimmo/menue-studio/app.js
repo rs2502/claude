@@ -57,7 +57,7 @@ const VORLAGE = {
   restaurant: { name:'Ristorante Da Mimmo', street:'Oldenburger Str. 160', city:'27753 Delmenhorst', phone:'04221 16647' },
   title:'Wochenkarte', from:'', to:'', intro:'', logo:null, stil:'stil-weiss',
   hintergrund:'hintergrund.jpeg', symbole:true, layout:'symbole',
-  datumZeigen:true, tageZeigen:true, adresseZeigen:false, logoUnten:true, fusszeile:true, qrZeigen:false, knopfZeigen:true, linienZeigen:false, blockTitel:true, ueberschrift:'keine',
+  datumZeigen:true, tageZeigen:true, adresseZeigen:false, logoZeigen:true, fusszeile:true, qrZeigen:false, knopfZeigen:true, linienZeigen:false, blockTitel:true, ueberschrift:'keine',
   sections:[], footnote:HINWEISE_STANDARD
 };
 
@@ -84,7 +84,6 @@ function bereicheSichern(){
 let studio = null;             /* { aktiv, sprache, karten:{...} } */
 let daten  = null;             /* zeigt immer auf die gerade offene Karte */
 let ansicht = 'story';
-let qrExportAusblenden = false; /* PNG-Exporte bleiben ohne QR-Code */
 
 /* ---------------------------------------------------------------- Helfer */
 const $  = (s,w=document)=>w.querySelector(s);
@@ -242,7 +241,7 @@ function editorAufbauen(){
   $('#fQR').checked          = daten.qrZeigen === true;
   $('#fLinien').checked      = daten.linienZeigen === true;
   $('#fUeberschrift').value  = daten.ueberschrift || 'keine';
-  $('#fLogoUnten').checked   = !!daten.logoUnten;
+  $('#fLogoZeigen').checked  = daten.logoZeigen !== false;
   logoVorschauSetzen();
   hintergrundGalerie();
   sektionenAufbauen();
@@ -790,15 +789,14 @@ function szeneDaten(){
     rufText: T('ruf'), hinweisPraefix: T('hinweis'),
     layout: daten.layout || 'symbole',
     fusszeile: true,
-    logoUnten: !!daten.logoUnten,
+    logoZeigen: daten.logoZeigen !== false,
     adresseZeigen: daten.adresseZeigen !== false,
     claim: '',                    /* Spruch auf Wunsch entfernt */
     footnote: hinweisAnzeige(),
     sections,
     preisText: preisKurz,        /* überall ohne € und ohne Null am Ende */
     logoBild: daten.logo ? bilder['logo:'+kurzHash(daten.logo)] : (bilder['logo'] || null),
-    qrBild: !qrExportAusblenden && !!FORMATE[ansicht].papier && daten.qrZeigen === true
-      ? (bilder['qr'] || null) : null,
+    qrBild: daten.qrZeigen === true ? (bilder['qr'] || null) : null,
     linienZeigen: daten.linienZeigen === true,
     ueberschrift: daten.ueberschrift || 'keine',
     titelBild: bilder['titelbild'] || null,
@@ -939,7 +937,6 @@ async function bildSpeichern(){
 
   knopf.disabled = true; knopf.textContent = 'wird gespeichert …';
   try{
-    qrExportAusblenden = true;
     await socialZeichnen(false);
     const blob = await new Promise(f=> leinwand.toBlob(f,'image/png'));
     if(!blob) throw new Error('Bild konnte nicht erzeugt werden');
@@ -971,8 +968,7 @@ async function bildSpeichern(){
   }catch(e){
     meldung('Das Bild konnte nicht gespeichert werden: '+e.message);
   }finally{
-    qrExportAusblenden = false;
-    await socialZeichnen(false);  /* QR wieder in der A4/A5-Vorschau zeigen */
+    await socialZeichnen(false);
     knopf.disabled = false;
     knopf.textContent = 'Bild speichern';
     standbildZeit = vorher;
@@ -1261,8 +1257,9 @@ function verdrahten(){
   $('#fAdresse').addEventListener('change',e=>{
     daten.adresseZeigen = e.target.checked; aktualisieren(false);
   });
-  $('#fLogoUnten').addEventListener('change',e=>{
-    daten.logoUnten = e.target.checked; aktualisieren(false);
+  $('#fLogoZeigen').addEventListener('change',e=>{
+    daten.logoZeigen = e.target.checked; aktualisieren(false);
+    socialZeichnen(true);
   });
 
   $('#fDatumZeigen').addEventListener('change',e=>{

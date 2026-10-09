@@ -187,7 +187,12 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
   /* ---------------- Kopf ---------------- */
   let y = hoch ? H*0.075 : H*0.075;      /* etwas mehr Luft oben */
 
-  /* Das Logo steht (wenn gewählt) unten in der Fußzeile, nicht mehr im Kopf. */
+  /* Das Logo steht ganz oben, über der Anschrift (Schalter „Logo“). */
+  if(daten.logoZeigen !== false){
+    teile.push({typ:'marke', x:W/2, y, hoehe:84*sk, ab:0.12});
+    /* Text steht auf der Grundlinie — die Schriftgröße gehört mit in den Abstand */
+    y += 84*sk + 16*sk + 28*sk;
+  }
 
   const adresse = daten.adresseZeigen === false ? '' :
                   [daten.restaurant.street, daten.restaurant.city]
@@ -457,16 +462,15 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
      Der Spruch wächst nach unten — seine Höhe wird deshalb vorher gerechnet. */
   const fussS  = Math.min(sk, 1.12);       /* der Fuß wächst nur gedämpft mit */
   const rufGr  = Math.round(32*fussS);
-  /* Unten steht nur noch eine Zeile mit Logo und/oder QR-Code. */
-  const mitLogo  = !!(daten.logoUnten && daten.logoBild);
+  /* Unten steht (wenn gewählt) der QR-Code in der Mitte. */
   const mitQR    = !!daten.qrBild;
-  const fussZeile = !ohneFuss && (mitLogo || mitQR);
+  const fussZeile = !ohneFuss && mitQR;
   /* Die Zeile muss samt QR-Feld innerhalb des Zierrahmens (W*0.035) bleiben. */
-  const zeileHalb = rufGr*2.4 * (mitQR ? 1.06 : 0.43);
+  const zeileHalb = rufGr*2.4 * 1.06;
   const rufY   = fussZeile ? Math.min(H - H*0.068, H - W*0.035 - zeileHalb - H*0.012)
                            : H - (hoch ? H*0.068 : H*0.072);
   if(fussZeile){
-    teile.push({typ:'ruf', marke: mitLogo, qr: mitQR,
+    teile.push({typ:'ruf', qr: true,
                 x:W/2, y:rufY, groesse:rufGr,
                 breite:Math.min(W-rand*2, 780*fussS), ab:ab+0.35});
   }
@@ -476,7 +480,7 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
   /* Der QR-Code ist höher als der Knopf — die Hinweiszeile muss darüber
      bleiben, sonst klebt sie am weißen Feld des Codes. */
   const rufHoehe = rufGr*2.4;
-  const fussHoch = mitQR ? rufHoehe*1.0 : rufHoehe*0.58;
+  const fussHoch = rufHoehe*1.0;
   let hinweisOben = ohneFuss ? H - H*0.03
                   : fussZeile ? rufY - fussHoch - 34*fussS
                   : rufY;          /* ohne Logo und QR rückt der Hinweis nach unten */
