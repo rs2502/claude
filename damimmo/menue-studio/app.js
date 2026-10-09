@@ -158,6 +158,8 @@ function karteAufbereiten(roh, vorgabe){
   if(k.footnote.includes('Feiertage ausgenommen')) k.footnote = HINWEISE_STANDARD;
   if(k.ueberschrift === 'bild') k.ueberschrift = 'seitlich';
   k.sections = k.sections || [];
+  /* Gerichtsfotos gibt es nicht mehr — alte eingebettete Bilder aus dem Speicher werfen */
+  k.sections.forEach(sec=> (sec.items||[]).forEach(i=>{ delete i.bild; }));
   return k;
 }
 function studioVorlage(){
@@ -381,11 +383,6 @@ function sektionenAufbauen(){
   ziel.appendChild(box);
 }
 
-const KAMERA = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" '+
-  'stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">'+
-  '<path d="M3.5 7.5h3.6l1.4-2h7l1.4 2h3.6v11h-17z"/>'+
-  '<circle cx="12" cy="12.8" r="3.3"/></svg>';
-
 function knopf(zeichen,titel,fn,extra=''){
   const b = document.createElement('button');
   b.className = 'btn btn--icon '+extra;
@@ -415,10 +412,18 @@ function gerichtFeld(sek,gericht,gi){
 
   const preis = document.createElement('input');
   preis.className='preis'; preis.type='text'; preis.placeholder='Preis';
-  preis.value = gericht.price!=null ? String(gericht.price).replace('.',',') : '';
-  preis.addEventListener('input',()=>{ gericht.price = preisLesen(preis.value); aktualisieren(false); });
+  preis.placeholder = 'Preis oder Text';
+  preis.title = 'Zahl (z. B. 18,5) oder Text, z. B. „Tagespreis“';
+  preis.value = gericht.price!=null ? String(gericht.price).replace('.',',') : (gericht.priceText || '');
+  preis.addEventListener('input',()=>{
+    const t = preis.value.trim();
+    if(t === ''){ gericht.price = null; delete gericht.priceText; }
+    else if(/^[\s0-9.,€-]+$/.test(t)){ gericht.price = preisLesen(t); delete gericht.priceText; }
+    else { gericht.price = null; gericht.priceText = t.slice(0,40); }   /* Freitext, z. B. „Tagespreis“ */
+    aktualisieren(false);
+  });
   preis.addEventListener('blur',()=>{
-    preis.value = gericht.price!=null ? gericht.price.toLocaleString('de-DE',{minimumFractionDigits:2}) : '';
+    preis.value = gericht.price!=null ? gericht.price.toLocaleString('de-DE',{minimumFractionDigits:2}) : (gericht.priceText || '');
   });
 
   kopf.append(name,preis);
@@ -454,7 +459,7 @@ function gerichtFeld(sek,gericht,gi){
     box.appendChild(enKopf);
   }
 
-  /* Symbol, eigenes Foto, Gericht der Woche */
+  /* Symbol */
   const zeile = document.createElement('div');
   zeile.className = 'bild-zeile';
 
@@ -468,43 +473,14 @@ function gerichtFeld(sek,gericht,gi){
 
   const schauSetzen = ()=>{
     schau.innerHTML = symbolSVG(symbolFuer(sek.label, gericht), '');
-    schau.classList.toggle('eigenes', !!(gericht.bild && gericht.bild.startsWith('data:')));
   };
   wahl.addEventListener('change',()=>{
     gericht.symbol = wahl.value === 'auto' ? null : wahl.value;
     schauSetzen(); aktualisieren(false);
   });
 
-  /* Eigenes Foto — es erscheint im Kopf der Karte und groß in der Story. */
-  const fotoFeld = document.createElement('input');
-  fotoFeld.type='file'; fotoFeld.accept='image/*'; fotoFeld.hidden=true;
-  fotoFeld.addEventListener('change',e=>{
-    const datei = e.target.files[0]; if(!datei) return;
-    if(datei.size > 4e6){ alert('Bitte ein Foto unter 4 MB wählen.'); return; }
-    const leser = new FileReader();
-    leser.onload = async ()=>{
-      gericht.bild = leser.result;
-      delete bilder['eigen:'+gericht.id];
-      await bildLaden('eigen:'+gericht.id, gericht.bild);
-      schauSetzen(); aktualisieren(false);
-    };
-    leser.readAsDataURL(datei);
-  });
-
-  const foto = knopf(KAMERA,'Eigenes Foto für dieses Gericht',()=>{
-    if(gericht.bild && gericht.bild.startsWith('data:')){
-      if(confirm('Eigenes Foto entfernen?')){
-        gericht.bild = 'auto'; delete bilder['eigen:'+gericht.id];
-        schauSetzen(); aktualisieren(false); return;
-      }
-      return;
-    }
-    fotoFeld.click();
-  });
-  foto.classList.toggle('an', !!(gericht.bild && gericht.bild.startsWith('data:')));
-
   schauSetzen();
-  zeile.append(schau, wahl, fotoFeld, foto);
+  zeile.append(schau, wahl);
   box.appendChild(zeile);
 
   /* Merkmale: vegetarisch / laktosefrei */
@@ -535,105 +511,6 @@ function gerichtFeld(sek,gericht,gi){
   box.appendChild(fuss);
 
   return box;
-}
-
-/* =========================================================== A4 / KARTE = */
-function karteZeichnen(){
-  const blatt = $('#blatt');
-  blatt.className = 'blatt ' + (daten.stil||'stil-klassisch');
-  blatt.style.backgroundImage = `url('bilder/${daten.hintergrund||HINTERGRUENDE[0].datei}')`;
-
-  /* Kopf */
-  const kopf = $('#karteKopf');
-  kopf.innerHTML = '';
-  const marke = document.createElement('div');
-  marke.className = 'karte-marke';
-  const bild = document.createElement('img');
-  bild.className = 'logo-bild';
-  bild.src = daten.logo || 'bilder/Logo-schrift.png';
-  bild.alt = daten.restaurant.name || 'Da Mimmo';
-  marke.appendChild(bild);
-  kopf.appendChild(marke);
-
-  const adresse = document.createElement('div');
-  adresse.className='adresse';
-  adresse.innerHTML = [daten.restaurant.street, daten.restaurant.city]
-    .filter(Boolean).map(t=>`<span>${escapeHTML(t)}</span>`).join(' ');
-  kopf.appendChild(adresse);
-
-  /* Band */
-  const spanne = zeitraumKurz();
-  $('#karteTitel').textContent = daten.title || 'Wochenkarte';
-  $('#karteDatum').innerHTML = spanne
-    ? `<span class="strich"></span><span class="spanne">${escapeHTML(spanne)}</span><span class="strich"></span>`
-    : '';
-  $('#karteZeitraum').textContent = wochentageText();
-  const intro = $('#karteIntro');
-  intro.textContent = daten.intro||'';
-  intro.style.display = daten.intro ? '' : 'none';
-
-  /* Gänge */
-  const ziel = $('#karteGaenge');
-  ziel.innerHTML = '';
-  daten.sections.forEach(sek=>{
-    const sichtbar = sek.items.filter(i=>i.name||i.desc);
-    if(!sichtbar.length) return;        /* leerer Bereich bleibt ohne Überschrift */
-    const gang = document.createElement('section');
-    gang.className = 'gang' + (sek.rahmen ? ' rahmen' : '');
-    if(sek.label){
-      const t = document.createElement('div');
-      t.className='gang-titel'; t.innerHTML = `<span>${escapeHTML(sek.label)}</span>`;
-      gang.appendChild(t);
-    }
-    sichtbar.forEach(gericht=>{
-      const s = document.createElement('div');
-      s.className='speise';
-      const symbol = daten.symbole === false
-        ? '<span class="speise-symbol"></span>'
-        : symbolSVG(symbolFuer(sek.label, gericht));
-      const preis = gericht.price!=null ? preisText(gericht.price) : '';
-      s.innerHTML = `
-        ${symbol}
-        <div class="speise-text">
-          <div class="speise-name">${escapeHTML(gericht.name||'')}</div>
-          ${gericht.desc?`<div class="speise-desc">${escapeHTML(gericht.desc)}</div>`:''}
-        </div>
-        <div class="speise-preis">${preis}</div>`;
-      gang.appendChild(s);
-    });
-    ziel.appendChild(gang);
-  });
-
-  /* Fuß */
-  const fuss = $('#karteFuss');
-  const telefon = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1.1z"/></svg>`;
-  fuss.innerHTML =
-    (daten.footnote?(()=>{ const [a,b] = Social.hinweisZeilen(daten.footnote);
-      return `<div class="hinweise"><b>WICHTIGE HINWEISE:</b> ${escapeHTML(a)}${b?'<br>'+escapeHTML(b):''}</div>`; })():'') +
-    (daten.restaurant.phone
-      ? `<div class="karte-ruf">${telefon}<span>Tisch reservieren</span><span class="trenner"></span><span>${escapeHTML(daten.restaurant.phone)}</span></div>`
-      : '');
-  fuss.style.display = '';
-}
-
-/* Die Überschrift füllt die Blattbreite — wie auf der Vorlage. */
-function titelEinpassen(){
-  const el = $('#karteTitel'), blatt = $('#blatt');
-  if(!el || !blatt) return;
-  const stil = getComputedStyle(blatt);
-  const innen = blatt.clientWidth
-              - parseFloat(stil.paddingLeft) - parseFloat(stil.paddingRight);
-  const ziel = innen * 0.94;
-  const zoom = parseFloat(blatt.style.zoom) || 1;   /* Vorschau-Zoom herausrechnen */
-  el.style.fontSize = '';
-  let gr = parseFloat(getComputedStyle(el).fontSize);
-  for(let runde=0; runde<8; runde++){
-    const breite = el.getBoundingClientRect().width / zoom;
-    if(!breite) break;
-    if(Math.abs(breite-ziel)/ziel < 0.015) break;
-    gr = Math.max(18, Math.min(220, gr * ziel/breite));
-    el.style.fontSize = gr.toFixed(1)+'px';
-  }
 }
 
 /* Wochentage als Unterzeile: „Dienstag bis Samstag" */
@@ -679,31 +556,6 @@ function hinweisAnzeige(){
   ).join('\n');
 }
 
-function alleGerichte(){
-  return daten.sections.flatMap(s=> (s.items||[]).filter(i=>i.name||i.desc));
-}
-
-function wortmarkeSVG(){
-  const ns = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(ns,'svg');
-  svg.setAttribute('viewBox','0 0 300 60');
-  svg.setAttribute('class','wortmarke');
-  const t = document.createElementNS(ns,'text');
-  t.setAttribute('x','150'); t.setAttribute('y','46');
-  t.setAttribute('text-anchor','middle');
-  t.setAttribute('font-family','Inter,sans-serif');
-  t.setAttribute('font-size','46'); t.setAttribute('font-weight','300');
-  t.setAttribute('letter-spacing','1');
-  t.setAttribute('fill','url(#goldVerlauf)');
-  t.textContent = 'Da Mimmo';
-  svg.appendChild(t);
-  return svg;
-}
-
-function escapeHTML(s){
-  return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
 /* ====================================================== SOCIAL / BEWEGUNG =
    Vorschau und Export sind dieselbe Szene: das Standbild ist ihr letzter
    Bild, das Video ist der Weg dorthin.
@@ -737,13 +589,8 @@ async function bilderVorbereiten(){
     bildLaden('logo','bilder/Logo-schrift.png'),
     bildLaden('qr','bilder/qr-code-speisekarte-kompakt.png'),
     bildLaden('titelbild','bilder/titel-extra.png'),
-    ...Object.entries(TELLER).map(([k,q])=> bildLaden(k,q)),
   ]);
-  /* eigene Bilder der Gerichte */
   const eigene = [];
-  daten.sections.forEach(s=> s.items.forEach(i=>{
-    if(i.bild && i.bild.startsWith('data:')) eigene.push(bildLaden('eigen:'+i.id, i.bild));
-  }));
   if(daten.logo) eigene.push(bildLaden('logo:'+kurzHash(daten.logo), daten.logo));
   await Promise.all(eigene);
   bilderBereit = true;
@@ -751,14 +598,6 @@ async function bilderVorbereiten(){
 function kurzHash(s){
   let h=0; for(let i=0;i<s.length;i+=97) h=(h*31+s.charCodeAt(i))|0;
   return String(h);
-}
-
-/* Welchen Bildschlüssel benutzt dieses Gericht? */
-function bildSchluessel(gangName, gericht){
-  if(gericht.bild === 'keins') return null;
-  if(gericht.bild && gericht.bild.startsWith('data:')) return 'eigen:'+gericht.id;
-  if(gericht.bild && TELLER[gericht.bild]) return gericht.bild;
-  return bildRaten(gangName, gericht);     /* 'auto' */
 }
 
 /* --------------------------------------------------- Daten für die Szene */
@@ -780,8 +619,8 @@ function szeneDaten(){
       ...i,
       merkmale: i.merkmale || [],
       name: eng(i.name||'', i.nameEn),
+      price: i.price!=null ? i.price : (i.priceText ? eng(i.priceText, i.priceTextEn) : null),
       desc: eng(i.desc||'', i.descEn),
-      bildSchluessel: bildSchluessel(s.label, i),
       symbol: daten.symbole === false ? null : symbolFuer(s.label, i),
     })),
   }));
@@ -997,57 +836,10 @@ function meldung(text){
 }
 
 
-/* --------------------------------------------------- Blatt einpassen --- */
-const A4_BREIT = 210 * 96 / 25.4;   /* 210 mm in CSS-Pixeln */
-const A4_HOCH  = 297 * 96 / 25.4;
-function blattEinpassen(){
-  const buehne = $('.buehne-inhalt');
-  if(!buehne) return;
-  const platz = buehne.clientWidth - 48;   /* Innenabstand der Bühne */
-  $('#blatt').style.zoom = Math.min(1, Math.max(0.42, platz / A4_BREIT));
-}
-
-/* Den Satz so weit vergrößern, dass er die Seite füllt — und warnen,
-   wenn selbst die kleinste Stufe nicht mehr auf eine Seite passt. */
-function seitenPruefen(){
-  const blatt = $('#blatt'), warnung = $('#seitenWarnung');
-  if(!blatt || !warnung) return;
-  const zoom = blatt.style.zoom || 1;
-  blatt.style.zoom = 1;
-
-  const messen = faktor => {
-    blatt.style.setProperty('--s', faktor);
-    blatt.style.minHeight = '0';
-    const h = blatt.scrollHeight;
-    blatt.style.minHeight = '';
-    return h;
-  };
-
-  let s = 1, hoehe = messen(s);
-  for(let runde=0; runde<7; runde++){
-    const abweichung = (A4_HOCH - hoehe) / A4_HOCH;
-    if(Math.abs(abweichung) < 0.012) break;
-    const neu = Math.max(0.72, Math.min(1.5, s * Math.pow(A4_HOCH/hoehe, 0.55)));
-    if(Math.abs(neu - s) < 0.004) break;
-    s = neu; hoehe = messen(s);
-  }
-  /* Lieber knapp darunter bleiben als über den Rand laufen. */
-  let schutz = 0;
-  /* 1,5 % Luft: beim Drucken setzt der Browser Text minimal anders */
-  while(hoehe > A4_HOCH*0.985 && s > 0.7 && schutz++ < 15){ s *= 0.975; hoehe = messen(s); }
-
-  blatt.style.setProperty('--s', s.toFixed(3));
-  blatt.style.zoom = zoom;
-  warnung.hidden = hoehe <= A4_HOCH + 4;
-}
-
 /* ========================================================== STEUERUNG == */
 let zeichenTakt = null;
 function aktualisieren(editorNeu = true){
   if(editorNeu) sektionenAufbauen();
-  karteZeichnen();
-  titelEinpassen();
-  seitenPruefen();
   sichern();
   clearTimeout(zeichenTakt);
   zeichenTakt = setTimeout(()=> socialZeichnen(false), 120);
@@ -1359,14 +1151,10 @@ async function start(){
   if(!studio) studio = studioVorlage();
   daten = studio.karten[studio.aktiv];
 
+  sichern();            /* alte, eingebettete Gerichtsfotos aus dem Browserspeicher entfernen */
   verdrahten();
   kartenReiterMarkieren();
   editorAufbauen();
-  karteZeichnen();
-  blattEinpassen();
-  titelEinpassen();
-  seitenPruefen();
-  window.addEventListener('resize', ()=>{ blattEinpassen(); titelEinpassen(); });
 
   bilderVorbereiten();
   if(document.fonts && document.fonts.ready){

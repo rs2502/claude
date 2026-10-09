@@ -9,7 +9,7 @@
 <meta name="description" content="Die aktuelle Wochenkarte im Ristorante Da Mimmo, Delmenhorst.">
 <link rel="stylesheet" href="fonts.css?v=1">
 <link rel="stylesheet" href="karte.css?v=162">
-<script src="woerterbuch.js?v=161"></script>
+<script src="woerterbuch.js?v=162"></script>
 <script src="symbole.js?v=161"></script>
 <style>
   body{background:#f2efe6;padding:0}
@@ -192,6 +192,10 @@ const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const preis = p => (p==null||p==='') ? '' :
   Number(p).toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:2});
 
+/* Preis eines Gerichts: Zahl oder Freitext (z. B. „Tagespreis“) */
+const preisAnzeige = i => (i.price!=null && i.price!=='') ? preis(i.price)
+  : (i.priceText ? esc(eng(i.priceText, i.priceTextEn)) : '');
+
 const tagName = t => { const x=new Date(t+'T12:00:00');
   return isNaN(x)?'':x.toLocaleDateString(EN()?'en-GB':'de-DE',{weekday:'long'}); };
 
@@ -264,7 +268,7 @@ function zeichnen(d){
         ${titel?`<div class="gang-titel kommt"><span class="zier"></span><span>${esc(titel)}</span><span class="zier"></span></div>`:''}
         ${gerichte.map(i=>`<div class="speise-z kommt">
             <div class="speise-z-kopf">${esc(eng(i.name||'', i.nameEn))}${(i.merkmale||[]).map(m=>merkmalSVG(m,'merkmal')).join('')}${
-              i.price!=null && i.price!=='' ? `<span class="punkt">·</span><span class="preis">${preis(i.price)}</span>` : ''}</div>
+              preisAnzeige(i) ? `<span class="punkt">·</span><span class="preis">${preisAnzeige(i)}</span>` : ''}</div>
             ${i.desc?`<div class="speise-z-desc">${esc(eng(i.desc, i.descEn))}</div>`:''}
           </div>`).join('')}
       </section>`;
@@ -281,7 +285,7 @@ function zeichnen(d){
             <div class="speise-name">${esc(eng(i.name||'', i.nameEn))}${(i.merkmale||[]).map(m=>merkmalSVG(m,'merkmal')).join('')}</div>
             ${i.desc?`<div class="speise-desc">${esc(eng(i.desc, i.descEn))}</div>`:''}
           </div>
-          <div class="speise-preis">${preis(i.price)}</div>
+          <div class="speise-preis">${preisAnzeige(i)}</div>
         </div>`;
       }).join('')}
     </section>`;

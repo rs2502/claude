@@ -199,7 +199,7 @@ footer{background:var(--ink);color:#e9e2d6;margin-top:30px}
   </div>
 </footer>
 
-<script src="woerterbuch.js?v=161"></script>
+<script src="woerterbuch.js?v=162"></script>
 <script>
 /* =====================================================================
    DATEN – hier pflegen.
@@ -398,9 +398,10 @@ const KARTE = [
     {n:108, name:'Filetto Miele Funghi Timo', de:'250 g Rinderfilet mit Pilzen der Saison und Thymian in Honigsoße, dazu eine Beilage', en:'250 g beef fillet with seasonal mushrooms and thyme in honey sauce, served with a side dish', p:38.5},
     {n:109, name:'Tagliata ai Broccoli', de:'Rindfleischstreifen mit Broccoli und Knoblauch in Sahnesoße – pikant, dazu eine Beilage', en:'Strips of beef with broccoli and garlic in cream sauce – spicy, served with a side dish', p:33}
   ], notes:BEILAGE, extrasTitle:{de:'Zusätzliche Beilage',en:'Extra side dish'}, extras:BEILAGE_EXTRA, doneness:true, foot:X},
-  {id:'pesce', img:'gamberoni.webp', pos:'50% 50%', it:'Pesce', t:{de:'Fischgerichte',en:'Fish dishes'}, items:[
-    {n:87, name:'Cozze al Vino Bianco', de:'Muscheln in Weißweinsoße mit Knoblauch', en:'Mussels in white wine sauce with garlic', p:{de:'saisonbedingt',en:'seasonal'}},
-    {n:88, name:'Cozze Barese', de:'Muscheln in pikanter Tomatensoße mit Knoblauch', en:'Mussels in spicy tomato sauce with garlic', p:{de:'saisonbedingt',en:'seasonal'}},
+  {id:'pesce', img:'gamberoni.webp', pos:'50% 50%', it:'Pesce', t:{de:'Fischgerichte',en:'Fish dishes'},
+   intro:{de:'Muscheln: Der aktuelle Tagespreis hängt im Lokal aus.',en:'Mussels: today’s price is displayed in the restaurant.'}, items:[
+    {n:87, name:'Cozze al Vino Bianco', de:'Muscheln in Weißweinsoße mit Knoblauch', en:'Mussels in white wine sauce with garlic', p:{de:'Tagespreis',en:'Daily price'}},
+    {n:88, name:'Cozze Barese', de:'Muscheln in pikanter Tomatensoße mit Knoblauch', en:'Mussels in spicy tomato sauce with garlic', p:{de:'Tagespreis',en:'Daily price'}},
     {n:89, name:'Calamari al Sugo', de:'Tintenfisch in pikanter Tomatensoße, dazu eine Beilage', en:'Squid in spicy tomato sauce, served with a side dish', p:25},
     {n:90, name:'Calamari Fritti', de:'Frittierter Tintenfisch mit hausgemachter Fischsoße, dazu eine Beilage', en:'Fried squid with homemade fish sauce, served with a side dish', p:25},
     {n:91, name:'Gamberoni ai Ferri', de:'Gegrillte Gambas mit hausgemachter Fischsoße, dazu eine Beilage', en:'Grilled king prawns with homemade fish sauce, served with a side dish', p:28},
@@ -541,6 +542,10 @@ async function studioKartenLaden(){
         if(i.price !== null && i.price !== undefined && i.price !== ''){
           const preis = Number(i.price);
           if(Number.isFinite(preis)) item.p = preis;
+        } else if(i.priceText){
+          /* Freitext statt Preis, z. B. „Tagespreis“ */
+          const t = String(i.priceText).trim();
+          item.p = {de:t, en:String(i.priceTextEn || Woerterbuch.uebersetzen(t))};
         }
         return item;
       });

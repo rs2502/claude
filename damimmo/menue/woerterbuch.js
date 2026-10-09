@@ -698,6 +698,10 @@ const BEGRIFFE = {
   'zusammengestellten': 'put together',
   'für sie': 'for you',
 
+  'tagespreis': 'daily price',
+  'nach gewicht': 'by weight',
+  'preis auf anfrage': 'price on request',
+
   /* --- Bindewörter ganz zum Schluss --- */
   'sowie': 'as well as',
   'dazu': 'with',

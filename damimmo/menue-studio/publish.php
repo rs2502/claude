@@ -23,6 +23,8 @@ function valid_card(mixed $card): bool {
         foreach (($section['items'] ?? []) as $item) {
             if (!is_array($item)) return false;
             if (isset($item['price']) && $item['price'] !== null && !is_numeric($item['price'])) return false;
+            /* Freitext statt Preis (z. B. "Tagespreis"): nur kurzer Text */
+            if (isset($item['priceText']) && (!is_string($item['priceText']) || mb_strlen($item['priceText']) > 60)) return false;
         }
     }
 

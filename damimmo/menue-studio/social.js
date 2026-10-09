@@ -109,6 +109,13 @@ function ausgewogen(ctx,text,maxBreite){
   }
   return umbrechen(ctx,text,hi);
 }
+/* Zu lange Texte nicht stumm abschneiden: die letzte erlaubte Zeile endet mit „…“ */
+function kuerzen(zeilen, max){
+  if(zeilen.length <= max) return zeilen;
+  const r = zeilen.slice(0, max);
+  r[max-1] = r[max-1].replace(/[\s,;·•-]+$/,'') + ' …';
+  return r;
+}
 /* **fett** im Text: in Stücke zerlegen */
 function segmente(text){
   return String(text||'').split(/\*\*/).map((t,i)=> ({text:t, fett: i%2===1}))
@@ -256,9 +263,13 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
   const preisGr   = Math.round(42*s);
 
   /* Breite des längsten Preises = gemeinsame Preisspalte */
-  mess.font = `600 ${preisGr}px Poppins, Inter, sans-serif`;
-  const preisSpalte = Math.max(0, ...gerichte.flatMap(g=> g.posten.map(p=>
-    p.price!=null ? mess.measureText(daten.preisText(p.price)).width : 0)));
+  /* Freitext statt Zahl (z. B. „Tagespreis“) steht kleiner, damit der Name Platz behält. */
+  const preisGroesse = p => typeof p === 'string' ? Math.round(preisGr*0.62) : preisGr;
+  const preisSpalte = Math.max(0, ...gerichte.flatMap(g=> g.posten.map(p=>{
+    if(p.price==null) return 0;
+    mess.font = `600 ${preisGroesse(p.price)}px Poppins, Inter, sans-serif`;
+    return mess.measureText(daten.preisText(p.price)).width;
+  })));
 
   /* Zweites Layout nach der Vorlage: alles mittig, Preis hinter dem Namen,
      keine Symbole, feine Trennlinien zwischen den Blöcken. Passt viel mehr
@@ -339,20 +350,25 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
 
       gruppe.posten.forEach(gericht=>{
         const preis = gericht.price!=null ? daten.preisText(gericht.price) : '';
-        const kopf = (gericht.name||'').toUpperCase() + (preis ? '  •  ' + preis : '');
+        const preisTeil = preis ? '  •  ' + preis : '';
+        let nameTxt = (gericht.name||'').toUpperCase();
         mess.font = `500 ${nameZ}px ${KARTENSCHRIFT}`;
         /* leichte Sperrung über den Zeichenabstand, nicht über Leerzeichen —
            sonst zerfällt das Wort und bricht an falschen Stellen um */
         if('letterSpacing' in mess) mess.letterSpacing = Math.round(nameZ*0.05)+'px';
-        const kopfZeilen = ausgewogen(mess, kopf, breite).slice(0,2);
+        let kopfZeilen = ausgewogen(mess, nameTxt + preisTeil, breite);
+        /* Höchstens drei Zeilen: sonst wird der Name mit „…“ gekürzt — der Preis bleibt stehen */
+        while(kopfZeilen.length > 3 && /\s/.test(nameTxt)){
+          nameTxt = nameTxt.replace(/[\s,;·•-]*\S+$/,'');
+          kopfZeilen = ausgewogen(mess, nameTxt + ' …' + preisTeil, breite);
+        }
         if('letterSpacing' in mess) mess.letterSpacing = '0px';
 
         mess.font = `400 ${descZ}px ${KARTENSCHRIFT}`;
         let descZeilen = [];
         if(gericht.desc){
-          /* Im mittigen Layout wird nichts gekürzt — auch lange
-             Weinbeschreibungen stehen vollständig da. */
-          descZeilen = ausgewogen(mess, gericht.desc, breite*0.94).slice(0,10);
+          /* Lange Weinbeschreibungen haben bis zu 12 Zeilen; erst danach folgt „…“. */
+          descZeilen = kuerzen(ausgewogen(mess, gericht.desc, breite*0.94), 12);
         }
 
         if(ersterBlock){
@@ -402,13 +418,14 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
     }
 
     gruppe.posten.forEach(gericht=>{
-      mess.font = `600 ${preisGr}px Poppins, Inter, sans-serif`;
+      const preisGrG = preisGroesse(gericht.price);
+      mess.font = `600 ${preisGrG}px Poppins, Inter, sans-serif`;
       const preis = gericht.price!=null ? daten.preisText(gericht.price) : '';
       const preisB = preis ? mess.measureText(preis).width : 0;
 
       mess.font = `600 ${nameGr}px Poppins, Inter, sans-serif`;
       const platz = W - rand - textX - preisB - 14*s - eingerueckt;
-      const nameZeilen = ausgewogen(mess, gericht.name||'', platz).slice(0,2);
+      const nameZeilen = kuerzen(ausgewogen(mess, gericht.name||'', platz), 3);
 
       mess.font = `italic 400 ${descGr}px Poppins, Inter, sans-serif`;
       let descZeilen = [];
@@ -423,7 +440,7 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
       teile.push({typ:'gericht', gericht, symbol:gericht.symbol,
                   x:textX+eingerueckt, symbolX:rand+symbolR+eingerueckt, y,
                   rechts:W-rand-eingerueckt, symbolR,
-                  nameGr, descGr, preisGr, preis, nameZeilen, descZeilen,
+                  nameGr, descGr, preisGr:preisGrG, preis, nameZeilen, descZeilen,
                   ab, skala:s, hoehe});
       y += hoehe; ab += 0.14;
     });
