@@ -29,9 +29,11 @@ const HINWEISE_STANDARD =
 const TEXTE = {
   de:{ speisen:'Speisen', getraenke:'Empfohlene Getränke', ruf:'Tisch reservieren',
        preis:'Alle Preise in € inklusive Mehrwertsteuer und Dienstleistung, vorbehaltlich von Änderungen',
+       allergene:'Allergene und Zusatzstoffe: Auskunft erhalten Sie von unserem Servicepersonal.',
        hinweis:'WICHTIGE HINWEISE:', bis:'bis' },
   en:{ speisen:'Food', getraenke:'Recommended Drinks', ruf:'Reserve a table',
        preis:'All prices include VAT and service. Prices are subject to change.',
+       allergene:'Allergens and additives: please ask our staff for information.',
        hinweis:'PLEASE NOTE:', bis:'to' },
 };
 function istEnglisch(){ return (studio && studio.sprache) === 'en'; }
@@ -788,7 +790,7 @@ function szeneDaten(){
     title: eng(daten.title, daten.titleEn),
     zeitraum:    daten.datumZeigen === false ? '' : zeitraumAnzeige(),
     wochentage:  daten.tageZeigen  === false ? '' : wochentageText(),
-    rufText: T('ruf'), hinweisPraefix: T('hinweis'), preisHinweis: T('preis'),
+    rufText: T('ruf'), hinweisPraefix: T('hinweis'), preisHinweis: T('preis'), allergenHinweis: T('allergene'),
     layout: daten.layout || 'symbole',
     fusszeile: true,
     logoZeigen: daten.logoZeigen !== false,

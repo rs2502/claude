@@ -7,10 +7,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wochenkarte · Ristorante Da Mimmo</title>
 <meta name="description" content="Die aktuelle Wochenkarte im Ristorante Da Mimmo, Delmenhorst.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Dancing+Script:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="karte.css?v=161">
+<link rel="stylesheet" href="fonts.css?v=1">
+<link rel="stylesheet" href="karte.css?v=162">
 <script src="woerterbuch.js?v=161"></script>
 <script src="symbole.js?v=161"></script>
 <style>
@@ -39,6 +37,9 @@
     .karte-fuss{font-size:13px}
   }
   @media print{ .gaeste-wahl{display:none} body{background:#fff} .blatt{box-shadow:none} }
+  .allergen-hinweis{text-align:center;margin-top:calc(2mm * var(--s));font-size:.92em}
+  .rechtliches{text-align:center;font:13px Poppins,Inter,sans-serif;color:#5b4a36;padding:0 12px 36px}
+  .rechtliches a{color:inherit;text-underline-offset:3px}
   .fehler{color:#C8B9A3;font-family:Inter,sans-serif;text-align:center;padding:60px 20px;line-height:1.7}
 
   /* Helle Extrakarte nach der Referenzvorlage; vorhandene Schriftgrade bleiben unverändert. */
@@ -164,14 +165,19 @@
 <div class="gaeste">
   <article class="blatt stil-klassisch" id="blatt"><div class="fehler">Karte wird geladen …</div></article>
 </div>
+<p class="rechtliches" id="rechtliches"><a href="https://www.damimmo.de/impressum/" target="_blank" rel="noopener" id="lnkImpressum">Impressum</a> · <a href="https://www.damimmo.de/datenschutzerklaerung/" target="_blank" rel="noopener" id="lnkDatenschutz">Datenschutz</a></p>
 
 <script>
 let studio = null, aktiv = 'wochenkarte', sprache = 'de';
 const EN = ()=> sprache === 'en';
 const TEXTE = {
   de:{ getraenke:'Empfohlene Getränke', hinweis:'WICHTIGE HINWEISE:',
+       allergene:'Allergene und Zusatzstoffe: Auskunft erhalten Sie von unserem Servicepersonal.',
+       impressum:'Impressum', datenschutz:'Datenschutz',
        bis:'bis', karte:{wochenkarte:'Extra Karte', mittagstisch:'Mittagstisch'} },
   en:{ getraenke:'Recommended Drinks',  hinweis:'PLEASE NOTE:',
+       allergene:'Allergens and additives: please ask our staff for information.',
+       impressum:'Legal notice', datenschutz:'Privacy policy',
        bis:'to', karte:{wochenkarte:'Specials', mittagstisch:'Lunch Menu'} },
 };
 const T = k => TEXTE[EN()?'en':'de'][k];
@@ -298,11 +304,12 @@ function zeichnen(d){
     ${(()=>{ const benutzt=[]; (d.sections||[]).forEach(s=>(s.items||[]).forEach(i=>(i.merkmale||[]).forEach(m=>{ if(!benutzt.includes(m)) benutzt.push(m); })));
       return benutzt.length ? `<div class="legende-merkmale">${benutzt.map(m=>
         `<span>${merkmalSVG(m,'merkmal')} ${esc(EN()?Woerterbuch.uebersetzen((MERKMALE[m]||{}).name||m):((MERKMALE[m]||{}).name||m))}</span>`).join('')}</div>` : ''; })()}
-    ${d.fusszeile === false ? '' : `<footer class="karte-fuss">
+    ${`<footer class="karte-fuss">
       ${d.footnote?(()=>{ const zeilen = hinweisZeilen(hinweisText(d));
         return `<div class="hinweise">${zeilen.map((z,i)=>
           `<span class="zeile">${i===0?`<b>${esc(T('hinweis'))}</b> `:''}${esc(z)}</span>`).join('')}</div>`; })():''}
       ${d.qrZeigen === true ? `<div class="qr-speisekarte"><img src="bilder/qr-code-speisekarte-kompakt.png" alt="QR-Code zur Speisekarte" loading="lazy"></div>` : ''}
+      <div class="allergen-hinweis">${esc(T('allergene'))}</div>
       <div class="preis-hinweis">${esc(EN()?'All prices include VAT and service. Prices are subject to change.':preisHinweis)}</div>
     </footer>`}`;
   if(r.name) document.title = `${kartenTitel(d)} · ${r.name}`;
@@ -395,6 +402,8 @@ function gefuellt(k){
 
 function anzeigen(){
   zeichnen(studio.karten[aktiv]);
+  document.getElementById('lnkImpressum').textContent = T('impressum');
+  document.getElementById('lnkDatenschutz').textContent = T('datenschutz');
   document.querySelectorAll('#kartenWahl button').forEach(b=>
     b.classList.toggle('an', b.dataset.karte === aktiv));
   document.querySelectorAll('#sprachWahl button').forEach(b=>

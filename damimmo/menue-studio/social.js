@@ -474,7 +474,8 @@ function szeneKarte(format, daten, bilder, welt, sVorgabe){
   /* Preishinweis: steht immer ganz unten im Rahmen, auch wenn die Fußzeile entfällt. */
   const phGr = Math.round(22*fussS);
   mess.font = `400 ${phGr}px Poppins, Inter, sans-serif`;
-  const phZeilen = daten.preisHinweis ? ausgewogen(mess, daten.preisHinweis, W-rand*2) : [];
+  const phZeilen = [daten.allergenHinweis, daten.preisHinweis].filter(Boolean)
+                   .flatMap(t=> ausgewogen(mess, t, W-rand*2));
   const phHoehe  = phZeilen.length*phGr*1.35;
   const phOben   = H - W*0.035 - H*0.014 - phHoehe;
   if(phZeilen.length){
