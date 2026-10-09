@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Da Mimmo · Menü-Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Dancing+Script:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=162">
+</head>
+<body>
+
+<!-- Wortmarke als Vorlage (Goldverlauf) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="goldVerlauf" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#E7C176"/>
+      <stop offset="22%"  stop-color="#C98B3A"/>
+      <stop offset="45%"  stop-color="#8C4E17"/>
+      <stop offset="68%"  stop-color="#D8A44F"/>
+      <stop offset="100%" stop-color="#E9C87F"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<header class="app-head">
+  <div class="marke">
+    <svg viewBox="0 0 260 52" role="img" aria-label="Da Mimmo">
+      <text x="0" y="39" font-family="Inter,sans-serif" font-size="40" font-weight="300"
+            letter-spacing="1" fill="url(#goldVerlauf)">Da Mimmo</text>
+    </svg>
+  </div>
+  <div class="claim">Menü-Studio</div>
+  <div class="tools">
+    <button class="btn btn--gold nur-handy" id="btnUmschalten">Vorschau</button>
+    <button class="btn" id="btnNeueWoche">Neue Woche</button>
+    <button class="btn" id="btnImport" title="Eine gesicherte Karte wieder einlesen">Karte laden</button>
+    <button class="btn" id="btnExport" title="Die Karte als Datei sichern — auch für die Gästeseite im Netz">Karte sichern</button>
+    <button class="btn btn--gold" id="btnVeroeffentlichen" title="Die aktuelle Karte auf www.damimmo.de/menue veröffentlichen">Online stellen</button>
+    <input type="file" id="dateiImport" accept="application/json" hidden>
+  </div>
+</header>
+
+<dialog class="publish-dialog" id="publishDialog" aria-labelledby="publishTitel">
+  <form id="publishForm">
+    <h2 id="publishTitel">Karte online stellen</h2>
+    <p>Gib den gesonderten Veröffentlichungsschlüssel ein. Das FTP-Passwort wird hier nicht verwendet.</p>
+    <label class="publish-key-label" for="publishKey">Veröffentlichungsschlüssel</label>
+    <input id="publishKey" name="publishKey" type="password" autocomplete="off" required>
+    <p class="publish-status" id="publishStatus" role="status" hidden></p>
+    <div class="publish-actions">
+      <button class="btn" type="button" id="publishAbbrechen">Abbrechen</button>
+      <button class="btn btn--gold" type="submit" id="publishSenden">Veröffentlichen</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="layout">
+
+  <!-- ====================== EDITOR ====================== -->
+  <aside class="editor">
+    <!-- Welche Karte wird gerade bearbeitet? -->
+    <div class="karten-reiter" id="kartenReiter">
+      <button type="button" data-karte="wochenkarte" class="an">Extra Karte</button>
+      <button type="button" data-karte="mittagstisch">Mittagstisch</button>
+    </div>
+
+    <h2>Diese Woche</h2>
+    <div class="feld-reihe">
+      <div class="feld">
+        <label for="fUeberschrift">Überschrift</label>
+        <select id="fUeberschrift">
+          <option value="keine">keine</option>
+          <option value="text">Text</option>
+          <option value="seitlich">Grafik daneben</option>
+        </select>
+      </div>
+      <div class="feld">
+        <label for="fTitel">Text der Überschrift</label>
+        <input id="fTitel" type="text" placeholder="Extra Karte">
+      </div>
+    </div>
+    <div class="feld-reihe">
+      <div class="feld">
+        <label for="fVon">von</label>
+        <input id="fVon" type="date">
+      </div>
+      <div class="feld">
+        <label for="fBis">bis</label>
+        <input id="fBis" type="date">
+      </div>
+    </div>
+    <div class="schalter-reihe">
+      <label class="schalter"><input type="checkbox" id="fDatumZeigen" checked> Datum zeigen</label>
+      <label class="schalter"><input type="checkbox" id="fTageZeigen" checked> Wochentage zeigen</label>
+      <label class="schalter"><input type="checkbox" id="fAdresse" checked> Anschrift zeigen</label>
+      <label class="schalter"><input type="checkbox" id="fLogoUnten"> Logo unten neben der Nummer</label>
+      <label class="schalter"><input type="checkbox" id="fFussZeigen" checked> Fußzeile zeigen</label>
+      <label class="schalter"><input type="checkbox" id="fKnopf" checked> Reservierungsknopf zeigen</label>
+      <label class="schalter"><input type="checkbox" id="fQR"> QR-Code beim Drucken zeigen</label>
+      <label class="schalter"><input type="checkbox" id="fBlockTitel" checked> Blocküberschriften zeigen</label>
+      <label class="schalter"><input type="checkbox" id="fLinien"> Trennlinien zwischen den Blöcken</label>
+    </div>
+    <div class="feld">
+      <label for="fIntro">Kurzer Einleitungssatz <span style="text-transform:none">(optional)</span></label>
+      <input id="fIntro" type="text" placeholder="Frisch, saisonal und jede Woche neu für Sie zusammengestellt.">
+    </div>
+
+    <h2>Die Karte</h2>
+    <div id="sektionen"></div>
+
+    <h2>Fußzeile</h2>
+    <div class="feld">
+      <label for="fFuss">Wichtige Hinweise</label>
+      <textarea id="fFuss" placeholder="Hinweise für Ihre Gäste"></textarea>
+    </div>
+
+    <h2>Hintergrund</h2>
+    <div class="hg-wahl" id="hgWahl"></div>
+    <p class="hinweis">Das gewählte Bild erscheint auf dem Aushang, der Gästeseite
+      und in beiden Instagram-Formaten. Eigene Bilder einfach als
+      <code>hintergrund7.jpeg</code> in den Ordner <code>bilder/</code> legen.</p>
+
+    <h2>Haus &amp; Logo</h2>
+    <details class="block">
+      <summary>Adresse &amp; Kontakt</summary>
+      <div class="inhalt">
+        <div class="feld"><label for="fName">Name</label><input id="fName" type="text"></div>
+        <div class="feld"><label for="fStrasse">Straße</label><input id="fStrasse" type="text"></div>
+        <div class="feld"><label for="fOrt">PLZ &amp; Ort</label><input id="fOrt" type="text"></div>
+        <div class="feld"><label for="fTel">Telefon</label><input id="fTel" type="text"></div>
+      </div>
+    </details>
+    <details class="block">
+      <summary>Logo</summary>
+      <div class="inhalt">
+        <p class="hinweis">Ohne eigenes Logo wird die Wortmarke „Da Mimmo“ im Goldverlauf gesetzt. Lade hier die
+          Original-Logodatei (PNG mit transparentem Hintergrund) hoch — sie wird im Browser gespeichert und
+          in allen Ausgaben verwendet.</p>
+        <input type="file" id="fLogo" accept="image/*">
+        <div class="logo-vorschau" id="logoVorschau" hidden>
+          <img id="logoBild" alt="Logo">
+          <button class="btn btn--klein btn--gefahr" id="btnLogoWeg">entfernen</button>
+        </div>
+      </div>
+    </details>
+
+    <h2>Sichern</h2>
+    <p class="hinweis">Alles wird laufend im Browser gespeichert — ein versehentlich
+      geschlossenes Fenster kostet keine Arbeit.<br><br>
+      <b>Karte sichern</b> legt die Woche zusätzlich als Datei <code>menu.json</code> ab:
+      als Archiv und als Futter für die Gästeseite (Datei neben <code>karte.html</code>
+      auf den Server legen).<br>
+      <b>Karte laden</b> holt so eine Datei wieder herein — etwa eine frühere Woche
+      oder die Karte von einem anderen Rechner.</p>
+  </aside>
+
+  <!-- ====================== BÜHNE ====================== -->
+  <main class="buehne">
+    <div class="buehne-leiste">
+      <div class="reiter" id="reiter">
+        <button data-ansicht="story" class="aktiv">Story 9:16</button>
+        <button data-ansicht="a4">Aushang A4</button>
+        <button data-ansicht="a5">Tischkarte A5</button>
+      </div>
+      <div class="rechts">
+        <div class="stil-wahl">
+          <label for="fLayout">Layout</label>
+          <select id="fLayout">
+            <option value="symbole">Mit Symbolen</option>
+            <option value="zentriert">Mittig (viel Platz)</option>
+          </select>
+        </div>
+        <div class="stil-wahl">
+          <label for="fSprache">Sprache</label>
+          <select id="fSprache">
+            <option value="de">Deutsch</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <div class="stil-wahl" id="stilWahl">
+          <label for="fStil">Stil</label>
+          <select id="fStil">
+            <option value="stil-klassisch">Mit Foto</option>
+            <option value="stil-dunkel">Ohne Foto</option>
+            <option value="stil-hell">Hell (Druck)</option>
+            <option value="stil-weiss">Weiß (Druck)</option>
+          </select>
+        </div>
+        <span class="warnung" id="seitenWarnung" hidden>länger als eine A4-Seite</span>
+        <button class="btn" id="btnBild" hidden>Bild speichern</button>
+        <button class="btn btn--gold" id="btnAusgabe">Bild speichern</button>
+      </div>
+    </div>
+
+    <div class="buehne-inhalt">
+      <!-- A4 -->
+      <article class="blatt stil-klassisch" id="blatt" hidden>
+        <header class="karte-kopf" id="karteKopf"></header>
+        <div class="wochen-band">
+          <span class="titel" id="karteTitel">Extra Karte</span>
+          <div class="wochen-datum" id="karteDatum"></div>
+          <div class="zeitraum" id="karteZeitraum"></div>
+        </div>
+        <p class="karte-intro" id="karteIntro"></p>
+        <div id="karteGaenge"></div>
+        <footer class="karte-fuss" id="karteFuss"></footer>
+      </article>
+
+      <!-- Social -->
+      <div class="canvas-huelle" id="canvasHuelle">
+        <canvas id="socialCanvas"></canvas>
+        <p class="canvas-info" id="canvasInfo"></p>
+        <p class="meldung" id="meldung" hidden></p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="bilder.js?v=162"></script>
+<script src="woerterbuch.js?v=162"></script>
+<script src="symbole.js?v=162"></script>
+<script src="social.js?v=162"></script>
+<script src="app.js?v=162"></script>
+</body>
+</html>
