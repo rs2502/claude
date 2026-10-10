@@ -53,21 +53,36 @@ def slow_swell(dur):
     # pitched-down air: low band sweep falling, used under slow-mo
     return whoosh(dur, 1100, 120, 0.25)
 
+import subprocess
+def sample(name, start=0.0, dur=None, fade=0.08):
+    cmd = ["ffmpeg", "-v", "error", "-ss", str(start), "-i", f"{S}/samples/{name}.mp3"]
+    if dur: cmd += ["-t", str(dur)]
+    cmd += ["-ac", "2", "-ar", str(SR), "-f", "f32le", "-"]
+    x = np.frombuffer(subprocess.run(cmd, capture_output=True).stdout, np.float32).reshape(-1, 2).copy()
+    x /= np.abs(x).max() + 1e-9
+    n = int(fade * SR); x[-n:] *= np.linspace(1, 0, n)[:, None]
+    return x
+
+SLAM = sample("slam", 0, 1.2)
+SLOWMO = sample("slowmo", 0, 1.0)
+HIT = sample("hit", 0, 1.3, 0.25)
+SWISH = sample("swish", 0.05, 0.6)
+
 # room tone everywhere
 rt = roomtone(); sfx += rt * 0.03
 
 # ---- hook: result first, slow-mo ----
 h = shots["hook_parmesan"]
-place(slow_swell(h["end"] - h["start"]), 0.0, 0.45)
+place(SLOWMO, 0.0, 0.35)
 place(sprinkle(h["end"] - 0.05, 30), 0.02, 0.45)
-place(impact(0.8, 80, 30), 0.0, 0.45)
-place(rewind(), HOOK_D - 0.38, 0.55)
+place(HIT, 0.0, 0.3)
+place(SWISH, HOOK_D - 0.22, 0.45)
 
 # ---- main ----
 slam = at("flour_slam", 0.28)
-place(impact(), slam - 0.01, 0.95)
+place(SLAM, slam - 0.02, 0.9)
 place(whoosh(0.30, 2000, 400, 0.3), slam - 0.02, 0.3)
-place(slow_swell(0.75), slam, 0.45)
+place(SLOWMO, slam + 0.02, 0.3)
 place(whoosh(0.25, 400, 5000, 0.8), at("flour_slam", 0.72) - 0.1, 0.35)   # ramp back to speed
 
 kn = shots["knead"]; place(thud(110), kn["start"] + 0.06, 0.35); place(thud(95), kn["start"] + 0.28, 0.3)
@@ -75,24 +90,24 @@ st = shots["stretch"]; place(whoosh(0.4, 250, 1600, 0.5), st["start"] + 0.2, 0.8
 sp = shots["sauce_pour"]; place(glug(sp["end"] - sp["start"] + 0.1), sp["start"], 0.42)
 ld = shots["ladle"]; place(whoosh(ld["end"] - ld["start"], 150, 700, 0.5), ld["start"], 0.5)
 tf = shots["toppings_fly"]
-place(whoosh(0.55, 300, 6000, 0.55), tf["start"] - 0.25, 0.6); place(impact(0.7, 95, 35), tf["start"], 0.5)
+place(whoosh(0.55, 300, 6000, 0.55), tf["start"] - 0.25, 0.6); place(HIT, tf["start"], 0.3)
 place(sprinkle(tf["end"] - tf["start"], 80), tf["start"] + 0.05, 0.45)
 cc = shots["cheese_chef"]; place(sprinkle(cc["end"] - cc["start"], 50), cc["start"] + 0.1, 1.2); place(whoosh(0.5, 300, 2500, 0.4), cc["start"] + 0.1, 0.3)
-cl = shots["cheese_close"]; place(sprinkle(cl["end"] - cl["start"], 70), cl["start"], 1.3); place(slow_swell(cl["end"] - cl["start"]), cl["start"], 0.3)
+cl = shots["cheese_close"]; place(sprinkle(cl["end"] - cl["start"], 70), cl["start"], 1.3); place(SLOWMO, cl["start"], 0.22)
 pk = shots["pumpkin"]
 place(whoosh(0.4, 400, 4000, 0.7), pk["start"] - 0.2, 0.45)
-place(slow_swell(0.9), at("pumpkin", 7.6 + 0.38 * 1.5), 0.45)
+place(SLOWMO, at("pumpkin", 7.6 + 0.38 * 1.5), 0.3)
 for k, srt in enumerate((8.40, 8.48, 8.58)):
     place(thud(150 + 20 * k), at("pumpkin", srt), 0.45)
 tm = shots["tomato"]; place(squish(), tm["start"] + 0.12, 0.45); place(squish(), tm["start"] + 0.33, 0.3)
 pl = shots["peel"]; place(scrape(pl["end"] - pl["start"]), pl["start"] + 0.05, 0.7)
 ov = shots["oven"]; place(fire(ov["end"] - ov["start"] + 0.3), ov["start"] - 0.05, 0.5)
-place(impact(0.6, 70, 32), ov["start"], 0.4)
+place(HIT, ov["start"], 0.22)
 pr = shots["prosciutto"]; place(whoosh(0.5, 200, 900, 0.4), pr["start"] + 0.2, 0.4)
 place(sprinkle(pr["end"] - pr["start"], 18), pr["start"] + 0.2, 0.45)
 pm = shots["parmesan"]; place(sprinkle(pm["end"] - pm["start"] - 0.1, 55), pm["start"] + 0.15, 1.2)
 he = shots["hero"]
-place(riser(0.9), he["start"] - 0.9, 0.3); place(impact(0.7, 90, 35), he["start"], 0.5)
+place(riser(0.9), he["start"] - 0.9, 0.3); place(HIT, he["start"], 0.3)
 place(ding(), he["start"] + 0.02, 0.35)
 
 # small swish on every remaining cut

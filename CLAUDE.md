@@ -12,3 +12,8 @@ mkdir -p ~/.claude/instagram && cp -n .claude/instagram/voice.md .claude/instagr
 
 When the voice file or `log.md` changes, update the repo copy in `.claude/instagram/` and commit it.
 Approved reel scripts are kept in `.claude/instagram/reels/`.
+
+## Links und Pfade
+
+Immer vollständige Links und Pfade nennen: komplette URLs (GitHub, ElevenLabs usw.) und
+absolute Dateipfade für jede gelieferte Datei, nie nur Dateinamen oder Kurzformen.
