@@ -68,13 +68,26 @@ SLOWMO = sample("slowmo", 0, 1.0)
 HIT = sample("hit", 0, 1.3, 0.25)
 SWISH = sample("swish", 0.05, 0.6)
 
+CHEESE = sample("cheese", 0, None, 0.05)
+
+def cheese(dur):
+    """natural cheese-sprinkle foley, tiled with crossfades to any length"""
+    n = int(dur * SR); out = np.zeros((n, 2), np.float32); xf = int(0.15 * SR); pos = 0
+    L = len(CHEESE)
+    while pos < n:
+        st = int(rng.integers(0, max(1, L // 3))); seg = CHEESE[st:].copy()
+        seg[:xf] *= np.linspace(0, 1, xf)[:, None]; seg[-xf:] *= np.linspace(1, 0, xf)[:, None]
+        j = min(n, pos + len(seg)); out[pos:j] += seg[: j - pos]; pos += len(seg) - xf
+    f = int(0.1 * SR); out[:f] *= np.linspace(0, 1, f)[:, None]; out[-f:] *= np.linspace(1, 0, f)[:, None]
+    return out
+
 # room tone everywhere
-rt = roomtone(); sfx += rt * 0.03
+rt = roomtone(); sfx += rt * 0.012
 
 # ---- hook: result first, slow-mo ----
 h = shots["hook_parmesan"]
 place(SLOWMO, 0.0, 0.35)
-place(sprinkle(h["end"] - 0.05, 30), 0.02, 0.45)
+place(cheese(h["end"] - 0.05), 0.02, 0.4)
 place(HIT, 0.0, 0.3)
 place(SWISH, HOOK_D - 0.22, 0.45)
 
@@ -91,9 +104,9 @@ sp = shots["sauce_pour"]; place(glug(sp["end"] - sp["start"] + 0.1), sp["start"]
 ld = shots["ladle"]; place(whoosh(ld["end"] - ld["start"], 150, 700, 0.5), ld["start"], 0.5)
 tf = shots["toppings_fly"]
 place(whoosh(0.55, 300, 6000, 0.55), tf["start"] - 0.25, 0.6); place(HIT, tf["start"], 0.3)
-place(sprinkle(tf["end"] - tf["start"], 80), tf["start"] + 0.05, 0.45)
-cc = shots["cheese_chef"]; place(sprinkle(cc["end"] - cc["start"], 50), cc["start"] + 0.1, 1.2); place(whoosh(0.5, 300, 2500, 0.4), cc["start"] + 0.1, 0.3)
-cl = shots["cheese_close"]; place(sprinkle(cl["end"] - cl["start"], 70), cl["start"], 1.3); place(SLOWMO, cl["start"], 0.22)
+place(cheese(tf["end"] - tf["start"]), tf["start"] + 0.05, 0.3)
+cc = shots["cheese_chef"]; place(cheese(cc["end"] - cc["start"]), cc["start"] + 0.1, 0.45); place(whoosh(0.5, 300, 2500, 0.4), cc["start"] + 0.1, 0.3)
+cl = shots["cheese_close"]; place(cheese(cl["end"] - cl["start"]), cl["start"], 0.9); place(SLOWMO, cl["start"], 0.22)
 pk = shots["pumpkin"]
 place(whoosh(0.4, 400, 4000, 0.7), pk["start"] - 0.2, 0.45)
 place(SLOWMO, at("pumpkin", 7.6 + 0.38 * 1.5), 0.3)
@@ -104,8 +117,8 @@ pl = shots["peel"]; place(scrape(pl["end"] - pl["start"]), pl["start"] + 0.05, 0
 ov = shots["oven"]; place(fire(ov["end"] - ov["start"] + 0.3), ov["start"] - 0.05, 0.5)
 place(HIT, ov["start"], 0.22)
 pr = shots["prosciutto"]; place(whoosh(0.5, 200, 900, 0.4), pr["start"] + 0.2, 0.4)
-place(sprinkle(pr["end"] - pr["start"], 18), pr["start"] + 0.2, 0.45)
-pm = shots["parmesan"]; place(sprinkle(pm["end"] - pm["start"] - 0.1, 55), pm["start"] + 0.15, 1.2)
+place(cheese(pr["end"] - pr["start"]), pr["start"] + 0.2, 0.18)
+pm = shots["parmesan"]; place(cheese(pm["end"] - pm["start"] - 0.1), pm["start"] + 0.15, 0.9)
 he = shots["hero"]
 place(riser(0.9), he["start"] - 0.9, 0.3); place(HIT, he["start"], 0.3)
 place(ding(), he["start"] + 0.02, 0.35)
