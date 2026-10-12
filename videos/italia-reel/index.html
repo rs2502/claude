@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      :root {
+        --night: #0e0b08;
+        --gold: #b8894a;
+        --gold-hi: #e2c08a;
+        --cream: #f3ebdd;
+        --serif: "EB Garamond", serif;
+        --sans: "Montserrat", sans-serif;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--night);
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--night);
+      }
+      .abs {
+        position: absolute;
+      }
+      .full {
+        position: absolute;
+        inset: 0;
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      .glow {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse 70% 45% at 50% 50%, rgba(120, 78, 32, 0.34), transparent 70%);
+      }
+      .vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.7) 100%);
+        pointer-events: none;
+        z-index: 1;
+      }
+      .label {
+        font-family: var(--sans);
+        font-weight: 600;
+        font-size: 26px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--gold);
+        white-space: nowrap;
+      }
+      .serif {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        color: var(--cream);
+        white-space: nowrap;
+      }
+      .mask {
+        display: block;
+        overflow: hidden;
+      }
+      .rise {
+        display: block;
+      }
+      .rule {
+        display: block;
+        height: 2px;
+        background: var(--gold);
+        transform-origin: 0% 50%;
+      }
+      .logo {
+        position: absolute;
+        width: 940px;
+        height: 492px;
+      }
+      .logo img {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .logo .script {
+        -webkit-mask-image: linear-gradient(100deg, #000 0%, #000 var(--p), transparent calc(var(--p) + 14%));
+        mask-image: linear-gradient(100deg, #000 0%, #000 var(--p), transparent calc(var(--p) + 14%));
+      }
+      .pen {
+        position: absolute;
+        top: 30px;
+        width: 24px;
+        height: 380px;
+        border-radius: 50%;
+        background: radial-gradient(ellipse at center, rgba(255, 226, 170, 0.9), rgba(255, 210, 140, 0) 70%);
+        filter: blur(6px);
+      }
+
+      /* S1 */
+      #s1-logo {
+        left: 70px;
+        top: 640px;
+      }
+      #s1-line {
+        left: 240px;
+        top: 1190px;
+        width: 600px;
+      }
+      #s1-tag {
+        left: 0;
+        right: 0;
+        top: 1226px;
+        text-align: center;
+      }
+
+      /* dishes */
+      .plate {
+        position: absolute;
+        width: 1260px;
+      }
+      .plate img {
+        display: block;
+        width: 100%;
+      }
+      .plate-shadow {
+        position: absolute;
+        left: 8%;
+        right: 8%;
+        bottom: -30px;
+        height: 100px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.75);
+        filter: blur(30px);
+      }
+      .steam {
+        position: absolute;
+        width: 100px;
+        height: 280px;
+        border-radius: 50%;
+        background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 70%);
+        filter: blur(14px);
+      }
+      .copy {
+        position: absolute;
+        left: 90px;
+        right: 90px;
+        top: 300px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        z-index: 2;
+      }
+      .big {
+        font-size: 210px;
+        line-height: 0.95;
+      }
+      .mid {
+        font-size: 126px;
+        line-height: 1.02;
+      }
+      .dish-name {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 46px;
+        color: var(--gold-hi);
+        white-space: nowrap;
+      }
+      .dish-note {
+        font-family: var(--sans);
+        font-size: 22px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(243, 235, 221, 0.66);
+        white-space: nowrap;
+      }
+      #s2-plate,
+      #s3-plate {
+        left: -90px;
+        top: 1000px;
+      }
+
+      /* S4 · hours */
+      #s4-copy {
+        top: 420px;
+        gap: 26px;
+      }
+      .hours {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-top: 30px;
+      }
+      .hours .row {
+        display: flex;
+        justify-content: space-between;
+        width: 900px;
+        font-family: var(--sans);
+        font-size: 30px;
+        letter-spacing: 0.08em;
+        color: var(--cream);
+        white-space: nowrap;
+      }
+      .hours .row b {
+        font-weight: 600;
+        color: var(--gold-hi);
+        letter-spacing: 0.2em;
+      }
+      .peek {
+        position: absolute;
+        width: 760px;
+      }
+      .peek img {
+        display: block;
+        width: 100%;
+      }
+      #s4-peek-a {
+        left: 520px;
+        top: 1300px;
+      }
+      #s4-peek-b {
+        left: -260px;
+        top: 1420px;
+      }
+
+      /* S5 · end card */
+      #s5-logo {
+        left: 70px;
+        top: 420px;
+      }
+      #s5-stamp {
+        left: 740px;
+        top: 870px;
+        width: 250px;
+        height: 248px;
+      }
+      #s5-info {
+        left: 0;
+        right: 0;
+        top: 1170px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 26px;
+      }
+      #s5-cta {
+        font-size: 84px;
+      }
+      #s5-tel {
+        font-family: var(--sans);
+        font-weight: 600;
+        font-size: 54px;
+        letter-spacing: 0.12em;
+        color: var(--gold-hi);
+      }
+      #s5-url {
+        font-size: 44px;
+      }
+      #s5-rule {
+        width: 420px;
+      }
+
+      #fade {
+        position: absolute;
+        inset: 0;
+        background: var(--night);
+        z-index: 60;
+        pointer-events: none;
+      }
+      #dust {
+        position: absolute;
+        inset: 0;
+        z-index: 40;
+        pointer-events: none;
+      }
+      .mote {
+        position: absolute;
+        border-radius: 50%;
+        background: var(--gold-hi);
+        box-shadow: 0 0 10px rgba(226, 192, 138, 0.8);
+      }
+      @keyframes hf-grain-noise {
+        0%,
+        100% {
+          transform: translate(0, 0);
+        }
+        10% {
+          transform: translate(-5%, -5%);
+        }
+        20% {
+          transform: translate(-10%, 5%);
+        }
+        30% {
+          transform: translate(5%, -10%);
+        }
+        40% {
+          transform: translate(-5%, 15%);
+        }
+        50% {
+          transform: translate(-10%, 5%);
+        }
+        60% {
+          transform: translate(15%, 0);
+        }
+        70% {
+          transform: translate(0, 10%);
+        }
+        80% {
+          transform: translate(-15%, 0);
+        }
+        90% {
+          transform: translate(10%, 5%);
+        }
+      }
+      #grain-overlay {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 50;
+        overflow: hidden;
+      }
+      #grain-overlay .grain-texture {
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        opacity: 0.07;
+        animation: hf-grain-noise 0.5s steps(1) infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="15"
+      data-fps="30"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div id="bg" class="clip full" data-start="0" data-duration="15" data-track-index="0">
+        <div class="glow" id="bg-glow"></div>
+      </div>
+
+      <!-- S1 · logo writes itself (0 – 3) -->
+      <div id="s1" class="clip scene" data-start="0" data-duration="3" data-track-index="1">
+        <div id="s1-logo" class="logo">
+          <img class="script" id="s1-script" src="assets/img/logo-script.png" alt="" />
+          <img id="s1-flag" src="assets/img/logo-flag.png" alt="" />
+          <img id="s1-sub" src="assets/img/logo-sub.png" alt="" />
+          <div class="pen" id="s1-pen"></div>
+        </div>
+        <span id="s1-line" class="abs rule"></span>
+        <div id="s1-tag" class="abs label">Cucina Italiana · seit 1994</div>
+        <div class="vignette" data-layout-ignore></div>
+      </div>
+
+      <!-- S2 · burrata (3 – 6.6) -->
+      <div id="s2" class="clip scene" data-start="3" data-duration="3.6" data-track-index="2">
+        <div id="s2-plate" class="plate" data-layout-allow-overflow>
+          <div class="plate-shadow"></div>
+          <img id="s2-img" src="assets/img/dish-burrata.png" alt="Burrata al Tartufo" />
+          <div class="steam" id="st1" style="left: 500px; top: -120px"></div>
+          <div class="steam" id="st2" style="left: 580px; top: -160px"></div>
+          <div class="steam" id="st3" style="left: 660px; top: -110px"></div>
+        </div>
+        <div id="s2-copy" class="copy">
+          <div class="label" id="s2-label">Spezialität des Hauses</div>
+          <div>
+            <span class="mask"><span class="rise serif big" id="s2-w1">Italien</span></span>
+            <span class="mask"><span class="rise serif big" id="s2-w2">beginnt</span></span>
+          </div>
+          <span class="rule" id="s2-rule" style="width: 120px"></span>
+          <div class="dish-name" id="s2-name">Burrata al Tartufo</div>
+          <div class="dish-note" id="s2-note">Gegrilltes Gemüse · Trüffel</div>
+        </div>
+        <div class="vignette" data-layout-ignore></div>
+      </div>
+
+      <!-- S3 · carpaccio (6.6 – 10.2) -->
+      <div id="s3" class="clip scene" data-start="6.6" data-duration="3.6" data-track-index="3">
+        <div id="s3-plate" class="plate" data-layout-allow-overflow>
+          <div class="plate-shadow"></div>
+          <img id="s3-img" src="assets/img/dish-carpaccio.png" alt="Carpaccio di Manzo" />
+        </div>
+        <div id="s3-copy" class="copy">
+          <div class="label" id="s3-label">Bruchhausen-Vilsen</div>
+          <div>
+            <span class="mask"><span class="rise serif mid" id="s3-w1">am</span></span>
+            <span class="mask"><span class="rise serif mid" id="s3-w2">Engelbergplatz.</span></span>
+          </div>
+          <span class="rule" id="s3-rule" style="width: 120px"></span>
+          <div class="dish-name" id="s3-name">Carpaccio di Manzo</div>
+          <div class="dish-note" id="s3-note">Steinpilze · Parmigiano · Rucola</div>
+        </div>
+        <div class="vignette" data-layout-ignore></div>
+      </div>
+
+      <!-- S4 · fresh + hours (10.2 – 12.6) -->
+      <div id="s4" class="clip scene" data-start="10.2" data-duration="2.4" data-track-index="4">
+        <div id="s4-peek-a" class="peek" data-layout-allow-overflow><img src="assets/img/dish-burrata.png" alt="" /></div>
+        <div id="s4-peek-b" class="peek" data-layout-allow-overflow><img src="assets/img/dish-carpaccio.png" alt="" /></div>
+        <div id="s4-copy" class="copy">
+          <span class="mask"><span class="rise serif mid" id="s4-w1">Frisch gekocht.</span></span>
+          <span class="mask"><span class="rise serif mid" id="s4-w2" style="color: var(--gold-hi)">Herzlich serviert.</span></span>
+          <div class="hours">
+            <div class="row" id="h1"><b>Mo · Do – Sa</b><span>11:30–14:30 · 17:30–22:30</span></div>
+            <div class="row" id="h2"><b>Sonntag</b><span>11:30–14:00 · 17:00–22:00</span></div>
+            <div class="row" id="h3"><b>Di &amp; Mi</b><span>Ruhetag</span></div>
+          </div>
+        </div>
+        <div class="vignette" data-layout-ignore></div>
+      </div>
+
+      <!-- S5 · end card (12.6 – 15) -->
+      <div id="s5" class="clip scene" data-start="12.6" data-duration="2.4" data-track-index="5">
+        <div id="s5-logo" class="logo">
+          <img class="script" id="s5-script" src="assets/img/logo-script.png" alt="" />
+          <img id="s5-flag" src="assets/img/logo-flag.png" alt="" />
+          <img id="s5-sub" src="assets/img/logo-sub.png" alt="" />
+        </div>
+        <img id="s5-stamp" class="abs" src="assets/img/stamp-gold.png" alt="Premium Quality 1994" />
+        <div id="s5-info" class="abs">
+          <div class="serif" id="s5-cta">Jetzt Tisch reservieren</div>
+          <div id="s5-tel">04252 4597</div>
+          <span class="rule" id="s5-rule"></span>
+          <div class="label" id="s5-addr">Engelbergplatz 4 · Bruchhausen-Vilsen</div>
+          <div class="serif" id="s5-url">ristorante-pizzeria-italia.com</div>
+        </div>
+        <div class="vignette" data-layout-ignore></div>
+      </div>
+
+      <div id="dust" class="clip" data-start="0" data-duration="15" data-track-index="6"></div>
+      <div id="grain-overlay" class="clip" data-start="0" data-duration="15" data-track-index="7">
+        <div class="grain-texture"></div>
+      </div>
+      <div id="fade" class="clip" data-start="0" data-duration="15" data-track-index="8"></div>
+
+      <audio
+        id="soundtrack"
+        src="assets/audio/soundtrack.wav"
+        data-start="0"
+        data-duration="15"
+        data-track-index="9"
+        data-volume="1"
+      ></audio>
+    </div>
+
+    <script>
+      let seed = 1994;
+      const rand = () => {
+        seed |= 0;
+        seed = (seed + 0x6d2b79f5) | 0;
+        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+      const dust = document.getElementById("dust");
+      const motes = [];
+      for (let i = 0; i < 50; i++) {
+        const m = document.createElement("span");
+        m.className = "mote";
+        const s = 2 + rand() * 4;
+        m.style.width = s + "px";
+        m.style.height = s + "px";
+        m.style.left = rand() * 1080 + "px";
+        m.style.top = rand() * 1920 + "px";
+        dust.appendChild(m);
+        motes.push({ el: m, dx: (rand() - 0.5) * 140, dy: -120 - rand() * 280, o: 0.25 + rand() * 0.6 });
+      }
+
+      const tl = gsap.timeline({ paused: true });
+      const D = 15;
+      motes.forEach((m) => {
+        tl.fromTo(m.el, { x: 0, y: 0, opacity: 0 }, { x: m.dx, y: m.dy, opacity: m.o, duration: D * 0.5, ease: "sine.out" }, 0);
+        tl.to(m.el, { x: m.dx * 2, y: m.dy * 2, opacity: 0, duration: D * 0.5, ease: "sine.in" }, D * 0.5);
+      });
+      tl.fromTo("#bg-glow", { scale: 0.9, opacity: 0.6 }, { scale: 1.1, opacity: 1, duration: D, ease: "sine.inOut" }, 0);
+      tl.fromTo("#fade", { opacity: 1 }, { opacity: 0, duration: 0.5, ease: "power1.out" }, 0);
+      tl.to("#fade", { opacity: 1, duration: 0.4, ease: "power1.in" }, D - 0.4);
+
+      // ===== S1 · logo (0 – 3) =====
+      tl.fromTo("#s1-script", { "--p": "-16%" }, { "--p": "104%", duration: 1.5, ease: "power2.inOut" }, 0.2);
+      tl.fromTo("#s1-pen", { x: -60, opacity: 0 }, { x: 960, opacity: 1, duration: 1.5, ease: "power2.inOut" }, 0.2);
+      tl.to("#s1-pen", { opacity: 0, duration: 0.25, ease: "none" }, 1.5);
+      tl.fromTo("#s1-flag", { scale: 0, opacity: 0, transformOrigin: "75% 15%" }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(3)" }, 1.55);
+      tl.fromTo("#s1-sub", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }, 1.7);
+      tl.fromTo("#s1-line", { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "expo.inOut" }, 1.8);
+      tl.fromTo("#s1-tag", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 2.05);
+      tl.fromTo("#s1-logo", { scale: 0.96 }, { scale: 1.02, duration: 3, ease: "sine.out" }, 0);
+      tl.to(["#s1-logo", "#s1-line", "#s1-tag"], { y: -50, opacity: 0, filter: "blur(8px)", duration: 0.4, ease: "power2.in" }, 2.6);
+
+      // ===== S2 · burrata (3 – 6.6) =====
+      tl.fromTo("#s2-plate", { y: 420, scale: 1.1, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 1.1, ease: "expo.out" }, 3.0);
+      tl.fromTo("#s2-img", { scale: 1 }, { scale: 1.05, duration: 3.6, ease: "none" }, 3.0);
+      ["#st1", "#st2", "#st3"].forEach((s, i) => {
+        tl.fromTo(s, { y: 60, x: 0, opacity: 0, scaleY: 0.6 }, { y: -150, x: (i - 1) * 30, opacity: 1, scaleY: 1.3, duration: 1.6, ease: "sine.out", repeat: 1 }, 3.3 + i * 0.35);
+      });
+      tl.fromTo("#s2-label", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 3.2);
+      tl.fromTo("#s2-w1", { yPercent: 105 }, { yPercent: 0, duration: 0.9, ease: "expo.out" }, 3.3);
+      tl.fromTo("#s2-w2", { yPercent: 105 }, { yPercent: 0, duration: 0.9, ease: "expo.out" }, 3.45);
+      tl.fromTo("#s2-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power4.out" }, 3.8);
+      tl.fromTo("#s2-name", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 3.9);
+      tl.fromTo("#s2-note", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "none" }, 4.1);
+      tl.to("#s2-plate", { x: 1300, duration: 0.55, ease: "power3.in" }, 6.05);
+      tl.to(["#s2-w1", "#s2-w2"], { yPercent: -105, duration: 0.4, ease: "power3.in", stagger: 0.05 }, 6.1);
+      tl.to(["#s2-label", "#s2-rule", "#s2-name", "#s2-note"], { opacity: 0, duration: 0.3, ease: "power1.in" }, 6.1);
+
+      // ===== S3 · carpaccio (6.6 – 10.2) =====
+      tl.fromTo("#s3-plate", { x: -1300 }, { x: 0, duration: 1.0, ease: "expo.out" }, 6.6);
+      tl.fromTo("#s3-img", { scale: 1.06 }, { scale: 1, duration: 3.6, ease: "none" }, 6.6);
+      tl.fromTo("#s3-label", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 6.8);
+      tl.fromTo("#s3-w1", { yPercent: 105 }, { yPercent: 0, duration: 0.8, ease: "expo.out" }, 6.85);
+      tl.fromTo("#s3-w2", { yPercent: 105 }, { yPercent: 0, duration: 0.9, ease: "expo.out" }, 7.0);
+      tl.fromTo("#s3-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power4.out" }, 7.35);
+      tl.fromTo("#s3-name", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 7.45);
+      tl.fromTo("#s3-note", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "none" }, 7.65);
+      tl.to("#s3-plate", { y: 1000, duration: 0.55, ease: "power3.in" }, 9.65);
+      tl.to(["#s3-w1", "#s3-w2"], { yPercent: -105, duration: 0.4, ease: "power3.in", stagger: 0.05 }, 9.7);
+      tl.to(["#s3-label", "#s3-rule", "#s3-name", "#s3-note"], { opacity: 0, duration: 0.3, ease: "power1.in" }, 9.7);
+
+      // ===== S4 · frisch + Öffnungszeiten (10.2 – 12.6) =====
+      tl.fromTo("#s4-peek-a", { x: 500, rotation: 12 }, { x: 0, rotation: 0, duration: 0.9, ease: "expo.out" }, 10.25);
+      tl.fromTo("#s4-peek-b", { x: -500, rotation: -12 }, { x: 0, rotation: 0, duration: 0.9, ease: "expo.out" }, 10.35);
+      tl.fromTo("#s4-w1", { yPercent: 105 }, { yPercent: 0, duration: 0.8, ease: "expo.out" }, 10.3);
+      tl.fromTo("#s4-w2", { yPercent: 105 }, { yPercent: 0, duration: 0.8, ease: "expo.out" }, 10.45);
+      tl.fromTo(["#h1", "#h2", "#h3"], { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out", stagger: 0.12 }, 10.75);
+      tl.to(["#s4-peek-a", "#s4-peek-b"], { y: 700, duration: 0.5, ease: "power3.in" }, 12.1);
+      tl.to(["#s4-w1", "#s4-w2"], { yPercent: -105, duration: 0.35, ease: "power3.in", stagger: 0.05 }, 12.2);
+      tl.to(["#h1", "#h2", "#h3"], { opacity: 0, duration: 0.25, ease: "power1.in" }, 12.2);
+
+      // ===== S5 · end card (12.6 – 15) =====
+      tl.fromTo("#s5-script", { "--p": "-16%" }, { "--p": "104%", duration: 0.9, ease: "power2.inOut" }, 12.62);
+      tl.fromTo("#s5-flag", { scale: 0, opacity: 0, transformOrigin: "75% 15%" }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(3)" }, 13.3);
+      tl.fromTo("#s5-sub", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 13.25);
+      tl.fromTo("#s5-stamp", { scale: 2.4, rotation: -40, opacity: 0 }, { scale: 1, rotation: -12, opacity: 1, duration: 0.3, ease: "power4.in" }, 13.5);
+      tl.to("#s5-logo", { keyframes: [{ y: 5 }, { y: -3 }, { y: 0 }], duration: 0.12, ease: "none" }, 13.8);
+      tl.fromTo("#s5-cta", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 13.65);
+      tl.fromTo("#s5-tel", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, 13.85);
+      tl.fromTo("#s5-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "expo.inOut" }, 13.95);
+      tl.fromTo("#s5-addr", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "none" }, 14.05);
+      tl.fromTo("#s5-url", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 14.15);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
