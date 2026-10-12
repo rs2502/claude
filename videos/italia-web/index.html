@@ -6,14 +6,16 @@
     <script src="assets/vendor/gsap.min.js"></script>
     <style>
       :root {
-        --night: #0e0b08;
+        --night: #f7f1e8;
         --umber: #2a1d10;
-        --gold: #b8894a;
-        --gold-hi: #e2c08a;
-        --cream: #f3ebdd;
+        --gold: #b8542e;
+        --star: #c4a04f;
+        --label: #a3461f;
+        --gold-hi: #b8542e;
+        --cream: #2f2922;
         --verde: #149a55;
         --rosso: #d23544;
-        --serif: "EB Garamond", serif;
+        --serif: "Playfair Display", serif;
         --sans: "Montserrat", sans-serif;
       }
       * {
@@ -50,12 +52,12 @@
       .glow {
         position: absolute;
         inset: 0;
-        background: radial-gradient(ellipse 60% 55% at 50% 50%, rgba(120, 78, 32, 0.32), transparent 70%);
+        background: radial-gradient(ellipse 60% 55% at 50% 50%, rgba(255, 255, 255, 0.75), transparent 70%);
       }
       .vignette {
         position: absolute;
         inset: 0;
-        background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.7) 100%);
+        background: radial-gradient(ellipse at center, transparent 50%, rgba(214, 190, 156, 0.35) 100%);
         pointer-events: none;
         z-index: 1;
       }
@@ -65,14 +67,27 @@
         font-size: 22px;
         letter-spacing: 0.32em;
         text-transform: uppercase;
-        color: var(--gold);
+        color: var(--label);
         white-space: nowrap;
+      }
+      .label::before {
+        content: "";
+        display: inline-block;
+        width: 44px;
+        height: 2px;
+        margin-right: 16px;
+        vertical-align: middle;
+        background: var(--gold);
       }
       .serif {
         font-family: var(--serif);
-        font-style: italic;
-        font-weight: 400;
+        font-style: normal;
+        font-weight: 700;
         color: var(--cream);
+      }
+      .em {
+        font-style: italic;
+        color: var(--gold);
         white-space: nowrap;
       }
       .mask {
@@ -112,7 +127,7 @@
         width: 26px;
         height: 420px;
         border-radius: 50%;
-        background: radial-gradient(ellipse at center, rgba(255, 226, 170, 0.9), rgba(255, 210, 140, 0) 70%);
+        background: radial-gradient(ellipse at center, rgba(184, 84, 46, 0.45), rgba(184, 84, 46, 0) 70%);
         filter: blur(6px);
       }
 
@@ -149,7 +164,7 @@
         bottom: -30px;
         height: 90px;
         border-radius: 50%;
-        background: rgba(0, 0, 0, 0.75);
+        background: rgba(120, 90, 50, 0.38);
         filter: blur(28px);
       }
       .steam {
@@ -157,7 +172,7 @@
         width: 90px;
         height: 260px;
         border-radius: 50%;
-        background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 70%);
+        background: radial-gradient(ellipse at center, rgba(150, 130, 110, 0.22), rgba(150, 130, 110, 0) 70%);
         filter: blur(14px);
       }
       .copy {
@@ -171,12 +186,12 @@
         z-index: 2;
       }
       .big {
-        font-size: 200px;
-        line-height: 0.95;
+        font-size: 180px;
+        line-height: 1.02;
       }
       .mid {
-        font-size: 150px;
-        line-height: 1;
+        font-size: 112px;
+        line-height: 1.05;
       }
       .dish-name {
         font-family: var(--serif);
@@ -190,7 +205,7 @@
         font-size: 20px;
         letter-spacing: 0.18em;
         text-transform: uppercase;
-        color: rgba(243, 235, 221, 0.62);
+        color: #6b6259;
         white-space: nowrap;
       }
 
@@ -203,12 +218,12 @@
         width: 700px;
       }
       #s3-plate {
-        left: -200px;
+        left: -400px;
         top: 150px;
       }
       #s3-copy {
-        left: 900px;
-        width: 960px;
+        left: 860px;
+        width: 1000px;
       }
 
       /* S4 end card */
@@ -234,6 +249,8 @@
         gap: 22px;
       }
       #s4-url {
+        font-style: italic;
+        font-weight: 400;
         font-size: 46px;
       }
       #s4-rule {
@@ -256,8 +273,7 @@
       .mote {
         position: absolute;
         border-radius: 50%;
-        background: var(--gold-hi);
-        box-shadow: 0 0 10px rgba(226, 192, 138, 0.8);
+        background: var(--star);
       }
 
       @keyframes hf-grain-noise {
@@ -307,7 +323,7 @@
         width: 200%;
         height: 200%;
         background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-        opacity: 0.07;
+        opacity: 0.045;
         animation: hf-grain-noise 0.5s steps(1) infinite;
       }
     </style>
@@ -352,7 +368,7 @@
           <div class="label" id="s2-label">Spezialität des Hauses</div>
           <div>
             <span class="mask"><span class="rise serif big" id="s2-w1">Italien</span></span>
-            <span class="mask"><span class="rise serif big" id="s2-w2">beginnt</span></span>
+            <span class="mask"><span class="rise serif big" id="s2-w2"><span class="em">beginnt</span></span></span>
           </div>
           <span class="rule" id="s2-rule" style="width: 120px"></span>
           <div class="dish-name" id="s2-name">Burrata al Tartufo</div>
@@ -371,7 +387,7 @@
           <div class="label" id="s3-label">Frisch gekocht · herzlich serviert</div>
           <div>
             <span class="mask"><span class="rise serif mid" id="s3-w1">am</span></span>
-            <span class="mask"><span class="rise serif mid" id="s3-w2">Engelbergplatz.</span></span>
+            <span class="mask"><span class="rise serif mid" id="s3-w2"><span class="em">Engelbergplatz.</span></span></span>
           </div>
           <span class="rule" id="s3-rule" style="width: 120px"></span>
           <div class="dish-name" id="s3-name">Carpaccio di Manzo</div>
@@ -424,7 +440,7 @@
         m.style.left = rand() * 1920 + "px";
         m.style.top = rand() * 1080 + "px";
         dust.appendChild(m);
-        motes.push({ el: m, dx: (rand() - 0.5) * 160, dy: -80 - rand() * 220, o: 0.25 + rand() * 0.6 });
+        motes.push({ el: m, dx: (rand() - 0.5) * 160, dy: -80 - rand() * 220, o: 0.12 + rand() * 0.3 });
       }
 
       const tl = gsap.timeline({ paused: true });
