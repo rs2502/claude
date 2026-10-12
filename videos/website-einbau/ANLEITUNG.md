@@ -17,7 +17,7 @@ Dateinamen nicht ändern.
 
 ## 3. Eine Zeile austauschen
 `/start/startseite.html` im Texteditor öffnen, die Zeile mit `dining.jpg` suchen
-(Strg+F bzw. Cmd+F: `dining.jpg`) und die ganze `<img …>`-Zeile durch den Block aus
+(Strg+F bzw. Cmd+F: `dining.jpg` oder `italia-hero`) und die ganze Zeile bzw. den Video-Block durch den Block aus
 `zeile-ersetzen.html` ersetzen. Kein CSS nötig.
 
 Falls du vorher schon den Video-Block unter dem Hero eingefügt hattest
