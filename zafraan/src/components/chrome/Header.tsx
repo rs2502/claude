@@ -54,10 +54,10 @@ export function Header() {
         <span aria-hidden className="absolute inset-x-0 top-0 h-px origin-left bg-ink/70" ref={progress} style={{ transform: "scaleX(0)" }} />
         <div className="container-editorial flex h-[var(--header-h)] items-center justify-between">
           <TransitionLink href="/" className="group flex items-baseline gap-3 rounded-full bg-canvas/95 px-5 py-2.5 shadow-soft" aria-label="Ristorante Pizzeria Italia — Startseite">
+            <span className="eyebrow text-[0.55rem] text-ink-mute sm:text-[0.6rem]">Ristorante Pizzeria</span>
             <span className="display text-[1.35rem] leading-none tracking-[-0.02em]">
               <span className="display-italic">I</span>talia
             </span>
-            <span className="eyebrow hidden text-[0.6rem] text-ink-mute lg:inline">Ristorante Pizzeria</span>
           </TransitionLink>
 
           <nav aria-label="Hauptnavigation" className="hidden rounded-full bg-canvas/95 px-3 py-2 shadow-soft md:block">
