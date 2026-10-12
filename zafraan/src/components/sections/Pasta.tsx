@@ -72,7 +72,8 @@ export function Pasta() {
           </div>
 
           {/* Die Bildtafel im Querformat */}
-          <div className="relative mx-auto aspect-video max-h-[58svh] w-full overflow-hidden rounded-[3px] bg-ink shadow-lift">
+          {/* Immer exakt 16:9 wie der Film — auf breiten Bildschirmen wird die Tafel schmaler statt beschnitten. */}
+          <div className="relative mx-auto aspect-video w-[min(100%,calc(60svh*16/9))] overflow-hidden rounded-[3px] bg-ink shadow-lift">
             <ScrubVideo ref={video} label="Spaghetti, Penne und Tortellini schweben nacheinander durch das Bild." />
 
             {/* Der Name der Nudel, unten links auf dem Film */}
@@ -96,7 +97,7 @@ export function Pasta() {
           </div>
 
           {/* Fortschritt: drei Stationen */}
-          <div className="mt-6" aria-hidden>
+          <div className="mx-auto mt-6 w-[min(100%,calc(60svh*16/9))]" aria-hidden>
             <div className="relative h-px bg-line">
               <span ref={fill} className="absolute inset-0 origin-left bg-ink" style={{ transform: "scaleX(0)" }} />
             </div>
