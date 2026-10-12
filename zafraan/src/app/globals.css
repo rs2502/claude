@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Tokens
+   ------------------------------------------------------------------ */
+@theme {
+  --color-canvas: #fafaf8;
+  --color-paper: #f3f1ec;
+  --color-ink: #2b2320;
+  --color-ink-soft: #5b504b;
+  --color-ink-mute: #8f847d;
+  --color-saffron: #c8862f;
+  --color-turmeric: #d9a441;
+  --color-chili: #9c3b26;
+  --color-cardamom: #6f7a4f;
+  --color-line: rgb(43 35 32 / 0.14);
+
+  --font-display: var(--font-fraunces), "Times New Roman", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-curtain: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --shadow-soft: 0 1px 2px rgb(43 35 32 / 0.04), 0 12px 32px -12px rgb(43 35 32 / 0.18);
+  --shadow-lift: 0 2px 4px rgb(43 35 32 / 0.05), 0 28px 60px -24px rgb(43 35 32 / 0.28);
+}
+
+:root {
+  --gutter: clamp(1.25rem, 3.2vw, 3.5rem);
+  --header-h: 5rem;
+  color-scheme: light;
+}
+
+html {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: clip; }
+
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  overflow-x: clip;
+}
+
+::selection { background: var(--color-ink); color: var(--color-canvas); }
+
+/* Hide native cursor only once our cursor is live (fine pointers). */
+html.has-cursor,
+html.has-cursor * { cursor: none !important; }
+
+:focus-visible {
+  outline: 1.5px solid var(--color-ink);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* ------------------------------------------------------------------
+   Editorial type
+   ------------------------------------------------------------------ */
+@utility display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 50, "WONK" 0;
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+  font-weight: 300;
+}
+@utility display-italic {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+  font-weight: 300;
+}
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+@utility folio {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+@utility container-editorial {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  max-width: 1680px;
+}
+@utility grid-editorial {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(1rem, 2vw, 2rem);
+}
+
+/* SplitType wrappers: lines clip their words so words rise from a mask. */
+.split-line { overflow: clip; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.split-word, .split-char { display: inline-block; will-change: transform; }
+
+/* ------------------------------------------------------------------
+   Links: underline grows from where the pointer entered.
+   ------------------------------------------------------------------ */
+.link-grow {
+  position: relative;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 100% 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 2px;
+  transition: background-size 0.7s var(--ease-editorial);
+}
+.link-grow:hover,
+.link-grow:focus-visible {
+  background-size: 100% 1px;
+  background-position: 0% 100%;
+}
+
+/* ------------------------------------------------------------------
+   Paper + grain. Static SVG noise, composited once — no animation cost.
+   ------------------------------------------------------------------ */
+.paper-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.055;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.17 0 0 0 0 0.14 0 0 0 0 0.12 0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.paper-fibre {
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgb(255 255 255 / 0.6), transparent 60%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='0.012 0.09' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.49 0 0 0 0 0.42 0 0 0 0.09 0'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>");
+}
+
+/* Videos never show native UI and never steal focus/clicks. */
+video::-webkit-media-controls { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
