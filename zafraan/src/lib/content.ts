@@ -23,7 +23,7 @@ export const site = {
   ],
 } as const;
 
-/** Unterordner auf dem Server (leer im Normalbetrieb, z. B. "/neu" beim Test-Export). */
+/** Unterordner auf dem Server (leer im Normalbetrieb, z. B. "/reinart-projects/risto" beim Test-Export). */
 export const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export const media = {

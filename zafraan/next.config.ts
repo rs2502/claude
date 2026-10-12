@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 /**
  * `npm run export` baut eine statische Fassung (nur HTML/JS/CSS/Medien) für
  * klassisches Webhosting per FTP. BASE_PATH ist der Unterordner auf dem Server,
- * z. B. "/neu" für ristorante-pizzeria-italia.com/neu/.
+ * z. B. "/reinart-projects/risto" für ristorante-pizzeria-italia.com/reinart-projects/risto/.
  */
 const isExport = process.env.STATIC_EXPORT === "1";
 const basePath = isExport ? (process.env.BASE_PATH ?? "") : "";

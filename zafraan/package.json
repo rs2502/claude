@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "tsc --noEmit",
     "encode:videos": "bash scripts/encode-videos.sh",
-    "export": "STATIC_EXPORT=1 BASE_PATH=/neu next build"
+    "export": "STATIC_EXPORT=1 BASE_PATH=/reinart-projects/risto next build"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",
