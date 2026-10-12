@@ -12,11 +12,12 @@ also dorthin, wo auch `dining.jpg` liegt:
 - `italia-hero-poster.jpg` (Standbild, solange das Video lädt)
 
 ## 2. Code einfügen
-Öffne `/start/startseite.html` in einem Texteditor und füge die beiden Teile aus
-`einbau-snippet.html` ein:
+Öffne `/start/startseite.html` in einem Texteditor (z. B. Notepad++ oder VS Code):
 
-- **Schritt A** (HTML) zwischen dem Hero-Bereich und `<!-- ÜBER UNS -->`
-- **Schritt B** (CSS) ganz unten im `<style>`-Block, vor `</style>`
+- **`1-html-einfuegen.html`**: Inhalt kopieren und einfügen direkt **vor** der Zeile
+  `<!-- ÜBER UNS -->` (also hinter das `</section>` des Hero-Bereichs).
+- **`2-css-einfuegen.css`**: Inhalt kopieren und einfügen ganz unten im `<style>`-Block,
+  direkt **vor** `</style>`.
 
 Speichern, wieder hochladen, fertig.
 
