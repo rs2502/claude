@@ -3,9 +3,8 @@
 import { useEffect, useRef } from "react";
 import { gsap, MQ } from "@/lib/gsap";
 import { media, site } from "@/lib/content";
-import { useScrubVideo } from "@/hooks/useScrubVideo";
 import { useMood } from "@/hooks/useMood";
-import { ScrubVideo } from "@/components/motion/ScrubVideo";
+import Image from "next/image";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { MaskImage } from "@/components/motion/MaskImage";
 import { Folio } from "@/components/ui/SectionHead";
@@ -29,10 +28,8 @@ export function Dining() {
   const section = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const filmLayer = useRef<HTMLDivElement>(null);
-  const video = useRef<HTMLVideoElement>(null);
 
   useMood(section, "dining");
-  useScrubVideo({ video, trigger: stage, src: media.video(6), start: "top bottom", end: "bottom top", stillAt: 0.5 });
 
   useEffect(() => {
     const mm = gsap.matchMedia();
@@ -62,7 +59,7 @@ export function Dining() {
             "md:inset-auto md:right-[7vw] md:top-[12%] md:aspect-[9/16] md:h-[108svh] md:rounded-[3px] md:shadow-lift",
           )}
         >
-          <ScrubVideo ref={video} label="Gäste genießen einen Abend im Ristorante Italia." />
+          <Image src={media.image(1)} alt="Ein Gericht aus dem Ristorante Italia." fill sizes="(min-width: 768px) 40vw, 100vw" className="object-cover" />
         </div>
         <div className="container-editorial relative z-10 flex h-full flex-col justify-center">
           <div>

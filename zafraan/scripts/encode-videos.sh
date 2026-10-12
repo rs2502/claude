@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
-# Re-wrap the Google Flow films for scroll scrubbing (does not regenerate them).
-# Short GOPs + no B-frames let the decoder land on any frame instantly;
-# faststart puts the index first so metadata arrives with the first bytes.
+# Bereitet die Filme fürs Scrollen auf (das Bildmaterial bleibt unverändert).
+# Kurze Keyframe-Abstände + keine B-Frames: der Decoder springt sofort auf jedes Bild.
+# "faststart" legt den Index nach vorn, damit das Video sofort startbereit ist.
+# Bereits aufbereitete Dateien werden erkannt und übersprungen.
 set -euo pipefail
 cd "$(dirname "$0")/../public/media"
 mkdir -p .orig
 for f in video-*.mp4; do
-  [ -f ".orig/$f" ] || cp "$f" ".orig/$f"
+  if ffprobe -v error -show_entries format_tags=comment -of csv=p=0 "$f" | grep -q "scrub-ready"; then
+    echo "• $f ist schon fertig"
+    continue
+  fi
+  cp "$f" ".orig/$f"
   ffmpeg -y -loglevel error -i ".orig/$f" -an \
     -vf "scale='min(1920,iw)':-2" \
     -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p \
-    -g 6 -keyint_min 6 -bf 0 -movflags +faststart "$f"
+    -g 6 -keyint_min 6 -bf 0 -movflags +faststart \
+    -metadata comment=scrub-ready "$f"
   echo "✓ $f"
 done

@@ -6,7 +6,7 @@ import { useSyncExternalStore } from "react";
  * A tiny external store for cross-cutting experience state (loader, scene
  * mood, transitions). Avoids a context re-render cascade on every update.
  */
-export type Mood = "hero" | "story" | "samosa" | "ingredients" | "craft" | "sauces" | "dining" | "reserve";
+export type Mood = "hero" | "story" | "pasta" | "ingredients" | "craft" | "sauces" | "dining" | "reserve";
 
 type State = {
   loaded: boolean;

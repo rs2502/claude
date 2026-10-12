@@ -4,13 +4,10 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap, MQ } from "@/lib/gsap";
 import { craftSteps, media } from "@/lib/content";
-import { useScrubVideo } from "@/hooks/useScrubVideo";
 import { useMood } from "@/hooks/useMood";
-import { ScrubVideo } from "@/components/motion/ScrubVideo";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { MaskImage } from "@/components/motion/MaskImage";
 import { Folio } from "@/components/ui/SectionHead";
-import { useIsMobile } from "@/hooks/useMedia";
 
 /**
  * A timeline you scroll through sideways. The film on the left is the
@@ -19,15 +16,12 @@ import { useIsMobile } from "@/hooks/useMedia";
  */
 export function Craft() {
   const section = useRef<HTMLElement>(null);
-  const video = useRef<HTMLVideoElement>(null);
   const track = useRef<HTMLDivElement>(null);
   const fill = useRef<HTMLSpanElement>(null);
   const fillV = useRef<HTMLSpanElement>(null);
-  const isMobile = useIsMobile();
   const counter = useRef<HTMLSpanElement>(null);
 
   useMood(section, "craft");
-  useScrubVideo({ video, trigger: section, src: media.video(4), start: "top top", end: "bottom bottom", stillAt: 0.5, enabled: !isMobile });
 
   useEffect(() => {
     const mm = gsap.matchMedia();
@@ -102,8 +96,8 @@ export function Craft() {
             <SplitReveal as="h2" by="words" id="craft-title" className="display mb-8 text-[clamp(2.2rem,3.8vw,4rem)]" start="top 70%" end="top 5%" trigger="#craft">
               Fünf Schritte zur perfekten Pizza.
             </SplitReveal>
-            <div className="relative mx-auto aspect-[9/16] min-h-0 max-w-full flex-1 overflow-hidden rounded-[3px] bg-paper shadow-lift" data-cursor="image" data-cursor-label="Ansehen">
-              <ScrubVideo ref={video} label="Hände bereiten in der Küche eine Pizza zu." />
+            <div className="relative mx-auto aspect-[9/16] min-h-0 max-w-full flex-1 overflow-hidden rounded-[3px] bg-paper shadow-lift" data-cursor="image" data-cursor-label="Probieren">
+              <Image src={media.image(3)} alt="" fill sizes="30vw" className="object-cover" />
               <div className="absolute bottom-4 left-4 flex items-baseline gap-2 rounded-full bg-canvas/95 px-4 py-1.5 shadow-soft">
                 <span className="folio text-ink-mute">Schritt</span>
                 <span ref={counter} className="display text-lg tabular-nums">01</span>
@@ -166,9 +160,8 @@ export function Craft() {
       <div className="container-editorial py-24 md:hidden motion-reduce:block">
         <Folio no="05" label="Das Handwerk" className="mb-6" />
         <h2 className="display mb-10 text-[2.6rem]">Fünf Schritte zur perfekten Pizza.</h2>
-        <div className="relative mb-14 aspect-[9/16] overflow-hidden rounded-[2px] bg-paper shadow-soft md:hidden">
-          {/* Mobile film reuses the same scrub via its own element */}
-          <MobileFilm enabled={isMobile} />
+        <div className="relative mb-14 aspect-[4/5] overflow-hidden rounded-[2px] bg-paper shadow-soft md:hidden">
+          <Image src={media.image(3)} alt="" fill sizes="90vw" className="object-cover" />
         </div>
         <ol data-mobile-steps className="relative space-y-16 pl-8">
           <span aria-hidden className="absolute left-0 top-0 h-full w-px bg-line">
@@ -190,17 +183,5 @@ export function Craft() {
         </ol>
       </div>
     </section>
-  );
-}
-
-/** On phones the film lives in the vertical flow and scrubs with it. */
-function MobileFilm({ enabled }: { enabled: boolean }) {
-  const wrap = useRef<HTMLDivElement>(null);
-  const video = useRef<HTMLVideoElement>(null);
-  useScrubVideo({ video, trigger: wrap, src: media.video(4), start: "top 80%", end: "bottom 20%", enabled });
-  return (
-    <div ref={wrap} className="absolute inset-0">
-      <ScrubVideo ref={video} />
-    </div>
   );
 }

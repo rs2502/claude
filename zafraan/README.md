@@ -6,7 +6,7 @@ Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 · GSAP + Scroll
 
 ```bash
 npm install
-# put video-1…6.mp4 (9:16) and image-1…4.jpeg in public/media (see public/media/README.md)
+# put video-1.mp4, video-2.mp4 and image-1…4.jpeg in public/media (see public/media/README.md)
 npm run encode:videos   # optional: re-wraps films with short GOPs for frame-accurate scrubbing
 npm run dev
 ```
@@ -23,7 +23,7 @@ npm run dev
 | Chrome | `components/chrome/*` | Real-progress loader that opens into the hero, curtain page transitions, magnetic buttons, custom cursor (fine pointers only), header that yields on scroll. |
 | Reservation | `sections/Reservation.tsx` | Links to the existing online reservation portal and phone. |
 
-Chapters: Hero (video 1) → Willkommen → Pizza anatomy (video 2, annotated) → Zutaten constellation (video 3) → Handwerk timeline (video 4, horizontal) → Saucen (video 5, tilt cards) → Feiern (video 6, layered gallery) → Reservierung. `/menu` is the full menu. Films are portrait (9:16): full-bleed on phones, framed plates from tablet up.
+Chapters: Hero (video 1: pasta with parmesan, 9:16) → Willkommen → Pasta shapes (video 2, 16:9, names synced to scroll) → Zutaten constellation → Handwerk timeline (horizontal) → Saucen (tilt cards) → Feiern (layered gallery); these use the photos → Reservierung. `/menu` is the full menu. Films are portrait (9:16): full-bleed on phones, framed plates from tablet up.
 
 **Responsive.** Phones get their own compositions rather than stacked desktop layouts: caption cards in place of callouts, swipe shelves in place of the constellation and the floating sauce cards, a vertical method with its own film, shorter sticky runs, and stepped scrubbing.
 

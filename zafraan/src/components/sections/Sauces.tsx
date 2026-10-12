@@ -3,9 +3,8 @@
 import { useEffect, useRef } from "react";
 import { gsap, MQ } from "@/lib/gsap";
 import { media, sauces, type Sauce } from "@/lib/content";
-import { useScrubVideo } from "@/hooks/useScrubVideo";
 import { useMood } from "@/hooks/useMood";
-import { ScrubVideo } from "@/components/motion/ScrubVideo";
+import Image from "next/image";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { TiltCard } from "@/components/ui/TiltCard";
 import { Folio } from "@/components/ui/SectionHead";
@@ -57,14 +56,15 @@ function SauceCard({ s, i }: { s: Sauce; i: number }) {
 
 export function Sauces() {
   const section = useRef<HTMLElement>(null);
-  const video = useRef<HTMLVideoElement>(null);
+  const photo = useRef<HTMLDivElement>(null);
 
   useMood(section, "sauces");
-  // Scroll is the pour: the liquid only moves while you do.
-  useScrubVideo({ video, trigger: section, src: media.video(5), start: "top bottom", end: "bottom top", from: 0, to: 1, stillAt: 0.45 });
 
   useEffect(() => {
     const mm = gsap.matchMedia();
+    mm.add(MQ.motion, () => {
+      gsap.fromTo(photo.current, { yPercent: -4, scale: 1.08 }, { yPercent: 4, scale: 1, ease: "none", scrollTrigger: { trigger: section.current, start: "top bottom", end: "bottom top", scrub: true } });
+    });
     mm.add(MQ.desktop + ", " + MQ.tablet, () => {
       gsap.utils.toArray<HTMLElement>("[data-sauce]", section.current).forEach((el, i) => {
         const sp = layout[i].speed;
@@ -89,7 +89,9 @@ export function Sauces() {
     <section ref={section} id="sauces" tabIndex={-1} aria-labelledby="sauces-title" className="relative h-[320vh] max-md:h-auto motion-reduce:h-auto">
       <div className="sticky top-0 h-svh overflow-hidden bg-paper max-md:relative max-md:h-auto max-md:min-h-svh motion-reduce:relative motion-reduce:h-auto">
         <div className={cn(PLATE, "md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2")}>
-          <ScrubVideo ref={video} label="Nahaufnahme von Saucen, die langsam ineinanderfließen." />
+          <div ref={photo} className="absolute -inset-[6%] will-change-transform">
+            <Image src={media.image(2)} alt="Ein Gericht mit Sauce aus dem Ristorante Italia." fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
+          </div>
         </div>
 
         <div className="container-editorial pointer-events-none relative z-10 pt-[calc(var(--header-h)+2.5rem)] max-md:pt-28">

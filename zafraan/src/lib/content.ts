@@ -24,7 +24,8 @@ export const site = {
 } as const;
 
 export const media = {
-  video: (n: 1 | 2 | 3 | 4 | 5 | 6) => `/media/video-${n}.mp4`,
+  /** video-1: Pasta mit Parmesan (9:16) · video-2: Pasta-Sorten im Flug (16:9) */
+  video: (n: 1 | 2) => `/media/video-${n}.mp4`,
   image: (n: 1 | 2 | 3 | 4) => `/media/image-${n}.jpeg`,
 } as const;
 
@@ -36,24 +37,21 @@ export const nav = [
   { label: "Speisekarte", href: "/menu" },
 ] as const;
 
-export type Callout = {
+export type PastaShape = {
   id: string;
-  title: string;
-  note: string;
-  /** Ankerpunkt auf dem Film, in % der Bildtafel. */
-  at: { x: number; y: number };
-  side: "left" | "right";
-  /** Scroll-Fenster (0–1), in dem das Label sichtbar ist. */
+  name: string;
+  it: string;
+  /** Gerichte von der Karte mit dieser Nudel. */
+  dishes: string;
+  /** Scroll-Fenster (0–1), in dem die Nudel im Film zu sehen ist. */
   window: [number, number];
 };
 
-export const samosaCallouts: Callout[] = [
-  { id: "teig", title: "Der Teig", note: "Von Hand ausgezogen, dünn in der Mitte, luftig am Rand.", at: { x: 42, y: 44 }, side: "left", window: [0.12, 0.5] },
-  { id: "pomodoro", title: "Tomatensauce", note: "Die Grundlage fast jeder Pizza — fruchtig und würzig.", at: { x: 54, y: 50 }, side: "right", window: [0.22, 0.6] },
-  { id: "mozzarella", title: "Käse", note: "Geschmolzen, goldbraun, mit Zug.", at: { x: 60, y: 32 }, side: "right", window: [0.32, 0.7] },
-  { id: "belag", title: "Der Belag", note: "Schinken, Salami, Champignons, Meeresfrüchte — 21 Pizzen zur Wahl.", at: { x: 41, y: 74 }, side: "left", window: [0.42, 0.8] },
-  { id: "kraeuter", title: "Oregano & Basilikum", note: "Zum Schluss, für den Duft Italiens.", at: { x: 62, y: 70 }, side: "right", window: [0.52, 0.9] },
-  { id: "ofen", title: "Aus dem Ofen", note: "Knusprig gebacken und sofort serviert.", at: { x: 36, y: 58 }, side: "left", window: [0.62, 0.95] },
+/** Fenster passend zum Pasta-Film (15 s): Spaghetti ~0,5–3,6 s, Penne ~5,2–8,6 s, Tortellini ~10,3–13,6 s. */
+export const pastaShapes: PastaShape[] = [
+  { id: "spaghetti", name: "Spaghetti", it: "lang & dünn", dishes: "all'Arrabbiata · Aglio Olio Peperoncino · alla Marinara · mit Scampi", window: [0.02, 0.26] },
+  { id: "penne", name: "Penne", it: "kurz & gerillt", dishes: "Pennette alla Paesana · Pennette all'Arrabbiata", window: [0.33, 0.6] },
+  { id: "tortellini", name: "Tortellini", it: "gefüllt", dishes: "alla Panna · al Frac · del Nord · Fantasia", window: [0.67, 0.93] },
 ];
 
 export type Ingredient = {

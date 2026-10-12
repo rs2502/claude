@@ -1,6 +1,6 @@
 import { Hero } from "@/components/sections/Hero";
 import { Story } from "@/components/sections/Story";
-import { Samosa } from "@/components/sections/Samosa";
+import { Pasta } from "@/components/sections/Pasta";
 import { Ingredients } from "@/components/sections/Ingredients";
 import { Craft } from "@/components/sections/Craft";
 import { Sauces } from "@/components/sections/Sauces";
@@ -14,7 +14,7 @@ export default function Home() {
       <main id="main">
         <Hero />
         <Story />
-        <Samosa />
+        <Pasta />
         <Ingredients />
         <Craft />
         <Sauces />

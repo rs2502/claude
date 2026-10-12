@@ -89,14 +89,13 @@ export function Hero() {
   return (
     <section ref={section} id="top" aria-labelledby="hero-title" className="relative h-[320vh] max-md:h-[220vh] motion-reduce:h-svh">
       <div className="sticky top-0 h-svh overflow-hidden bg-paper">
-        <div ref={depthLayer} data-hero-plate className={cn(PLATE, "will-change-transform md:right-[7vw] md:top-1/2 md:-translate-y-1/2")}>
+        <div ref={depthLayer} data-hero-plate className={cn(PLATE, "will-change-transform max-md:bottom-auto max-md:h-[50svh] md:right-[7vw] md:top-1/2 md:-translate-y-1/2")}>
           <div ref={mediaLayer} className="absolute -inset-6 will-change-transform">
-            <ScrubVideo ref={video} hero src={media.video(1)} label="Italienische Gerichte aus der Küche des Ristorante Italia, im Film." />
+            <ScrubVideo ref={video} hero src={media.video(1)} label="Ein Teller Pasta, auf den frisch gehobelter Parmesan rieselt; Dampf steigt auf." />
           </div>
         </div>
         {/* A single, functional veil — only where type needs to sit. */}
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] md:hidden bg-[linear-gradient(to_top,rgb(250_250_248/0.82),rgb(250_250_248/0))]" />
-
+        
         {plates.map((p) => (
           <div
             key={p.name}
@@ -114,7 +113,7 @@ export function Hero() {
         <div ref={type} className="absolute inset-0 z-20 flex flex-col justify-end will-change-transform">
           <div ref={typeDepth} className="container-editorial grid-editorial items-end gap-y-10 pb-[clamp(2rem,6vh,4.5rem)]">
             <div className="col-span-12 md:col-span-7 lg:col-span-7">
-              <p data-hero-fade className="eyebrow mb-6 flex items-center gap-3 text-ink-soft opacity-0">
+              <p data-hero-fade className="eyebrow mb-6 flex items-center gap-3 text-ink-soft opacity-0 max-md:hidden">
                 <span className="folio">No. 01</span>
                 <span className="h-px w-10 bg-ink/40" />
                 Cucina Italiana · Bruchhausen-Vilsen
@@ -130,8 +129,8 @@ export function Hero() {
               >
                 Echte italienische Lebensfreude.
               </SplitReveal>
-              <div className="mt-10 flex flex-col gap-8">
-              <p data-hero-fade className="max-w-[26rem] text-[0.9375rem] leading-[1.7] text-ink-soft opacity-0">
+              <div className="mt-10 flex flex-col gap-8 max-md:mt-6">
+              <p data-hero-fade className="max-w-[26rem] text-[0.9375rem] leading-[1.7] text-ink-soft opacity-0 max-md:hidden">
                 Frisch gekocht, herzlich serviert — und immer mit dem Geschmack Italiens. Mitten in Bruchhausen-Vilsen.
               </p>
               <div data-hero-fade className="flex flex-wrap items-center gap-5 opacity-0">
