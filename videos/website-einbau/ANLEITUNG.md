@@ -1,27 +1,23 @@
-# Video anstelle des Spaghetti-Fotos einbauen
+# Video im oberen Bereich der Startseite
 
-Das Video ersetzt das Foto rechts oben auf der Startseite. Es hat dasselbe Hochformat (4:5),
-dieselben runden Ecken und denselben Schatten, weil es dieselbe Klasse `hero-photo` nutzt.
+Das Video ersetzt das Foto rechts oben. Läuft es auf einem Gerät nicht
+(z. B. iPhone im Stromsparmodus oder Server ohne Video-Streaming), wird nach
+spätestens 3,5 Sekunden automatisch dieselbe Animation als Bild (AVIF, 0,5 MB) gezeigt.
 
 ## 1. Sicherung
-Kopie von `/start/startseite.html` herunterladen und aufheben.
+Kopie von `/start/startseite.html` aufheben.
 
-## 2. Drei Dateien hochladen
-Aus dem Ordner `assets/` nach **`/start/assets/`** auf deinem Webspace (dort liegt auch `dining.jpg`):
-
+## 2. Dateien hochladen nach `/start/assets/`
 - `italia-hero.mp4`
 - `italia-hero.webm`
 - `italia-hero-poster.jpg`
+- `italia-hero-anim.avif`  ← neu
 
 Dateinamen nicht ändern.
 
-## 3. Eine Zeile austauschen
-`/start/startseite.html` im Texteditor öffnen, die Zeile mit `dining.jpg` suchen
-(Strg+F bzw. Cmd+F: `dining.jpg` oder `italia-hero`) und die ganze Zeile bzw. den Video-Block durch den Block aus
-`zeile-ersetzen.html` ersetzen. Kein CSS nötig.
+## 3. Code austauschen
+In `/start/startseite.html` den kompletten Video-Block (von `<video class="hero-photo"`
+bis `</video>`) durch den Inhalt von `zeile-ersetzen.html` ersetzen (ab „ERSETZEN DURCH“).
 
-Falls du vorher schon den Video-Block unter dem Hero eingefügt hattest
-(`<section class="film">…</section>` und die `.film`-CSS-Zeilen): beides wieder löschen.
-
-## 4. Speichern und hochladen
-Fertig. Das Video läuft automatisch, stumm, in Schleife, auch auf dem Handy.
+## 4. Speichern, hochladen, auf dem iPhone neu laden
+Falls Safari noch die alte Seite zeigt: Tab schließen und Seite neu öffnen.

@@ -1,13 +1,33 @@
-SUCHEN (der Video-Block im oberen Bereich von /start/startseite.html):
+SUCHEN: den kompletten Video-Block im oberen Bereich von /start/startseite.html,
+also alles von  <video class="hero-photo"  bis einschließlich  </video>
 
-      <video class="hero-photo" ...>
-        <source src="...italia-hero.webm" type="video/webm">
-        <source src="...italia-hero.mp4" type="video/mp4">
-      </video>
+ERSETZEN DURCH:
 
-ERSETZEN DURCH (MP4 zuerst, damit iPhone/Safari sie nimmt):
-
-      <video class="hero-photo" style="display:block" autoplay muted loop playsinline preload="auto" poster="https://ristorante-pizzeria-italia.com/start/assets/italia-hero-poster.jpg" aria-label="Video: Burrata, Carpaccio und unser Logo">
+      <video id="heroVideo" class="hero-photo" style="display:block" autoplay muted loop playsinline preload="auto" poster="https://ristorante-pizzeria-italia.com/start/assets/italia-hero-poster.jpg" aria-label="Video: Burrata, Carpaccio und unser Logo">
         <source src="https://ristorante-pizzeria-italia.com/start/assets/italia-hero.mp4" type="video/mp4">
         <source src="https://ristorante-pizzeria-italia.com/start/assets/italia-hero.webm" type="video/webm">
       </video>
+      <script>
+      /* Läuft das Video nicht (z. B. iPhone im Stromsparmodus), zeigen wir dieselbe Animation als Bild. */
+      (function () {
+        var v = document.getElementById('heroVideo');
+        if (!v) return;
+        var done = false;
+        function zeigeBild() {
+          if (done || (!v.paused && v.currentTime > 0.1)) return;
+          done = true;
+          var img = new Image();
+          img.className = 'hero-photo';
+          img.style.display = 'block';
+          img.alt = 'Burrata, Carpaccio und unser Logo';
+          img.onerror = function () { img.onerror = null; img.src = v.poster; };
+          img.src = 'https://ristorante-pizzeria-italia.com/start/assets/italia-hero-anim.avif';
+          v.replaceWith(img);
+        }
+        var quellen = v.getElementsByTagName('source');
+        if (quellen.length) quellen[quellen.length - 1].addEventListener('error', zeigeBild);
+        var p = v.play && v.play();
+        if (p && p.catch) p.catch(function (e) { if (e && e.name === 'NotAllowedError') zeigeBild(); });
+        setTimeout(zeigeBild, 3500);
+      })();
+      </script>
