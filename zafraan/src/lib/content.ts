@@ -23,10 +23,13 @@ export const site = {
   ],
 } as const;
 
+/** Unterordner auf dem Server (leer im Normalbetrieb, z. B. "/neu" beim Test-Export). */
+export const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 export const media = {
   /** video-1: Pasta mit Parmesan (9:16) · video-2: Pasta-Sorten im Flug (16:9) */
-  video: (n: 1 | 2) => `/media/video-${n}.mp4`,
-  image: (n: 1 | 2 | 3 | 4) => `/media/image-${n}.jpeg`,
+  video: (n: 1 | 2) => `${BASE}/media/video-${n}.mp4`,
+  image: (n: 1 | 2 | 3 | 4) => `${BASE}/media/image-${n}.jpeg`,
 } as const;
 
 export const nav = [

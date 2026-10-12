@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import type { ReactNode } from "react";
 import "./globals.css";
-import { site } from "@/lib/content";
+import { BASE, site } from "@/lib/content";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { Header } from "@/components/chrome/Header";
 import { Cursor } from "@/components/chrome/Cursor";
@@ -30,10 +30,12 @@ export const metadata: Metadata = {
     title: `${site.name} · Bruchhausen-Vilsen`,
     description: site.description,
     locale: "de_DE",
-    images: [{ url: "/media/image-1.jpeg", alt: "Ristorante Pizzeria Italia in Bruchhausen-Vilsen" }],
+    images: [{ url: `${BASE}/media/image-1.jpeg`, alt: "Ristorante Pizzeria Italia in Bruchhausen-Vilsen" }],
   },
   twitter: { card: "summary_large_image" },
   alternates: { canonical: "/" },
+  // Die Testfassung im Unterordner soll nicht bei Google auftauchen.
+  ...(BASE ? { robots: { index: false, follow: false } } : {}),
 };
 
 export const viewport: Viewport = {
