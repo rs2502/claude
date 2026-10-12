@@ -93,6 +93,9 @@
       .mask {
         display: block;
         overflow: hidden;
+        /* room for descenders (g) and italic overhang (t) without shifting layout */
+        padding: 0 60px 60px 24px;
+        margin: 0 -60px -60px -24px;
       }
       .rise {
         display: block;
@@ -186,7 +189,7 @@
         z-index: 2;
       }
       .big {
-        font-size: 180px;
+        font-size: 166px;
         line-height: 1.02;
       }
       .mid {
@@ -210,7 +213,7 @@
       }
 
       #s2-plate {
-        left: 760px;
+        left: 840px;
         top: 150px;
       }
       #s2-copy {
@@ -474,27 +477,27 @@
         tl.fromTo(s, { y: 60, x: 0, opacity: 0, scaleY: 0.6 }, { y: -140, x: (i - 1) * 30, opacity: 1, scaleY: 1.3, duration: 1.6, ease: "sine.out", repeat: 1 }, 3.3 + i * 0.35);
       });
       tl.fromTo("#s2-label", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 3.25);
-      tl.fromTo("#s2-w1", { yPercent: 105 }, { yPercent: 0, duration: 0.9, ease: "expo.out" }, 3.35);
-      tl.fromTo("#s2-w2", { yPercent: 105 }, { yPercent: 0, duration: 0.9, ease: "expo.out" }, 3.5);
+      tl.fromTo("#s2-w1", { yPercent: 140 }, { yPercent: 0, duration: 0.9, ease: "expo.out" }, 3.35);
+      tl.fromTo("#s2-w2", { yPercent: 140 }, { yPercent: 0, duration: 0.9, ease: "expo.out" }, 3.5);
       tl.fromTo("#s2-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power4.out" }, 3.85);
       tl.fromTo("#s2-name", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 3.95);
       tl.fromTo("#s2-note", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "none" }, 4.15);
       // exit: plate glides off right, words drop away
       tl.to("#s2-plate", { x: 1100, duration: 0.55, ease: "power3.in" }, 6.05);
-      tl.to(["#s2-w1", "#s2-w2"], { yPercent: -105, duration: 0.4, ease: "power3.in", stagger: 0.05 }, 6.1);
+      tl.to(["#s2-w1", "#s2-w2"], { yPercent: -140, duration: 0.4, ease: "power3.in", stagger: 0.05 }, 6.1);
       tl.to(["#s2-label", "#s2-rule", "#s2-name", "#s2-note"], { opacity: 0, duration: 0.3, ease: "power1.in" }, 6.1);
 
       // ===== S3 · carpaccio (6.6 – 9.6) =====
       tl.fromTo("#s3-plate", { x: -700, opacity: 1 }, { x: 0, duration: 1.0, ease: "expo.out" }, 6.6);
       tl.fromTo("#s3-img", { scale: 1.06 }, { scale: 1, duration: 3, ease: "none" }, 6.6);
       tl.fromTo("#s3-label", { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 6.8);
-      tl.fromTo("#s3-w1", { yPercent: 105 }, { yPercent: 0, duration: 0.8, ease: "expo.out" }, 6.85);
-      tl.fromTo("#s3-w2", { yPercent: 105 }, { yPercent: 0, duration: 0.9, ease: "expo.out" }, 7.0);
+      tl.fromTo("#s3-w1", { yPercent: 140 }, { yPercent: 0, duration: 0.8, ease: "expo.out" }, 6.85);
+      tl.fromTo("#s3-w2", { yPercent: 140 }, { yPercent: 0, duration: 0.9, ease: "expo.out" }, 7.0);
       tl.fromTo("#s3-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power4.out" }, 7.35);
       tl.fromTo("#s3-name", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 7.45);
       tl.fromTo("#s3-note", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "none" }, 7.65);
       tl.to("#s3-plate", { x: -1100, duration: 0.55, ease: "power3.in" }, 9.05);
-      tl.to(["#s3-w1", "#s3-w2"], { yPercent: -105, duration: 0.4, ease: "power3.in", stagger: 0.05 }, 9.1);
+      tl.to(["#s3-w1", "#s3-w2"], { yPercent: -140, duration: 0.4, ease: "power3.in", stagger: 0.05 }, 9.1);
       tl.to(["#s3-label", "#s3-rule", "#s3-name", "#s3-note"], { opacity: 0, duration: 0.3, ease: "power1.in" }, 9.1);
 
       // ===== S4 · end card (9.6 – 12) =====
