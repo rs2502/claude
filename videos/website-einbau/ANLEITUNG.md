@@ -1,33 +1,27 @@
-# Video auf ristorante-pizzeria-italia.com einbauen
+# Video anstelle des Spaghetti-Fotos einbauen
 
-Die Startseite liegt unter `/start/startseite.html`, ihre Bilder unter `/start/assets/`.
+Das Video ersetzt das Foto rechts oben auf der Startseite. Es hat dasselbe Hochformat (4:5),
+dieselben runden Ecken und denselben Schatten, weil es dieselbe Klasse `hero-photo` nutzt.
 
-## 1. Dateien hochladen
-Lade die drei Dateien aus dem Ordner `assets/` in den Ordner **`/start/assets/`** auf
-deinem Webspace (per FTP-Programm wie FileZilla oder über den Dateimanager deines Hosters),
-also dorthin, wo auch `dining.jpg` liegt:
+## 1. Sicherung
+Kopie von `/start/startseite.html` herunterladen und aufheben.
 
-- `italia-hero-web.mp4` (3,2 MB)
-- `italia-hero-web.webm` (1,5 MB, wird von den meisten Browsern bevorzugt, lädt schneller)
-- `italia-hero-poster.jpg` (Standbild, solange das Video lädt)
+## 2. Drei Dateien hochladen
+Aus dem Ordner `assets/` nach **`/start/assets/`** auf deinem Webspace (dort liegt auch `dining.jpg`):
 
-## 2. Code einfügen
-Öffne `/start/startseite.html` in einem Texteditor (z. B. Notepad++ oder VS Code):
+- `italia-hero.mp4`
+- `italia-hero.webm`
+- `italia-hero-poster.jpg`
 
-- **`1-html-einfuegen.html`**: Inhalt kopieren und einfügen direkt **vor** der Zeile
-  `<!-- ÜBER UNS -->` (also hinter das `</section>` des Hero-Bereichs).
-- **`2-css-einfuegen.css`**: Inhalt kopieren und einfügen ganz unten im `<style>`-Block,
-  direkt **vor** `</style>`.
+Dateinamen nicht ändern.
 
-Speichern, wieder hochladen, fertig.
+## 3. Eine Zeile austauschen
+`/start/startseite.html` im Texteditor öffnen, die Zeile mit `dining.jpg` suchen
+(Strg+F bzw. Cmd+F: `dining.jpg`) und die ganze `<img …>`-Zeile durch den Block aus
+`zeile-ersetzen.html` ersetzen. Kein CSS nötig.
 
-## Was passiert
-- Das Video erscheint als breite Karte mit runden Ecken und Schatten direkt unter
-  „Echte italienische Lebensfreude…“, im gleichen Stil wie deine anderen Karten.
-- Es startet automatisch, stumm, in Schleife, auch auf dem Handy.
-- Es blendet beim Scrollen weich ein (nutzt deine vorhandene `reveal`-Animation).
-- Wer am Gerät „Bewegung reduzieren“ eingestellt hat, sieht nur das Standbild.
+Falls du vorher schon den Video-Block unter dem Hero eingefügt hattest
+(`<section class="film">…</section>` und die `.film`-CSS-Zeilen): beides wieder löschen.
 
-## Sicherung
-Vor dem Bearbeiten eine Kopie von `startseite.html` anlegen. Falls etwas nicht passt,
-einfach die Kopie zurück hochladen.
+## 4. Speichern und hochladen
+Fertig. Das Video läuft automatisch, stumm, in Schleife, auch auf dem Handy.

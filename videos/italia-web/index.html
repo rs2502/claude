@@ -336,12 +336,12 @@
       id="root"
       data-composition-id="main"
       data-start="0"
-      data-duration="12"
+      data-duration="13"
       data-fps="30"
       data-width="1920"
       data-height="1080"
     >
-      <div id="bg" class="clip full" data-start="0" data-duration="12" data-track-index="0">
+      <div id="bg" class="clip full" data-start="0" data-duration="13" data-track-index="0">
         <div class="glow" id="bg-glow"></div>
       </div>
 
@@ -400,7 +400,7 @@
       </div>
 
       <!-- S4 · end card -->
-      <div id="s4" class="clip scene" data-start="9.6" data-duration="2.4" data-track-index="4">
+      <div id="s4" class="clip scene" data-start="9.6" data-duration="3.4" data-track-index="4">
         <div id="s4-logo" class="logo">
           <img class="script" id="s4-script" src="assets/img/logo-script.png" alt="" />
           <img id="s4-flag" src="assets/img/logo-flag.png" alt="" />
@@ -415,11 +415,7 @@
         <div class="vignette" data-layout-ignore></div>
       </div>
 
-      <div id="dust" class="clip" data-start="0" data-duration="12" data-track-index="5"></div>
-      <div id="grain-overlay" class="clip" data-start="0" data-duration="12" data-track-index="6">
-        <div class="grain-texture"></div>
-      </div>
-      <div id="fade" class="clip" data-start="0" data-duration="12" data-track-index="7"></div>
+      <div id="dust" class="clip" data-start="0" data-duration="13" data-track-index="5"></div>
     </div>
 
     <script>
@@ -447,7 +443,7 @@
       }
 
       const tl = gsap.timeline({ paused: true });
-      const D = 12;
+      const D = 13;
 
       // global: dust drift, glow breathing, loop fades
       motes.forEach((m) => {
@@ -455,8 +451,6 @@
         tl.to(m.el, { x: m.dx * 2, y: m.dy * 2, opacity: 0, duration: D * 0.5, ease: "sine.in" }, D * 0.5);
       });
       tl.fromTo("#bg-glow", { scale: 0.9, opacity: 0.6 }, { scale: 1.1, opacity: 1, duration: D, ease: "sine.inOut" }, 0);
-      tl.fromTo("#fade", { opacity: 1 }, { opacity: 0, duration: 0.6, ease: "power1.out" }, 0);
-      tl.to("#fade", { opacity: 1, duration: 0.5, ease: "power1.in" }, D - 0.5);
 
       // ===== S1 · logo writes itself (0 – 3) =====
       tl.fromTo("#s1-script", { "--p": "-16%" }, { "--p": "104%", duration: 1.5, ease: "power2.inOut" }, 0.25);
@@ -509,6 +503,9 @@
       tl.fromTo("#s4-addr", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 10.75);
       tl.fromTo("#s4-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "expo.inOut" }, 10.85);
       tl.fromTo("#s4-url", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 11.0);
+
+      // loop seam: end card bows out onto the same empty cream scene 1 starts on
+      tl.to(["#s4-logo", "#s4-stamp", "#s4-info"], { opacity: 0, y: -16, duration: 0.5, ease: "power2.in", stagger: 0.06 }, 12.35);
 
       window.__timelines["main"] = tl;
       tl.seek(0);
