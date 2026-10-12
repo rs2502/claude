@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     siteName: site.name,
     title: `${site.name} — ${site.tagline}`,
     description: site.description,
-    images: [{ url: "/media/image-1.webp", width: 1600, height: 2000, alt: "The royal thali at Zafraan" }],
+    images: [{ url: "/media/image-1.jpeg", width: 1600, height: 2000, alt: "The royal thali at Zafraan" }],
   },
   twitter: { card: "summary_large_image" },
   alternates: { canonical: "/" },
@@ -51,7 +51,7 @@ const jsonLd = {
   servesCuisine: ["Indian", "Awadhi", "Rajasthani"],
   priceRange: "££££",
   acceptsReservations: true,
-  image: `${site.url}/media/image-1.webp`,
+  image: `${site.url}/media/image-1.jpeg`,
   address: {
     "@type": "PostalAddress",
     streetAddress: site.address.street,

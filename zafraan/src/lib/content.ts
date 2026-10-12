@@ -17,7 +17,7 @@ export const site = {
 
 export const media = {
   video: (n: 1 | 2 | 3 | 4 | 5 | 6) => `/media/video-${n}.mp4`,
-  image: (n: 1 | 2 | 3 | 4) => `/media/image-${n}.webp`,
+  image: (n: 1 | 2 | 3 | 4) => `/media/image-${n}.jpeg`,
 } as const;
 
 export const nav = [
