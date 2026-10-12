@@ -86,8 +86,8 @@ export function Hero() {
   return (
     <section ref={section} id="top" aria-labelledby="hero-title" className="relative h-[320vh] max-md:h-svh motion-reduce:h-svh">
       <div className="sticky top-0 h-svh overflow-hidden bg-paper">
-        <div ref={depthLayer} data-hero-plate className={cn(PLATE, "will-change-transform max-md:bottom-auto max-md:h-[50svh] md:right-[7vw] md:top-1/2 md:-translate-y-1/2")}>
-          <div ref={mediaLayer} className="absolute -inset-6 will-change-transform">
+        <div ref={depthLayer} data-hero-plate className={cn(PLATE, "will-change-transform max-md:inset-auto max-md:left-1/2 max-md:top-[calc(var(--header-h)+0.25rem)] max-md:aspect-[9/16] max-md:h-[44svh] max-md:-translate-x-1/2 max-md:rounded-[3px] max-md:shadow-lift md:right-[7vw] md:top-1/2 md:-translate-y-1/2")}>
+          <div ref={mediaLayer} className="absolute -inset-6 will-change-transform max-md:inset-0">
             <ScrubVideo ref={video} hero src={media.video(1)} poster={media.poster(1)} label="Ein Teller Pasta, auf den frisch gehobelter Parmesan rieselt; Dampf steigt auf." />
           </div>
         </div>

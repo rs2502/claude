@@ -89,15 +89,14 @@ export type Step = {
   body: string;
   ingredient: string;
   duration: string;
-  image: 1 | 2 | 3 | 4;
 };
 
 export const craftSteps: Step[] = [
-  { no: "01", title: "Kneten", it: "Impasto", body: "Mehl, Wasser, Hefe, Salz. Mehr braucht ein guter Pizzateig nicht — nur Hände und Zeit.", ingredient: "Mehl · Hefe · Salz", duration: "Von Hand", image: 2 },
-  { no: "02", title: "Ruhen", it: "Riposo", body: "Der Teig darf gehen. Erst dann wird er leicht, luftig und bekömmlich.", ingredient: "Geduld", duration: "Mit Ruhe", image: 3 },
-  { no: "03", title: "Ausziehen", it: "Stendere", body: "Kein Nudelholz: Der Teig wird mit den Fingern geformt, damit der Rand schön aufgeht.", ingredient: "Teig", duration: "Mit Gefühl", image: 4 },
-  { no: "04", title: "Belegen", it: "Condire", body: "Tomatensauce, Käse und der Belag Ihrer Wahl — jede weitere Zutat ist möglich.", ingredient: "Tomate · Käse", duration: "Großzügig", image: 1 },
-  { no: "05", title: "Backen", it: "Infornare", body: "Heiß und schnell, bis der Rand knusprig ist. Dann direkt an Ihren Tisch.", ingredient: "Hitze", duration: "Frisch serviert", image: 2 },
+  { no: "01", title: "Kneten", it: "Impasto", body: "Mehl, Wasser, Hefe, Salz. Mehr braucht ein guter Pizzateig nicht — nur Hände und Zeit.", ingredient: "Mehl · Hefe · Salz", duration: "Von Hand" },
+  { no: "02", title: "Ruhen", it: "Riposo", body: "Der Teig darf gehen. Erst dann wird er leicht, luftig und bekömmlich.", ingredient: "Geduld", duration: "Mit Ruhe" },
+  { no: "03", title: "Ausziehen", it: "Stendere", body: "Kein Nudelholz: Der Teig wird mit den Fingern geformt, damit der Rand schön aufgeht.", ingredient: "Teig", duration: "Mit Gefühl" },
+  { no: "04", title: "Belegen", it: "Condire", body: "Tomatensauce, Käse und der Belag Ihrer Wahl — jede weitere Zutat ist möglich.", ingredient: "Tomate · Käse", duration: "Großzügig" },
+  { no: "05", title: "Backen", it: "Infornare", body: "Heiß und schnell, bis der Rand knusprig ist. Dann direkt an Ihren Tisch.", ingredient: "Hitze", duration: "Frisch serviert" },
 ];
 
 export type Sauce = {

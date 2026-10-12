@@ -69,11 +69,16 @@ export function Loader() {
   }, []);
 
   useEffect(() => {
+    // Handys: kein Ladebildschirm — die Seite steht sofort da.
+    if (window.matchMedia(PLAYBACK_QUERY).matches) {
+      experience.set({ loaded: true });
+      setDone(true);
+      return;
+    }
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const started = performance.now();
     // Phones never buffer a film before it plays, so they only wait for fonts.
-    const phone = window.matchMedia(PLAYBACK_QUERY).matches;
-    const minDuration = reduce ? 300 : phone ? 900 : 1800;
+    const minDuration = reduce ? 300 : 1800;
     let fonts = 0;
     let film = 0;
     let shown = 0;
@@ -91,7 +96,7 @@ export function Loader() {
     hero?.addEventListener("progress", readFilm);
     hero?.addEventListener("canplaythrough", giveUp);
     hero?.addEventListener("error", giveUp);
-    if (!hero || phone) film = 1;
+    if (!hero) film = 1;
     const ceiling = setTimeout(giveUp, 3500); // never hold a visitor hostage
 
     const loop = (now: number) => {
@@ -105,7 +110,7 @@ export function Loader() {
       if (bar.current) bar.current.style.transform = `scaleX(${shown / 100})`;
       if (shown === 100 && !finished) {
         finished = true;
-        exit(reduce || phone);
+        exit(reduce);
         return;
       }
       raf = requestAnimationFrame(loop);

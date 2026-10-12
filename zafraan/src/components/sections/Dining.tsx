@@ -1,20 +1,6 @@
-"use client";
-
-import { useEffect, useRef } from "react";
-import { gsap, MQ } from "@/lib/gsap";
-import { media, site } from "@/lib/content";
-import Image from "next/image";
+import { site } from "@/lib/content";
 import { SplitReveal } from "@/components/motion/SplitReveal";
-import { MaskImage } from "@/components/motion/MaskImage";
 import { Folio } from "@/components/ui/SectionHead";
-import { cn } from "@/lib/utils";
-
-const gallery = [
-  { n: 2 as const, alt: "Pastagericht aus dem Ristorante Italia.", cls: "col-span-7 col-start-1 aspect-[4/5] z-10", speed: -6, caption: "Pasta, frisch gekocht" },
-  { n: 3 as const, alt: "Pastagericht aus dem Ristorante Italia.", cls: "col-span-4 col-start-8 mt-[18vh] aspect-[3/4] z-20", speed: -16, caption: "Aus unserer Küche" },
-  { n: 4 as const, alt: "Pastagericht aus dem Ristorante Italia.", cls: "col-span-5 col-start-5 -mt-[22vh] aspect-[5/4] z-30", speed: -26, caption: "Buon appetito" },
-  { n: 1 as const, alt: "Pastagericht aus dem Ristorante Italia.", cls: "col-span-3 col-start-10 -mt-[8vh] aspect-square z-20", speed: -36, caption: "Piatto i." },
-];
 
 // Alle Zahlen stammen aus der Speisekarte und den Öffnungszeiten.
 const facts = [
@@ -24,45 +10,14 @@ const facts = [
 ];
 
 export function Dining() {
-  const section = useRef<HTMLElement>(null);
-  const stage = useRef<HTMLDivElement>(null);
-  const filmLayer = useRef<HTMLDivElement>(null);
-
-
-  useEffect(() => {
-    const mm = gsap.matchMedia();
-    mm.add(MQ.desktop + ", " + MQ.tablet, () => {
-      // Background parallax: the room drifts slower than the page and settles in scale.
-      gsap.fromTo(
-        filmLayer.current,
-        { yPercent: -7, scale: 1.08 },
-        { yPercent: 7, scale: 1, ease: "none", scrollTrigger: { trigger: stage.current, start: "top bottom", end: "bottom top", scrub: true } },
-      );
-      gsap.utils.toArray<HTMLElement>("[data-depth]", section.current).forEach((el) => {
-        const d = Number(el.dataset.depth);
-        gsap.fromTo(el, { yPercent: -d }, { yPercent: d, ease: "none", scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } });
-      });
-    });
-    return () => mm.revert();
-  }, []);
-
   return (
-    <section ref={section} id="dining" aria-labelledby="dining-title" className="relative">
-      {/* Full-bleed film with the chapter title set large over it */}
-      <div ref={stage} className="relative h-[140svh] overflow-hidden bg-paper max-md:h-[100svh]">
-        <div
-          ref={filmLayer}
-          className={cn(
-            "absolute inset-x-0 -inset-y-[14%] overflow-hidden will-change-transform",
-            "md:inset-auto md:right-[7vw] md:top-[12%] md:aspect-[9/16] md:h-[108svh] md:rounded-[3px] md:shadow-lift",
-          )}
-        >
-          <Image src={media.image(1)} alt="Ein Gericht aus dem Ristorante Italia." fill sizes="(min-width: 768px) 40vw, 100vw" className="object-cover" />
-        </div>
+    <section id="dining" aria-labelledby="dining-title" className="relative">
+      {/* Großer Kapiteltitel, reine Typografie */}
+      <div className="relative overflow-hidden py-[clamp(7rem,18vh,14rem)]">
         <div className="container-editorial relative z-10 flex h-full flex-col justify-center">
           <div>
-            <Folio no="07" label="Feiern" className="mb-8 w-fit rounded-full bg-canvas/90 px-4 py-2 shadow-soft" />
-            <h2 id="dining-title" className="display relative z-10 text-[clamp(4rem,10.5vw,12rem)] leading-[0.86] text-canvas [text-shadow:0_2px_40px_rgb(43_35_32/0.35)] md:text-ink md:[text-shadow:none]">
+            <Folio no="07" label="Feiern" className="mb-8" />
+            <h2 id="dining-title" className="display relative z-10 text-[clamp(3.4rem,10.5vw,12rem)] leading-[0.86] text-ink">
               <SplitReveal as="span" by="chars" className="block" start="top 95%" end="top 45%" stagger={0.03}>
                 Mit uns feiern
               </SplitReveal>
@@ -72,16 +27,6 @@ export function Dining() {
             </h2>
           </div>
         </div>
-      </div>
-
-      {/* Overlapping gallery at four depths */}
-      <div className="container-editorial grid-editorial relative py-[clamp(6rem,16vh,12rem)] max-md:flex max-md:flex-col max-md:gap-12">
-        {gallery.map((g) => (
-          <figure key={g.n} data-depth={g.speed} className={`${g.cls} relative max-md:aspect-[4/5] max-md:w-[86%] max-md:odd:self-start max-md:even:self-end`}>
-            <MaskImage src={media.image(g.n)} alt={g.alt} sizes="(min-width: 768px) 45vw, 86vw" className="h-full w-full rounded-[2px] shadow-lift" from="center" drift={8} />
-            <figcaption className="display-italic mt-3 text-[0.95rem] text-ink-soft">{g.caption}</figcaption>
-          </figure>
-        ))}
       </div>
 
       <div className="container-editorial grid-editorial border-t border-line pb-[clamp(5rem,14vh,10rem)] pt-12">

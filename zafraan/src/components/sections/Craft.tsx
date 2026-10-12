@@ -1,11 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap, MQ } from "@/lib/gsap";
-import { craftSteps, media } from "@/lib/content";
+import { craftSteps } from "@/lib/content";
 import { SplitReveal } from "@/components/motion/SplitReveal";
-import { MaskImage } from "@/components/motion/MaskImage";
 import { Folio } from "@/components/ui/SectionHead";
 
 /**
@@ -55,16 +53,6 @@ export function Craft() {
       gsap.utils.toArray<HTMLElement>("[data-step]", section.current).forEach((panel) => {
         const base = { trigger: panel, containerAnimation: move, scrub: 0.8 };
         gsap.fromTo(
-          panel.querySelector("[data-step-image]"),
-          { clipPath: "inset(0% 0% 0% 100%)" },
-          { clipPath: "inset(0% 0% 0% 0%)", ease: "none", scrollTrigger: { ...base, start: "left 95%", end: "left 45%" } },
-        );
-        gsap.fromTo(
-          panel.querySelector("[data-step-image] > div"),
-          { scale: 1.3, xPercent: 8 },
-          { scale: 1, xPercent: 0, ease: "none", scrollTrigger: { ...base, start: "left 95%", end: "right 30%" } },
-        );
-        gsap.fromTo(
           panel.querySelectorAll("[data-step-line]"),
           { autoAlpha: 0, y: 22 },
           { autoAlpha: 1, y: 0, stagger: 0.12, ease: "power2.out", scrollTrigger: { ...base, start: "left 85%", end: "left 40%" } },
@@ -94,27 +82,20 @@ export function Craft() {
             <SplitReveal as="h2" by="words" id="craft-title" className="display mb-8 text-[clamp(2.2rem,3.8vw,4rem)]" start="top 70%" end="top 5%" trigger="#craft">
               Fünf Schritte zur perfekten Pizza.
             </SplitReveal>
-            <div className="relative mx-auto aspect-[9/16] min-h-0 max-w-full flex-1 overflow-hidden rounded-[3px] bg-paper shadow-lift" data-cursor="image" data-cursor-label="Probieren">
-              <Image src={media.image(3)} alt="" fill sizes="30vw" className="object-cover" />
-              <div className="absolute bottom-4 left-4 flex items-baseline gap-2 rounded-full bg-canvas/95 px-4 py-1.5 shadow-soft">
-                <span className="folio text-ink-mute">Schritt</span>
-                <span ref={counter} className="display text-lg tabular-nums">01</span>
-              </div>
+            {/* Die aktuelle Schrittnummer, groß gesetzt */}
+            <div className="mt-auto flex items-end gap-4" aria-hidden>
+              <span ref={counter} className="display text-[clamp(8rem,16vw,15rem)] leading-[0.8] tabular-nums">01</span>
+              <span className="folio mb-3 text-ink-mute">/ 05</span>
             </div>
           </div>
 
           <div className="relative col-span-8 overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_7%,#000_100%)]">
             <div ref={track} className="flex h-full w-max gap-[4vw] pl-[4vw] pr-[6vw] pt-10 will-change-transform">
               {craftSteps.map((s) => (
-                <article key={s.no} data-step className="relative flex h-full w-[min(34vw,30rem)] flex-col justify-end">
-                  <span data-step-no aria-hidden className="display pointer-events-none absolute -top-8 right-0 text-[clamp(7rem,12vw,12rem)] leading-none text-ink/[0.07]">
+                <article key={s.no} data-step className="relative flex h-full w-[min(30vw,26rem)] flex-col justify-end pb-6">
+                  <span data-step-no aria-hidden className="display pointer-events-none absolute right-0 top-[18%] text-[clamp(9rem,15vw,16rem)] leading-none text-ink/[0.06]">
                     {s.no}
                   </span>
-                  <div data-step-image className="relative mb-8 aspect-[5/4] w-full overflow-hidden rounded-[2px] bg-paper shadow-soft" data-cursor="image" data-cursor-label="Probieren">
-                    <div className="absolute inset-0">
-                      <Image src={media.image(s.image)} alt="" fill sizes="34vw" className="object-cover" />
-                    </div>
-                  </div>
                   <p data-step-line className="eyebrow mb-3 flex items-center gap-3 text-ink-mute">
                     <span className="folio">{s.no}</span>
                     <span className="h-px w-6 bg-current opacity-50" />
@@ -158,9 +139,6 @@ export function Craft() {
       <div className="container-editorial py-24 md:hidden motion-reduce:block">
         <Folio no="05" label="Das Handwerk" className="mb-6" />
         <h2 className="display mb-10 text-[2.6rem]">Fünf Schritte zur perfekten Pizza.</h2>
-        <div className="relative mb-14 aspect-[4/5] overflow-hidden rounded-[2px] bg-paper shadow-soft md:hidden">
-          <Image src={media.image(3)} alt="" fill sizes="90vw" className="object-cover" />
-        </div>
         <ol data-mobile-steps className="relative space-y-16 pl-8">
           <span aria-hidden className="absolute left-0 top-0 h-full w-px bg-line">
             <span ref={fillV} className="absolute inset-0 origin-top bg-ink md:hidden" />
@@ -175,7 +153,6 @@ export function Craft() {
                 {s.title} <span className="display-italic text-[0.55em] text-ink-soft">{s.it}</span>
               </h3>
               <p className="mt-3 text-[0.95rem] leading-[1.7] text-ink-soft">{s.body}</p>
-              <MaskImage src={media.image(s.image)} alt="" sizes="90vw" className="mt-6 aspect-[5/4] w-full rounded-[2px]" from="left" />
             </li>
           ))}
         </ol>
