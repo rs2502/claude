@@ -9,13 +9,15 @@ import { ScrubVideo } from "@/components/motion/ScrubVideo";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { TiltCard } from "@/components/ui/TiltCard";
 import { Folio } from "@/components/ui/SectionHead";
+import { PLATE } from "@/lib/plate";
+import { cn } from "@/lib/utils";
 
 /* Desktop composition: each card has its own column, height and drift rate. */
 const layout = [
-  { left: "6%", top: "38%", speed: 1.0 },
-  { left: "30%", top: "58%", speed: 1.35 },
-  { left: "54%", top: "30%", speed: 0.8 },
-  { left: "76%", top: "52%", speed: 1.15 },
+  { left: "8%", top: "44%", speed: 1.0 },
+  { left: "29%", top: "62%", speed: 1.35 },
+  { left: "56%", top: "34%", speed: 0.8 },
+  { left: "75%", top: "56%", speed: 1.15 },
 ];
 
 function Drop({ tone }: { tone: string }) {
@@ -86,7 +88,9 @@ export function Sauces() {
   return (
     <section ref={section} id="sauces" tabIndex={-1} aria-labelledby="sauces-title" className="relative h-[320vh] max-md:h-auto motion-reduce:h-auto">
       <div className="sticky top-0 h-svh overflow-hidden bg-paper max-md:relative max-md:h-auto max-md:min-h-svh motion-reduce:relative motion-reduce:h-auto">
-        <ScrubVideo ref={video} label="Macro film of saffron, tamarind and chili sauces folding into one another in slow ribbons." />
+        <div className={cn(PLATE, "md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2")}>
+          <ScrubVideo ref={video} label="Macro film of saffron, tamarind and chili sauces folding into one another in slow ribbons." />
+        </div>
 
         <div className="container-editorial pointer-events-none relative z-10 pt-[calc(var(--header-h)+2.5rem)] max-md:pt-28">
           <div className="inline-block rounded-[3px] bg-canvas/90 p-6 pr-10 shadow-soft">

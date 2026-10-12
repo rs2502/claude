@@ -10,12 +10,15 @@ import { ScrubVideo } from "@/components/motion/ScrubVideo";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { ButtonLink } from "@/components/ui/Button";
 import { Arrow } from "@/components/ui/Arrow";
+import { PLATE } from "@/lib/plate";
+import { cn } from "@/lib/utils";
 
+// Dish names drift around the film plate as the thali comes apart.
 const plates = [
-  { roman: "i.", name: "Dal Zafraan", x: "18%", y: "30%", at: 0.28 },
-  { roman: "ii.", name: "Saffron sheermal", x: "72%", y: "24%", at: 0.38 },
-  { roman: "iii.", name: "Galouti kebab", x: "78%", y: "62%", at: 0.48 },
-  { roman: "iv.", name: "Kesar kulfi", x: "24%", y: "66%", at: 0.58 },
+  { roman: "i.", name: "Dal Zafraan", x: "47%", y: "22%", at: 0.28 },
+  { roman: "ii.", name: "Saffron sheermal", x: "84%", y: "12%", at: 0.38 },
+  { roman: "iii.", name: "Galouti kebab", x: "85%", y: "80%", at: 0.48 },
+  { roman: "iv.", name: "Kesar kulfi", x: "50%", y: "68%", at: 0.58 },
 ];
 
 export function Hero() {
@@ -86,13 +89,13 @@ export function Hero() {
   return (
     <section ref={section} id="top" aria-labelledby="hero-title" className="relative h-[320vh] max-md:h-[220vh] motion-reduce:h-svh">
       <div className="sticky top-0 h-svh overflow-hidden bg-paper">
-        <div ref={depthLayer} className="absolute inset-0 will-change-transform">
+        <div ref={depthLayer} data-hero-plate className={cn(PLATE, "will-change-transform md:right-[7vw] md:top-1/2 md:-translate-y-1/2")}>
           <div ref={mediaLayer} className="absolute -inset-6 will-change-transform">
             <ScrubVideo ref={video} hero src={media.video(1)} label="An exploded royal thali: sixteen small dishes lift away from a brass plate, scattering saffron and herbs." />
           </div>
         </div>
         {/* A single, functional veil — only where type needs to sit. */}
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-[linear-gradient(to_top,rgb(250_250_248/0.82),rgb(250_250_248/0))]" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] md:hidden bg-[linear-gradient(to_top,rgb(250_250_248/0.82),rgb(250_250_248/0))]" />
 
         {plates.map((p) => (
           <div
@@ -110,7 +113,7 @@ export function Hero() {
 
         <div ref={type} className="absolute inset-0 z-20 flex flex-col justify-end will-change-transform">
           <div ref={typeDepth} className="container-editorial grid-editorial items-end gap-y-10 pb-[clamp(2rem,6vh,4.5rem)]">
-            <div className="col-span-12 lg:col-span-8">
+            <div className="col-span-12 md:col-span-7 lg:col-span-7">
               <p data-hero-fade className="eyebrow mb-6 flex items-center gap-3 text-ink-soft opacity-0">
                 <span className="folio">No. 01</span>
                 <span className="h-px w-10 bg-ink/40" />
@@ -122,14 +125,13 @@ export function Hero() {
                 play={loaded}
                 delay={0.55}
                 stagger={0.03}
-                className="display text-[clamp(3.6rem,10.4vw,11.5rem)] text-ink"
+                className="display text-[clamp(3.6rem,8.2vw,9.5rem)] text-ink"
                 id="hero-title"
               >
                 The royal thali, unbound.
               </SplitReveal>
-            </div>
-            <div className="col-span-12 flex flex-col gap-8 lg:col-span-4 lg:items-end lg:pb-4">
-              <p data-hero-fade className="max-w-[24rem] text-[0.9375rem] leading-[1.7] text-ink-soft opacity-0 lg:text-right">
+              <div className="mt-10 flex flex-col gap-8">
+              <p data-hero-fade className="max-w-[26rem] text-[0.9375rem] leading-[1.7] text-ink-soft opacity-0">
                 A twelve-seat tasting house on Marylebone Lane, reading the royal kitchens of Awadh one ingredient at a time.
               </p>
               <div data-hero-fade className="flex flex-wrap items-center gap-5 opacity-0">
@@ -138,11 +140,12 @@ export function Hero() {
                   Explore the menu
                 </ButtonLink>
               </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div data-hero-fade aria-hidden className="absolute bottom-6 left-1/2 z-20 hidden -translate-x-1/2 flex-col items-center gap-3 opacity-0 lg:flex">
+        <div data-hero-fade aria-hidden className="absolute bottom-6 left-[46%] z-20 hidden -translate-x-1/2 flex-col items-center gap-3 opacity-0 lg:flex">
           <span className="eyebrow text-[0.6rem] text-ink-soft">Scroll to unfold</span>
           <span className="relative block h-14 w-px bg-ink/15">
             <span ref={cue} className="absolute inset-0 origin-top bg-ink" />

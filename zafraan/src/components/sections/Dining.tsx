@@ -9,6 +9,7 @@ import { ScrubVideo } from "@/components/motion/ScrubVideo";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { MaskImage } from "@/components/motion/MaskImage";
 import { Folio } from "@/components/ui/SectionHead";
+import { cn } from "@/lib/utils";
 
 const gallery = [
   { n: 2 as const, alt: "Candle-lit table set with brass thalis and linen.", cls: "col-span-7 col-start-1 aspect-[4/5] z-10", speed: -6, caption: "The long table, 19:30" },
@@ -38,8 +39,8 @@ export function Dining() {
       // Background parallax: the room drifts slower than the page and settles in scale.
       gsap.fromTo(
         filmLayer.current,
-        { yPercent: -9, scale: 1.14 },
-        { yPercent: 9, scale: 1, ease: "none", scrollTrigger: { trigger: stage.current, start: "top bottom", end: "bottom top", scrub: true } },
+        { yPercent: -7, scale: 1.08 },
+        { yPercent: 7, scale: 1, ease: "none", scrollTrigger: { trigger: stage.current, start: "top bottom", end: "bottom top", scrub: true } },
       );
       gsap.utils.toArray<HTMLElement>("[data-depth]", section.current).forEach((el) => {
         const d = Number(el.dataset.depth);
@@ -53,13 +54,19 @@ export function Dining() {
     <section ref={section} id="dining" aria-labelledby="dining-title" className="relative">
       {/* Full-bleed film with the chapter title set large over it */}
       <div ref={stage} className="relative h-[140svh] overflow-hidden bg-paper max-md:h-[100svh]">
-        <div ref={filmLayer} className="absolute inset-x-0 -inset-y-[14%] will-change-transform">
+        <div
+          ref={filmLayer}
+          className={cn(
+            "absolute inset-x-0 -inset-y-[14%] overflow-hidden will-change-transform",
+            "md:inset-auto md:right-[7vw] md:top-[12%] md:aspect-[9/16] md:h-[108svh] md:rounded-[3px] md:shadow-lift",
+          )}
+        >
           <ScrubVideo ref={video} label="The dining room at dusk: candlelight, brass, guests leaning in over the thali." />
         </div>
         <div className="container-editorial relative z-10 flex h-full flex-col justify-center">
           <div>
             <Folio no="07" label="The evening" className="mb-8 w-fit rounded-full bg-canvas/90 px-4 py-2 shadow-soft" />
-            <h2 id="dining-title" className="display text-[clamp(4rem,13.5vw,15rem)] leading-[0.86] text-canvas [text-shadow:0_2px_40px_rgb(43_35_32/0.35)]">
+            <h2 id="dining-title" className="display relative z-10 text-[clamp(4rem,10.5vw,12rem)] leading-[0.86] text-canvas [text-shadow:0_2px_40px_rgb(43_35_32/0.35)] md:text-ink md:[text-shadow:none]">
               <SplitReveal as="span" by="chars" className="block" start="top 95%" end="top 45%" stagger={0.03}>
                 An evening,
               </SplitReveal>

@@ -11,6 +11,7 @@ import { SplitReveal } from "@/components/motion/SplitReveal";
 import { Folio } from "@/components/ui/SectionHead";
 import { Glyph } from "@/components/ui/Glyph";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/useMedia";
 
 const centre = ingredients.find((i) => i.id === "turmeric")!;
 const ring = ingredients.filter((i) => i.id !== "turmeric");
@@ -24,11 +25,15 @@ const byId = Object.fromEntries(ingredients.map((i) => [i.id, i]));
 export function Ingredients() {
   const section = useRef<HTMLElement>(null);
   const video = useRef<HTMLVideoElement>(null);
+  const videoMobile = useRef<HTMLVideoElement>(null);
+  const isMobile = useIsMobile();
   const [active, setActive] = useState("saffron");
   const current = byId[active];
 
   useMood(section, "ingredients");
-  useScrubVideo({ video, trigger: section, src: media.video(3), start: "top bottom", end: "bottom top", stillAt: 0.5 });
+  // Desktop: the film is a plate behind the star chart. Phones: full-bleed backdrop.
+  useScrubVideo({ video, trigger: section, src: media.video(3), start: "top bottom", end: "bottom top", stillAt: 0.5, enabled: !isMobile });
+  useScrubVideo({ video: videoMobile, trigger: section, src: media.video(3), start: "top bottom", end: "bottom top", stillAt: 0.5, enabled: isMobile });
 
   useEffect(() => {
     const mm = gsap.matchMedia();
@@ -48,8 +53,10 @@ export function Ingredients() {
   return (
     <section ref={section} id="ingredients" tabIndex={-1} aria-labelledby="ingredients-title" className="relative h-[230vh] max-md:h-auto motion-reduce:h-auto">
       <div className="sticky top-0 h-svh overflow-hidden bg-paper max-md:relative max-md:h-auto max-md:min-h-svh motion-reduce:relative motion-reduce:h-auto">
-        <ScrubVideo ref={video} className="max-md:opacity-60" />
-        <div aria-hidden className="absolute inset-y-0 left-0 w-full bg-[linear-gradient(to_right,rgb(250_250_248/0.92)_0%,rgb(250_250_248/0.75)_38%,rgb(250_250_248/0)_70%)] max-md:bg-canvas/60" />
+        <div className="absolute inset-0 md:hidden">
+          <ScrubVideo ref={videoMobile} className="opacity-60" />
+          <div aria-hidden className="absolute inset-0 bg-canvas/60" />
+        </div>
 
         <div className="container-editorial grid-editorial relative z-10 h-full items-center gap-y-12 pt-[var(--header-h)] max-md:py-28">
           <div className="col-span-12 md:col-span-5 lg:col-span-4">
@@ -91,6 +98,10 @@ export function Ingredients() {
 
           {/* The constellation */}
           <div className="relative col-span-12 mx-auto aspect-square w-full max-w-[min(42rem,78vh)] max-md:hidden md:col-span-7 lg:col-span-7 lg:col-start-6">
+            <div aria-hidden className="absolute left-1/2 top-1/2 aspect-[9/16] h-[112%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[3px] bg-paper shadow-lift">
+              <ScrubVideo ref={video} />
+              <div className="absolute inset-0 bg-canvas/20" />
+            </div>
             <svg aria-hidden className="absolute inset-0 h-full w-full overflow-visible" viewBox="0 0 100 100">
               {edges.map(([a, b]) => {
                 const A = byId[a].at;

@@ -123,18 +123,26 @@ export function Loader() {
         animate(el, { y: ["0%", "-110%"] }, { duration: 0.9, delay: i * 0.035, ease: EASE_CURTAIN }),
       );
       r.querySelectorAll<HTMLElement>("[data-fade]").forEach((el) => animate(el, { opacity: 0 }, { duration: 0.7, delay: 0.3 }));
-      // 1. A framed plate opens onto the film.
-      const plateW = Math.min(innerWidth * 0.34, 520);
-      const plateH = plateW * 1.25;
+      // The window opens exactly where the hero film sits, so the loader
+      // dissolves into the page instead of cutting to it.
+      const plate = document.querySelector<HTMLElement>("[data-hero-plate]")?.getBoundingClientRect();
+      const framed = !!plate && innerWidth >= 768;
+      const target = framed
+        ? { left: plate!.left, top: plate!.top, width: plate!.width, height: plate!.height }
+        : { left: -2, top: -2, width: innerWidth + 4, height: innerHeight + 4 };
       a.style.opacity = "1";
-      await animate(a, { width: [0, plateW], height: [0, plateH] }, { duration: 1.1, delay: 0.45, ease: EASE_OUT });
-      // 2. The plate becomes the page.
-      experience.set({ loaded: true });
       await animate(
         a,
-        { width: innerWidth + 4, height: innerHeight + 4, borderRadius: ["2px", "0px"] },
-        { duration: 1.25, ease: EASE_CURTAIN },
+        {
+          left: [innerWidth / 2, target.left],
+          top: [innerHeight / 2, target.top],
+          width: [0, target.width],
+          height: [0, target.height],
+        },
+        { duration: 1.5, delay: 0.45, ease: EASE_CURTAIN },
       );
+      experience.set({ loaded: true });
+      await animate(r, { opacity: 0 }, { duration: framed ? 0.9 : 0.4, ease: EASE_OUT });
       setDone(true);
     }
 
@@ -155,7 +163,7 @@ export function Loader() {
       <div
         ref={aperture}
         aria-hidden
-        className="absolute left-1/2 top-1/2 h-0 w-0 -translate-x-1/2 -translate-y-1/2 rounded-[2px]"
+        className="absolute left-1/2 top-1/2 h-0 w-0 rounded-[3px]"
         style={{ boxShadow: "0 0 0 200vmax var(--color-paper)" }}
       />
       <div data-fade aria-hidden className="paper-fibre pointer-events-none absolute inset-0 opacity-70 mix-blend-multiply" />

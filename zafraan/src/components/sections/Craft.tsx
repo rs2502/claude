@@ -102,7 +102,7 @@ export function Craft() {
             <SplitReveal as="h2" by="words" id="craft-title" className="display mb-8 text-[clamp(2.2rem,3.8vw,4rem)]" start="top 70%" end="top 5%" trigger="#craft">
               Five verbs. One long afternoon.
             </SplitReveal>
-            <div className="relative min-h-0 flex-1 overflow-hidden rounded-[2px] bg-paper shadow-soft" data-cursor="image" data-cursor-label="Watch">
+            <div className="relative mx-auto aspect-[9/16] min-h-0 max-w-full flex-1 overflow-hidden rounded-[3px] bg-paper shadow-lift" data-cursor="image" data-cursor-label="Watch">
               <ScrubVideo ref={video} label="Hands working through the method: rice soaking, whole spices hitting hot ghee, masala ground on stone, a handi sealed with dough." />
               <div className="absolute bottom-4 left-4 flex items-baseline gap-2 rounded-full bg-canvas/95 px-4 py-1.5 shadow-soft">
                 <span className="folio text-ink-mute">Step</span>
@@ -166,7 +166,7 @@ export function Craft() {
       <div className="container-editorial py-24 md:hidden motion-reduce:block">
         <Folio no="05" label="The craft" className="mb-6" />
         <h2 className="display mb-10 text-[2.6rem]">Five verbs. One long afternoon.</h2>
-        <div className="relative mb-14 aspect-[4/5] overflow-hidden rounded-[2px] bg-paper shadow-soft md:hidden">
+        <div className="relative mb-14 aspect-[9/16] overflow-hidden rounded-[2px] bg-paper shadow-soft md:hidden">
           {/* Mobile film reuses the same scrub via its own element */}
           <MobileFilm enabled={isMobile} />
         </div>

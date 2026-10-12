@@ -8,8 +8,11 @@ import { useMood } from "@/hooks/useMood";
 import { ScrubVideo } from "@/components/motion/ScrubVideo";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { Folio } from "@/components/ui/SectionHead";
+import { PLATE, PLATE_BOX } from "@/lib/plate";
+import { cn } from "@/lib/utils";
 
-const LABEL_OFFSET = 15; // % of stage width between anchor and label
+// Labels sit just outside the film plate, in the margin, like Apple spec callouts.
+const LABEL_X = { left: -10, right: 110 } as const; // % of plate width
 
 /**
  * Locked camera, scrubbed film, and annotations that behave like an Apple
@@ -82,7 +85,9 @@ export function Samosa() {
   return (
     <section ref={section} id="samosa" aria-labelledby="samosa-title" className="relative h-[420vh] max-md:h-[260vh] motion-reduce:h-auto">
       <div className="sticky top-0 h-svh overflow-hidden bg-paper motion-reduce:relative">
-        <ScrubVideo ref={video} label="A samosa slowly separating into its layers: pastry, potato, peas and whole spices suspended in air." />
+        <div className={cn(PLATE, "md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2")}>
+          <ScrubVideo ref={video} label="A samosa slowly separating into its layers: pastry, potato, peas and whole spices suspended in air." />
+        </div>
 
         <div className="container-editorial pointer-events-none relative z-10 pt-[calc(var(--header-h)+2.5rem)]">
           <Folio no="03" label="Anatomy of a samosa" className="mb-6" />
@@ -92,10 +97,10 @@ export function Samosa() {
         </div>
 
         {/* Desktop/tablet annotations */}
-        <div ref={stage} className="absolute inset-0 z-10 max-md:hidden motion-reduce:hidden" aria-hidden>
+        <div ref={stage} className={cn(PLATE_BOX, "z-10 md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 max-md:hidden motion-reduce:hidden")} aria-hidden>
           {samosaCallouts.map((c) => {
             const dir = c.side === "left" ? -1 : 1;
-            const lx = c.at.x + dir * LABEL_OFFSET;
+            const lx = LABEL_X[c.side];
             const ely = c.at.y - 5;
             const elx = c.at.x + dir * 4;
             return (
