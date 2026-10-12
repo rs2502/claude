@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap, MQ } from "@/lib/gsap";
+import { gsap } from "@/lib/gsap";
 import { media } from "@/lib/content";
 import { pointer, useExperience } from "@/lib/store";
 import { useScrubVideo } from "@/hooks/useScrubVideo";
@@ -9,8 +9,6 @@ import { ScrubVideo } from "@/components/motion/ScrubVideo";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { ButtonLink } from "@/components/ui/Button";
 import { Arrow } from "@/components/ui/Arrow";
-import { PLATE } from "@/lib/plate";
-import { cn } from "@/lib/utils";
 
 // Dish names drift around the film plate as the thali comes apart.
 const plates = [
@@ -42,7 +40,8 @@ export function Hero() {
   useEffect(() => {
     const mm = gsap.matchMedia();
     // Nur auf dem Desktop: Auf dem Handy ist der Einstieg ein ruhiger Bildschirm.
-    mm.add(MQ.desktop + ", " + MQ.tablet, () => {
+    // Nur auf großen Bildschirmen (Tafel neben dem Text); darunter steht alles untereinander.
+    mm.add("(min-width: 1280px) and (prefers-reduced-motion: no-preference)", () => {
       const trigger = { trigger: section.current, start: "top top", end: "bottom bottom", scrub: 1 };
 
       // The thali expands: the film grows toward the viewer…
@@ -84,10 +83,11 @@ export function Hero() {
   }, []);
 
   return (
-    <section ref={section} id="top" aria-labelledby="hero-title" className="relative h-[320vh] max-md:h-svh motion-reduce:h-svh">
-      <div className="sticky top-0 h-svh overflow-hidden bg-paper">
-        <div ref={depthLayer} data-hero-plate className={cn(PLATE, "will-change-transform max-md:inset-auto max-md:left-1/2 max-md:top-[calc(var(--header-h)+0.25rem)] max-md:aspect-[9/16] max-md:h-[44svh] max-md:-translate-x-1/2 max-md:rounded-[3px] max-md:shadow-lift md:right-[7vw] md:top-1/2 md:-translate-y-1/2")}>
-          <div ref={mediaLayer} className="absolute -inset-6 will-change-transform max-md:inset-0">
+    <section ref={section} id="top" aria-labelledby="hero-title" className="relative h-[320vh] max-xl:h-auto motion-reduce:h-svh">
+      {/* Desktop: gepinnte Bühne. Handy & Tablet (unter 1280 px): Video und Text stehen untereinander und können sich nie überlappen. */}
+      <div className="sticky top-0 h-svh overflow-hidden bg-paper max-xl:static max-xl:flex max-xl:h-auto max-xl:flex-col max-xl:pb-12 max-xl:pt-[calc(var(--header-h)+0.5rem)]">
+        <div ref={depthLayer} data-hero-plate className="relative mx-auto aspect-[9/16] h-[min(46svh,30rem)] shrink-0 overflow-hidden rounded-[3px] bg-paper shadow-lift will-change-transform xl:absolute xl:right-[7vw] xl:top-1/2 xl:mx-0 xl:h-[min(84svh,67vw)] xl:-translate-y-1/2">
+          <div ref={mediaLayer} className="absolute inset-0 will-change-transform xl:-inset-6">
             <ScrubVideo ref={video} hero src={media.video(1)} poster={media.poster(1)} label="Ein Teller Pasta, auf den frisch gehobelter Parmesan rieselt; Dampf steigt auf." />
           </div>
         </div>
@@ -99,7 +99,7 @@ export function Hero() {
             data-plate
             data-at={p.at}
             aria-hidden
-            className="pointer-events-none absolute z-10 hidden items-baseline gap-2 opacity-0 md:flex"
+            className="pointer-events-none absolute z-10 hidden items-baseline gap-2 opacity-0 xl:flex"
             style={{ left: p.x, top: p.y }}
           >
             <span className="display-italic text-sm text-ink-soft">{p.roman}</span>
@@ -107,10 +107,10 @@ export function Hero() {
           </div>
         ))}
 
-        <div ref={type} className="absolute inset-0 z-20 flex flex-col justify-end will-change-transform">
-          <div ref={typeDepth} className="container-editorial grid-editorial items-end gap-y-10 pb-[clamp(2rem,6vh,4.5rem)]">
-            <div className="col-span-12 md:col-span-7 lg:col-span-7">
-              <p data-hero-fade className="eyebrow mb-6 flex items-center gap-3 text-ink-soft opacity-0 max-md:hidden">
+        <div ref={type} className="absolute inset-0 z-20 flex flex-col justify-end will-change-transform max-xl:relative max-xl:inset-auto max-xl:mt-8">
+          <div ref={typeDepth} className="container-editorial grid-editorial items-end gap-y-10 pb-[clamp(2rem,6vh,4.5rem)] max-xl:pb-0">
+            <div className="col-span-12 xl:col-span-7">
+              <p data-hero-fade className="eyebrow mb-6 flex items-center gap-3 text-ink-soft opacity-0 max-xl:hidden">
                 <span className="folio">No. 01</span>
                 <span className="h-px w-10 bg-ink/40" />
                 Cucina Italiana · Bruchhausen-Vilsen
@@ -141,7 +141,7 @@ export function Hero() {
           </div>
         </div>
 
-        <div data-hero-fade aria-hidden className="absolute bottom-6 left-[46%] z-20 hidden -translate-x-1/2 flex-col items-center gap-3 opacity-0 lg:flex">
+        <div data-hero-fade aria-hidden className="absolute bottom-6 left-[46%] z-20 hidden -translate-x-1/2 flex-col items-center gap-3 opacity-0 xl:flex">
           <span className="eyebrow text-[0.6rem] text-ink-soft">Scrollen</span>
           <span className="relative block h-14 w-px bg-ink/15">
             <span ref={cue} className="absolute inset-0 origin-top bg-ink" />

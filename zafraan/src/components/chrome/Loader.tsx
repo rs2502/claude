@@ -134,7 +134,7 @@ export function Loader() {
       // The window opens exactly where the hero film sits, so the loader
       // dissolves into the page instead of cutting to it.
       const plate = document.querySelector<HTMLElement>("[data-hero-plate]")?.getBoundingClientRect();
-      const framed = !!plate && innerWidth >= 768;
+      const framed = !!plate && innerWidth >= 1280;
       const target = framed
         ? { left: plate!.left, top: plate!.top, width: plate!.width, height: plate!.height }
         : { left: -2, top: -2, width: innerWidth + 4, height: innerHeight + 4 };
