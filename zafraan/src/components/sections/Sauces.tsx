@@ -37,14 +37,14 @@ function SauceCard({ s, i }: { s: Sauce; i: number }) {
           <Drop tone={s.tone} />
           <span className="folio text-ink-mute">0{i + 1}</span>
         </div>
-        <p className="eyebrow mt-6 text-ink-mute">{s.hindi}</p>
+        <p className="eyebrow mt-6 text-ink-mute">{s.it}</p>
         <h3 className="display mt-1 text-[1.85rem] leading-[1]">{s.name}</h3>
         <p className="mt-3 text-[0.875rem] leading-relaxed text-ink-soft">{s.notes}</p>
         <div className="mt-5 flex items-center justify-between border-t border-line pt-4 text-[0.75rem]">
           <span className="text-ink-mute">
-            With <span className="text-ink">{s.pairs}</span>
+            Zu <span className="text-ink">{s.pairs}</span>
           </span>
-          <span className="flex gap-1" aria-label={`Heat ${s.heat} of 3`}>
+          <span className="flex gap-1" aria-label={`Schärfe ${s.heat} von 3`}>
             {[0, 1, 2].map((k) => (
               <span key={k} className={k < s.heat ? "h-1.5 w-1.5 rounded-full bg-chili" : "h-1.5 w-1.5 rounded-full bg-ink/15"} />
             ))}
@@ -89,14 +89,14 @@ export function Sauces() {
     <section ref={section} id="sauces" tabIndex={-1} aria-labelledby="sauces-title" className="relative h-[320vh] max-md:h-auto motion-reduce:h-auto">
       <div className="sticky top-0 h-svh overflow-hidden bg-paper max-md:relative max-md:h-auto max-md:min-h-svh motion-reduce:relative motion-reduce:h-auto">
         <div className={cn(PLATE, "md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2")}>
-          <ScrubVideo ref={video} label="Macro film of saffron, tamarind and chili sauces folding into one another in slow ribbons." />
+          <ScrubVideo ref={video} label="Nahaufnahme von Saucen, die langsam ineinanderfließen." />
         </div>
 
         <div className="container-editorial pointer-events-none relative z-10 pt-[calc(var(--header-h)+2.5rem)] max-md:pt-28">
           <div className="inline-block rounded-[3px] bg-canvas/90 p-6 pr-10 shadow-soft">
-            <Folio no="06" label="Signature sauces" className="mb-5" />
+            <Folio no="06" label="Unsere Saucen" className="mb-5" />
             <SplitReveal as="h2" by="words" id="sauces-title" className="display max-w-[12ch] text-[clamp(2.2rem,4.2vw,4.4rem)]" start="top 75%" end="top 10%" trigger="#sauces">
-              Four sauces, poured slowly.
+              Vier Saucen, mit Liebe gerührt.
             </SplitReveal>
           </div>
         </div>
@@ -110,7 +110,7 @@ export function Sauces() {
         </ul>
 
         {/* Phones & reduced motion: a swipeable tray */}
-        <ul className="relative z-10 mt-16 flex snap-x snap-mandatory gap-4 overflow-x-auto px-[var(--gutter)] pb-14 md:hidden motion-reduce:flex" aria-label="Sauces">
+        <ul className="relative z-10 mt-16 flex snap-x snap-mandatory gap-4 overflow-x-auto px-[var(--gutter)] pb-14 md:hidden motion-reduce:flex" aria-label="Saucen">
           {sauces.map((s, i) => (
             <li key={s.id} className="shrink-0 snap-center">
               <SauceCard s={s} i={i} />

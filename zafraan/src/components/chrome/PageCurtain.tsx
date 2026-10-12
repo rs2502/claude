@@ -54,7 +54,7 @@ export function PageCurtain() {
       style={{ visibility: "hidden", clipPath: "inset(100% 0% 0% 0%)" }}
     >
       <span ref={mark} className="display text-[clamp(3rem,9vw,8rem)] opacity-0">
-        Zafraan
+        Italia
       </span>
     </div>
   );

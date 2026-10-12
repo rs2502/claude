@@ -22,14 +22,15 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: { default: `${site.name} — ${site.tagline}`, template: `%s — ${site.name}` },
+  title: { default: `${site.name} · Bruchhausen-Vilsen`, template: `%s · ${site.name}` },
   description: site.description,
   openGraph: {
     type: "website",
     siteName: site.name,
-    title: `${site.name} — ${site.tagline}`,
+    title: `${site.name} · Bruchhausen-Vilsen`,
     description: site.description,
-    images: [{ url: "/media/image-1.jpeg", width: 1600, height: 2000, alt: "The royal thali at Zafraan" }],
+    locale: "de_DE",
+    images: [{ url: "/media/image-1.jpeg", alt: "Ristorante Pizzeria Italia in Bruchhausen-Vilsen" }],
   },
   twitter: { card: "summary_large_image" },
   alternates: { canonical: "/" },
@@ -46,10 +47,11 @@ const jsonLd = {
   name: site.name,
   description: site.description,
   url: site.url,
-  telephone: site.phone,
+  telephone: "+49 4252 4597",
   email: site.email,
-  servesCuisine: ["Indian", "Awadhi", "Rajasthani"],
-  priceRange: "££££",
+  servesCuisine: ["Italienisch", "Pizza", "Pasta"],
+  priceRange: "€€",
+  hasMenu: `${site.url}/menu`,
   acceptsReservations: true,
   image: `${site.url}/media/image-1.jpeg`,
   address: {
@@ -60,14 +62,16 @@ const jsonLd = {
     addressCountry: site.address.country,
   },
   openingHoursSpecification: [
-    { "@type": "OpeningHoursSpecification", dayOfWeek: ["Wednesday", "Thursday", "Friday", "Saturday"], opens: "18:30", closes: "23:00" },
-    { "@type": "OpeningHoursSpecification", dayOfWeek: "Sunday", opens: "13:00", closes: "16:30" },
+    { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday", "Thursday", "Friday", "Saturday"], opens: "11:30", closes: "14:30" },
+    { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday", "Thursday", "Friday", "Saturday"], opens: "17:30", closes: "22:30" },
+    { "@type": "OpeningHoursSpecification", dayOfWeek: "Sunday", opens: "11:30", closes: "14:00" },
+    { "@type": "OpeningHoursSpecification", dayOfWeek: "Sunday", opens: "17:00", closes: "22:00" },
   ],
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${inter.variable}`}>
+    <html lang="de" className={`${fraunces.variable} ${inter.variable}`}>
       <head>
         <noscript>
           <style>{`[data-loader]{display:none!important}`}</style>

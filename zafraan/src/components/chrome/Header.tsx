@@ -43,7 +43,7 @@ export function Header() {
   return (
     <>
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[120] focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-canvas">
-        Skip to content
+        Zum Inhalt springen
       </a>
       <header
         className={cn(
@@ -53,14 +53,14 @@ export function Header() {
       >
         <span aria-hidden className="absolute inset-x-0 top-0 h-px origin-left bg-ink/70" ref={progress} style={{ transform: "scaleX(0)" }} />
         <div className="container-editorial flex h-[var(--header-h)] items-center justify-between">
-          <TransitionLink href="/" className="group flex items-baseline gap-3 rounded-full bg-canvas/95 px-5 py-2.5 shadow-soft" aria-label="Zafraan — home">
+          <TransitionLink href="/" className="group flex items-baseline gap-3 rounded-full bg-canvas/95 px-5 py-2.5 shadow-soft" aria-label="Ristorante Pizzeria Italia — Startseite">
             <span className="display text-[1.35rem] leading-none tracking-[-0.02em]">
-              <span className="display-italic">Z</span>afraan
+              <span className="display-italic">I</span>talia
             </span>
-            <span className="eyebrow hidden text-[0.6rem] text-ink-mute lg:inline">Est. Lucknow 1924</span>
+            <span className="eyebrow hidden text-[0.6rem] text-ink-mute lg:inline">Ristorante Pizzeria</span>
           </TransitionLink>
 
-          <nav aria-label="Primary" className="hidden rounded-full bg-canvas/95 px-3 py-2 shadow-soft md:block">
+          <nav aria-label="Hauptnavigation" className="hidden rounded-full bg-canvas/95 px-3 py-2 shadow-soft md:block">
             <ul className="flex items-center">
               {nav.map((item) => (
                 <li key={item.href}>
@@ -71,7 +71,7 @@ export function Header() {
               ))}
               <li>
                 <TransitionLink href="/#reserve" className="ml-2 block rounded-full bg-ink px-5 py-2 text-[0.8125rem] text-canvas transition-colors duration-500 hover:bg-saffron">
-                  Reserve
+                  Reservieren
                 </TransitionLink>
               </li>
             </ul>
@@ -84,7 +84,7 @@ export function Header() {
             aria-controls="mobile-menu"
             onClick={() => setOpen((v) => !v)}
           >
-            {open ? "Close" : "Menu"}
+            {open ? "Schließen" : "Menü"}
           </button>
         </div>
       </header>
@@ -95,7 +95,7 @@ export function Header() {
             id="mobile-menu"
             role="dialog"
             aria-modal="true"
-            aria-label="Site navigation"
+            aria-label="Navigation"
             className="paper-fibre fixed inset-0 z-40 flex flex-col justify-end bg-paper px-[var(--gutter)] pb-10 pt-28 md:hidden"
             initial={{ clipPath: "inset(0% 0% 100% 0%)" }}
             animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
@@ -103,7 +103,7 @@ export function Header() {
             transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
           >
             <ul className="flex flex-col gap-1">
-              {[...nav, { label: "Reserve", href: "/#reserve" }].map((item, i) => (
+              {[...nav, { label: "Reservieren", href: "/#reserve" }].map((item, i) => (
                 <li key={item.href} className="overflow-clip">
                   <motion.div initial={{ y: "110%" }} animate={{ y: 0 }} transition={{ duration: 0.9, delay: 0.2 + i * 0.06, ease: EASE }}>
                     <TransitionLink href={item.href} onClick={() => setOpen(false)} className="display flex items-baseline justify-between border-b border-line py-3 text-[2.75rem]">

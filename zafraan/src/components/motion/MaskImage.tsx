@@ -42,7 +42,7 @@ export function MaskImage({
   start = "top 92%",
   end = "top 30%",
   drift = 10,
-  cursorLabel = "Taste",
+  cursorLabel = "Probieren",
 }: Props) {
   const frame = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);

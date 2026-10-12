@@ -98,14 +98,14 @@ export function Craft() {
       <div className="sticky top-0 hidden h-svh overflow-hidden md:block motion-reduce:hidden">
         <div className="container-editorial grid h-full grid-cols-12 gap-x-8 pb-28 pt-[calc(var(--header-h)+2rem)]">
           <div className="relative col-span-4 flex flex-col">
-            <Folio no="05" label="The craft" className="mb-6" />
+            <Folio no="05" label="Das Handwerk" className="mb-6" />
             <SplitReveal as="h2" by="words" id="craft-title" className="display mb-8 text-[clamp(2.2rem,3.8vw,4rem)]" start="top 70%" end="top 5%" trigger="#craft">
-              Five verbs. One long afternoon.
+              Fünf Schritte zur perfekten Pizza.
             </SplitReveal>
-            <div className="relative mx-auto aspect-[9/16] min-h-0 max-w-full flex-1 overflow-hidden rounded-[3px] bg-paper shadow-lift" data-cursor="image" data-cursor-label="Watch">
-              <ScrubVideo ref={video} label="Hands working through the method: rice soaking, whole spices hitting hot ghee, masala ground on stone, a handi sealed with dough." />
+            <div className="relative mx-auto aspect-[9/16] min-h-0 max-w-full flex-1 overflow-hidden rounded-[3px] bg-paper shadow-lift" data-cursor="image" data-cursor-label="Ansehen">
+              <ScrubVideo ref={video} label="Hände bereiten in der Küche eine Pizza zu." />
               <div className="absolute bottom-4 left-4 flex items-baseline gap-2 rounded-full bg-canvas/95 px-4 py-1.5 shadow-soft">
-                <span className="folio text-ink-mute">Step</span>
+                <span className="folio text-ink-mute">Schritt</span>
                 <span ref={counter} className="display text-lg tabular-nums">01</span>
               </div>
             </div>
@@ -118,7 +118,7 @@ export function Craft() {
                   <span data-step-no aria-hidden className="display pointer-events-none absolute -top-8 right-0 text-[clamp(7rem,12vw,12rem)] leading-none text-ink/[0.07]">
                     {s.no}
                   </span>
-                  <div data-step-image className="relative mb-8 aspect-[5/4] w-full overflow-hidden rounded-[2px] bg-paper shadow-soft" data-cursor="image" data-cursor-label="Taste">
+                  <div data-step-image className="relative mb-8 aspect-[5/4] w-full overflow-hidden rounded-[2px] bg-paper shadow-soft" data-cursor="image" data-cursor-label="Probieren">
                     <div className="absolute inset-0">
                       <Image src={media.image(s.image)} alt="" fill sizes="34vw" className="object-cover" />
                     </div>
@@ -129,7 +129,7 @@ export function Craft() {
                     {s.duration}
                   </p>
                   <h3 data-step-line className="display text-[clamp(2.4rem,3.6vw,3.75rem)]">
-                    {s.title} <span className="display-italic text-[0.55em] text-ink-soft">{s.hindi}</span>
+                    {s.title} <span className="display-italic text-[0.55em] text-ink-soft">{s.it}</span>
                   </h3>
                   <p data-step-line className="mt-4 max-w-[26rem] text-[0.975rem] leading-[1.7] text-ink-soft">
                     {s.body}
@@ -164,8 +164,8 @@ export function Craft() {
 
       {/* ---------- Phones + reduced motion: a vertical method ---------- */}
       <div className="container-editorial py-24 md:hidden motion-reduce:block">
-        <Folio no="05" label="The craft" className="mb-6" />
-        <h2 className="display mb-10 text-[2.6rem]">Five verbs. One long afternoon.</h2>
+        <Folio no="05" label="Das Handwerk" className="mb-6" />
+        <h2 className="display mb-10 text-[2.6rem]">Fünf Schritte zur perfekten Pizza.</h2>
         <div className="relative mb-14 aspect-[9/16] overflow-hidden rounded-[2px] bg-paper shadow-soft md:hidden">
           {/* Mobile film reuses the same scrub via its own element */}
           <MobileFilm enabled={isMobile} />
@@ -181,7 +181,7 @@ export function Craft() {
                 {s.no} · {s.duration}
               </p>
               <h3 className="display text-[2.25rem]">
-                {s.title} <span className="display-italic text-[0.55em] text-ink-soft">{s.hindi}</span>
+                {s.title} <span className="display-italic text-[0.55em] text-ink-soft">{s.it}</span>
               </h3>
               <p className="mt-3 text-[0.95rem] leading-[1.7] text-ink-soft">{s.body}</p>
               <MaskImage src={media.image(s.image)} alt="" sizes="90vw" className="mt-6 aspect-[5/4] w-full rounded-[2px]" from="left" />

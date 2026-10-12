@@ -15,10 +15,10 @@ import { cn } from "@/lib/utils";
 
 // Dish names drift around the film plate as the thali comes apart.
 const plates = [
-  { roman: "i.", name: "Dal Zafraan", x: "47%", y: "22%", at: 0.28 },
-  { roman: "ii.", name: "Saffron sheermal", x: "84%", y: "12%", at: 0.38 },
-  { roman: "iii.", name: "Galouti kebab", x: "85%", y: "80%", at: 0.48 },
-  { roman: "iv.", name: "Kesar kulfi", x: "50%", y: "68%", at: 0.58 },
+  { roman: "i.", name: "Pizza", x: "47%", y: "22%", at: 0.28 },
+  { roman: "ii.", name: "Pasta", x: "84%", y: "12%", at: 0.38 },
+  { roman: "iii.", name: "Carne", x: "85%", y: "80%", at: 0.48 },
+  { roman: "iv.", name: "Pesce", x: "50%", y: "68%", at: 0.58 },
 ];
 
 export function Hero() {
@@ -91,7 +91,7 @@ export function Hero() {
       <div className="sticky top-0 h-svh overflow-hidden bg-paper">
         <div ref={depthLayer} data-hero-plate className={cn(PLATE, "will-change-transform md:right-[7vw] md:top-1/2 md:-translate-y-1/2")}>
           <div ref={mediaLayer} className="absolute -inset-6 will-change-transform">
-            <ScrubVideo ref={video} hero src={media.video(1)} label="An exploded royal thali: sixteen small dishes lift away from a brass plate, scattering saffron and herbs." />
+            <ScrubVideo ref={video} hero src={media.video(1)} label="Italienische Gerichte aus der Küche des Ristorante Italia, im Film." />
           </div>
         </div>
         {/* A single, functional veil — only where type needs to sit. */}
@@ -117,7 +117,7 @@ export function Hero() {
               <p data-hero-fade className="eyebrow mb-6 flex items-center gap-3 text-ink-soft opacity-0">
                 <span className="folio">No. 01</span>
                 <span className="h-px w-10 bg-ink/40" />
-                A study in sixteen courses
+                Cucina Italiana · Bruchhausen-Vilsen
               </p>
               <SplitReveal
                 as="h1"
@@ -128,16 +128,16 @@ export function Hero() {
                 className="display text-[clamp(3.6rem,8.2vw,9.5rem)] text-ink"
                 id="hero-title"
               >
-                The royal thali, unbound.
+                Echte italienische Lebensfreude.
               </SplitReveal>
               <div className="mt-10 flex flex-col gap-8">
               <p data-hero-fade className="max-w-[26rem] text-[0.9375rem] leading-[1.7] text-ink-soft opacity-0">
-                A twelve-seat tasting house on Marylebone Lane, reading the royal kitchens of Awadh one ingredient at a time.
+                Frisch gekocht, herzlich serviert — und immer mit dem Geschmack Italiens. Mitten in Bruchhausen-Vilsen.
               </p>
               <div data-hero-fade className="flex flex-wrap items-center gap-5 opacity-0">
-                <ButtonLink href="/#reserve">Reserve a table</ButtonLink>
+                <ButtonLink href="/#reserve">Tisch reservieren</ButtonLink>
                 <ButtonLink href="/menu" variant="light">
-                  Explore the menu
+                  Speisekarte ansehen
                 </ButtonLink>
               </div>
               </div>
@@ -146,7 +146,7 @@ export function Hero() {
         </div>
 
         <div data-hero-fade aria-hidden className="absolute bottom-6 left-[46%] z-20 hidden -translate-x-1/2 flex-col items-center gap-3 opacity-0 lg:flex">
-          <span className="eyebrow text-[0.6rem] text-ink-soft">Scroll to unfold</span>
+          <span className="eyebrow text-[0.6rem] text-ink-soft">Scrollen</span>
           <span className="relative block h-14 w-px bg-ink/15">
             <span ref={cue} className="absolute inset-0 origin-top bg-ink" />
           </span>

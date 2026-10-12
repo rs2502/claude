@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { gsap, MQ } from "@/lib/gsap";
-import { media } from "@/lib/content";
+import { media, site } from "@/lib/content";
 import { useScrubVideo } from "@/hooks/useScrubVideo";
 import { useMood } from "@/hooks/useMood";
 import { ScrubVideo } from "@/components/motion/ScrubVideo";
@@ -12,16 +12,17 @@ import { Folio } from "@/components/ui/SectionHead";
 import { cn } from "@/lib/utils";
 
 const gallery = [
-  { n: 2 as const, alt: "Candle-lit table set with brass thalis and linen.", cls: "col-span-7 col-start-1 aspect-[4/5] z-10", speed: -6, caption: "The long table, 19:30" },
-  { n: 3 as const, alt: "A cook pouring saffron milk over rice in a copper handi.", cls: "col-span-4 col-start-8 mt-[18vh] aspect-[3/4] z-20", speed: -16, caption: "Dum, unsealed" },
-  { n: 4 as const, alt: "Close detail of kulfi with pistachio and rose on a silver plate.", cls: "col-span-5 col-start-5 -mt-[22vh] aspect-[5/4] z-30", speed: -26, caption: "To close" },
-  { n: 1 as const, alt: "Overhead view of the sixteen-course royal thali.", cls: "col-span-3 col-start-10 -mt-[8vh] aspect-square z-20", speed: -36, caption: "Plate i." },
+  { n: 2 as const, alt: "Pastagericht aus dem Ristorante Italia.", cls: "col-span-7 col-start-1 aspect-[4/5] z-10", speed: -6, caption: "Pasta, frisch gekocht" },
+  { n: 3 as const, alt: "Pastagericht aus dem Ristorante Italia.", cls: "col-span-4 col-start-8 mt-[18vh] aspect-[3/4] z-20", speed: -16, caption: "Aus unserer Küche" },
+  { n: 4 as const, alt: "Pastagericht aus dem Ristorante Italia.", cls: "col-span-5 col-start-5 -mt-[22vh] aspect-[5/4] z-30", speed: -26, caption: "Buon appetito" },
+  { n: 1 as const, alt: "Pastagericht aus dem Ristorante Italia.", cls: "col-span-3 col-start-10 -mt-[8vh] aspect-square z-20", speed: -36, caption: "Piatto i." },
 ];
 
+// Alle Zahlen stammen aus der Speisekarte und den Öffnungszeiten.
 const facts = [
-  { k: "12", v: "Seats, one table" },
-  { k: "16", v: "Courses, unhurried" },
-  { k: "1", v: "Sitting each night" },
+  { k: "120+", v: "Gerichte auf der Karte" },
+  { k: "21", v: "Pizzen aus dem Ofen" },
+  { k: "5", v: "Tage pro Woche geöffnet" },
 ];
 
 export function Dining() {
@@ -61,17 +62,17 @@ export function Dining() {
             "md:inset-auto md:right-[7vw] md:top-[12%] md:aspect-[9/16] md:h-[108svh] md:rounded-[3px] md:shadow-lift",
           )}
         >
-          <ScrubVideo ref={video} label="The dining room at dusk: candlelight, brass, guests leaning in over the thali." />
+          <ScrubVideo ref={video} label="Gäste genießen einen Abend im Ristorante Italia." />
         </div>
         <div className="container-editorial relative z-10 flex h-full flex-col justify-center">
           <div>
-            <Folio no="07" label="The evening" className="mb-8 w-fit rounded-full bg-canvas/90 px-4 py-2 shadow-soft" />
+            <Folio no="07" label="Feiern" className="mb-8 w-fit rounded-full bg-canvas/90 px-4 py-2 shadow-soft" />
             <h2 id="dining-title" className="display relative z-10 text-[clamp(4rem,10.5vw,12rem)] leading-[0.86] text-canvas [text-shadow:0_2px_40px_rgb(43_35_32/0.35)] md:text-ink md:[text-shadow:none]">
               <SplitReveal as="span" by="chars" className="block" start="top 95%" end="top 45%" stagger={0.03}>
-                An evening,
+                Mit uns feiern
               </SplitReveal>
               <SplitReveal as="span" by="chars" className="display-italic block pl-[12vw]" start="top 95%" end="top 40%" stagger={0.03}>
-                composed.
+                Sie richtig.
               </SplitReveal>
             </h2>
           </div>
@@ -90,7 +91,10 @@ export function Dining() {
 
       <div className="container-editorial grid-editorial border-t border-line pb-[clamp(5rem,14vh,10rem)] pt-12">
         <p className="col-span-12 mb-10 max-w-[34rem] text-[1.0625rem] leading-[1.75] text-ink-soft md:col-span-5">
-          The room seats twelve around a single walnut table. Courses arrive in the order the old kitchens intended: light to rich, cool to warm, sour to sweet — and then, silence and tea.
+          Hochzeit, Geburtstag, Firmenfeier, Jubiläum oder Catering — mit uns wird Ihr Event zu einem kulinarischen Erlebnis.
+          <a href={`mailto:${site.email}`} className="link-grow mt-6 block w-fit text-ink" data-cursor="link">
+            Anfrage senden →
+          </a>
         </p>
         <dl className="col-span-12 grid grid-cols-3 gap-6 md:col-span-6 md:col-start-7">
           {facts.map((f) => (

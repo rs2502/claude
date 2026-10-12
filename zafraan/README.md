@@ -1,10 +1,12 @@
-# Zafraan — an editorial, scroll-directed tasting house
+# Ristorante Pizzeria Italia — scroll-directed website
+
+Bruchhausen-Vilsen. Texts, menu, address and opening hours come from ristorante-pizzeria-italia.com; edit them in `src/lib/content.ts`.
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 · GSAP + ScrollTrigger · Lenis · Three.js / R3F / Drei · Framer Motion · SplitType
 
 ```bash
 npm install
-# put video-1…6.mp4 and image-1…4.webp in public/media (see public/media/README.md)
+# put video-1…6.mp4 (9:16) and image-1…4.jpeg in public/media (see public/media/README.md)
 npm run encode:videos   # optional: re-wraps films with short GOPs for frame-accurate scrubbing
 npm run dev
 ```
@@ -19,9 +21,9 @@ npm run dev
 | Type | `components/motion/SplitReveal.tsx` | SplitType lines become masks; words or letters rise, scrubbed to scroll. Re-splits on resize and after fonts load; screen readers get one sr-only copy. |
 | Images | `components/motion/MaskImage.tsx` | clip-path aperture reveal + inner scale/drift, `next/image`. |
 | Chrome | `components/chrome/*` | Real-progress loader that opens into the hero, curtain page transitions, magnetic buttons, custom cursor (fine pointers only), header that yields on scroll. |
-| Reservation | `app/actions.ts` | Server Action with validation; connect `deliver()` to your booking provider. |
+| Reservation | `sections/Reservation.tsx` | Links to the existing online reservation portal and phone. |
 
-Chapters: Hero (video 1) → Story → Exploded samosa (video 2, annotated) → Ingredient constellation (video 3) → Craft timeline (video 4, horizontal) → Sauces (video 5, tilt cards) → Dining (video 6, layered gallery) → Reservation. `/menu` is a second route that shows off the transitions.
+Chapters: Hero (video 1) → Willkommen → Pizza anatomy (video 2, annotated) → Zutaten constellation (video 3) → Handwerk timeline (video 4, horizontal) → Saucen (video 5, tilt cards) → Feiern (video 6, layered gallery) → Reservierung. `/menu` is the full menu. Films are portrait (9:16): full-bleed on phones, framed plates from tablet up.
 
 **Responsive.** Phones get their own compositions rather than stacked desktop layouts: caption cards in place of callouts, swipe shelves in place of the constellation and the floating sauce cards, a vertical method with its own film, shorter sticky runs, and stepped scrubbing.
 

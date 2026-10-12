@@ -62,7 +62,7 @@ export function Cursor() {
       const t = (e.target as Element | null)?.closest<HTMLElement>("[data-cursor], a, button, input, select, textarea, label");
       if (!t) return setMode("default");
       const kind = t.dataset.cursor as Mode | undefined;
-      if (kind === "image") return setMode("image", t.dataset.cursorLabel ?? "View");
+      if (kind === "image") return setMode("image", t.dataset.cursorLabel ?? "Ansehen");
       if (t.matches("input, textarea")) return setMode("text");
       setMode("link");
     };
@@ -94,7 +94,7 @@ export function Cursor() {
         style={{ translate: "-50% -50%" }}
       >
         <span ref={label} className="display-italic text-[0.95rem] text-ink opacity-0">
-          View
+          Ansehen
         </span>
       </div>
       <div ref={dot} className="absolute left-0 top-0 h-[6px] w-[6px] rounded-full bg-ink opacity-0 will-change-transform" style={{ translate: "-50% -50%" }} />

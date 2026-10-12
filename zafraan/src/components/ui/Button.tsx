@@ -47,11 +47,20 @@ function Inner({ children, variant }: { children: ReactNode; variant: Variant })
 type LinkProps = { href: string; variant?: Variant; children: ReactNode; className?: string };
 
 export function ButtonLink({ href, variant = "solid", children, className }: LinkProps) {
+  const cls = cn(base, variants[variant], className);
+  // External pages, phone numbers and mail open normally; internal routes get the curtain.
+  const external = /^(https?:|tel:|mailto:)/.test(href);
   return (
     <Magnetic>
-      <TransitionLink href={href} className={cn(base, variants[variant], className)} data-cursor="link">
-        <Inner variant={variant}>{children}</Inner>
-      </TransitionLink>
+      {external ? (
+        <a href={href} className={cls} data-cursor="link" {...(href.startsWith("http") ? { target: "_blank", rel: "noopener" } : {})}>
+          <Inner variant={variant}>{children}</Inner>
+        </a>
+      ) : (
+        <TransitionLink href={href} className={cls} data-cursor="link">
+          <Inner variant={variant}>{children}</Inner>
+        </TransitionLink>
+      )}
     </Magnetic>
   );
 }

@@ -6,7 +6,7 @@ import { experience } from "@/lib/store";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 const EASE_CURTAIN = [0.76, 0, 0.24, 1] as const;
-const WORD = "Zafraan";
+const WORD = "Italia";
 
 /**
  * Loading is real: the counter reports fonts + the hero film's buffer, eased
@@ -158,7 +158,7 @@ export function Loader() {
   if (done) return null;
 
   return (
-    <div ref={root} data-loader role="status" aria-live="polite" aria-label="Loading Zafraan" className="fixed inset-0 z-[100] overflow-hidden">
+    <div ref={root} data-loader role="status" aria-live="polite" aria-label="Ristorante Pizzeria Italia wird geladen" className="fixed inset-0 z-[100] overflow-hidden">
       {/* The aperture: transparent, its enormous shadow is the paper. */}
       <div
         ref={aperture}
@@ -171,12 +171,12 @@ export function Loader() {
 
       <div data-fade ref={chrome} className="container-editorial absolute inset-0 flex flex-col justify-between py-8 text-ink">
         <div className="flex items-start justify-between">
-          <span className="eyebrow">House of Indian Gastronomy</span>
-          <span className="eyebrow hidden sm:block">Vol. IV — The Royal Thali</span>
+          <span className="eyebrow">Ristorante Pizzeria</span>
+          <span className="eyebrow hidden sm:block">Cucina Italiana · Bruchhausen-Vilsen</span>
         </div>
         <div className="flex items-end justify-between gap-8">
           <p className="max-w-[18rem] text-[0.8125rem] leading-relaxed text-ink-soft">
-            Sixteen courses, composed one ingredient at a time. Setting the table…
+            Frisch gekocht, herzlich serviert. Wir decken den Tisch…
           </p>
           <div className="flex flex-col items-end gap-3">
             <span className="display text-[clamp(4rem,11vw,10rem)] leading-none tabular-nums">

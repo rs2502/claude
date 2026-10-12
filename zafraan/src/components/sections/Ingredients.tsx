@@ -13,8 +13,8 @@ import { Glyph } from "@/components/ui/Glyph";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/useMedia";
 
-const centre = ingredients.find((i) => i.id === "turmeric")!;
-const ring = ingredients.filter((i) => i.id !== "turmeric");
+const centre = ingredients.find((i) => i.id === "peperoncino")!;
+const ring = ingredients.filter((i) => i.id !== "peperoncino");
 // Spokes from the centre + a loose ring, like a star chart.
 const edges: [string, string][] = [
   ...ring.map((i) => [centre.id, i.id] as [string, string]),
@@ -27,7 +27,7 @@ export function Ingredients() {
   const video = useRef<HTMLVideoElement>(null);
   const videoMobile = useRef<HTMLVideoElement>(null);
   const isMobile = useIsMobile();
-  const [active, setActive] = useState("saffron");
+  const [active, setActive] = useState("pomodoro");
   const current = byId[active];
 
   useMood(section, "ingredients");
@@ -60,12 +60,12 @@ export function Ingredients() {
 
         <div className="container-editorial grid-editorial relative z-10 h-full items-center gap-y-12 pt-[var(--header-h)] max-md:py-28">
           <div className="col-span-12 md:col-span-5 lg:col-span-4">
-            <Folio no="04" label="The pantry" className="mb-8" />
+            <Folio no="04" label="Die Zutaten" className="mb-8" />
             <SplitReveal as="h2" by="words" id="ingredients-title" className="display mb-8 text-[clamp(2.4rem,4.6vw,4.75rem)]" start="top 80%" end="top 20%" trigger="#ingredients">
-              Eight spices, sourced by name.
+              Gute Küche beginnt bei den Zutaten.
             </SplitReveal>
             <p className="mb-10 max-w-[30rem] text-[1rem] leading-[1.75] text-ink-soft">
-              Every jar in our pantry has an address. Hover a star to read where it grows and what it is asked to do.
+              Acht Zutaten, ohne die keine italienische Küche auskommt. Fahren Sie über einen Stern, um zu sehen, wo sie bei uns auf dem Teller landen.
             </p>
 
             <div data-ingredient-card className="relative min-h-[14rem] max-md:hidden">
@@ -81,15 +81,15 @@ export function Ingredients() {
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="eyebrow text-ink-mute">{current.hindi}</p>
+                      <p className="eyebrow text-ink-mute">{current.it}</p>
                       <h3 className="display mt-2 text-[2rem]">{current.name}</h3>
                     </div>
                     <Glyph kind={current.glyph} className="h-10 w-10 text-saffron" />
                   </div>
                   <p className="mt-5 text-[0.9375rem] leading-relaxed text-ink-soft">{current.note}</p>
                   <p className="mt-6 flex items-center gap-3 border-t border-line pt-4 text-[0.75rem] text-ink-mute">
-                    <span className="eyebrow text-[0.6rem]">Origin</span>
-                    {current.origin}
+                    <span className="eyebrow shrink-0 text-[0.6rem]">Steckt in</span>
+                    {current.usedIn}
                   </p>
                 </motion.article>
               </AnimatePresence>
@@ -134,7 +134,7 @@ export function Ingredients() {
                       onMouseEnter={() => setActive(ing.id)}
                       onFocus={() => setActive(ing.id)}
                       aria-pressed={active === ing.id}
-                      aria-label={`${ing.name}, from ${ing.origin}`}
+                      aria-label={`${ing.name}, steckt in ${ing.usedIn}`}
                       className="group flex flex-col items-center gap-3"
                       whileHover="hover"
                       whileFocus="hover"
@@ -159,14 +159,14 @@ export function Ingredients() {
           </div>
 
           {/* Phones: a swipeable shelf of cards instead of a chart. */}
-          <ul className="col-span-12 -mx-[var(--gutter)] flex snap-x snap-mandatory gap-4 overflow-x-auto px-[var(--gutter)] pb-4 md:hidden" aria-label="Spices">
+          <ul className="col-span-12 -mx-[var(--gutter)] flex snap-x snap-mandatory gap-4 overflow-x-auto px-[var(--gutter)] pb-4 md:hidden" aria-label="Zutaten">
             {ingredients.map((ing) => (
               <li key={ing.id} className="w-[78%] shrink-0 snap-center rounded-[3px] bg-canvas p-6 shadow-soft">
                 <Glyph kind={ing.glyph} className="h-9 w-9 text-saffron" />
-                <p className="eyebrow mt-5 text-ink-mute">{ing.hindi}</p>
+                <p className="eyebrow mt-5 text-ink-mute">{ing.it}</p>
                 <h3 className="display mt-1 text-[1.75rem]">{ing.name}</h3>
                 <p className="mt-3 text-[0.875rem] leading-relaxed text-ink-soft">{ing.note}</p>
-                <p className="mt-4 border-t border-line pt-3 text-[0.75rem] text-ink-mute">{ing.origin}</p>
+                <p className="mt-4 border-t border-line pt-3 text-[0.75rem] text-ink-mute">{ing.usedIn}</p>
               </li>
             ))}
           </ul>

@@ -86,13 +86,13 @@ export function Samosa() {
     <section ref={section} id="samosa" aria-labelledby="samosa-title" className="relative h-[420vh] max-md:h-[260vh] motion-reduce:h-auto">
       <div className="sticky top-0 h-svh overflow-hidden bg-paper motion-reduce:relative">
         <div className={cn(PLATE, "md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2")}>
-          <ScrubVideo ref={video} label="A samosa slowly separating into its layers: pastry, potato, peas and whole spices suspended in air." />
+          <ScrubVideo ref={video} label="Eine Pizza, die sich in ihre Zutaten zerlegt." />
         </div>
 
         <div className="container-editorial pointer-events-none relative z-10 pt-[calc(var(--header-h)+2.5rem)]">
-          <Folio no="03" label="Anatomy of a samosa" className="mb-6" />
+          <Folio no="03" label="Anatomie einer Pizza" className="mb-6" />
           <SplitReveal as="h2" by="words" id="samosa-title" className="display max-w-[11ch] text-[clamp(2.4rem,5vw,5rem)]" start="top 70%" end="top 10%" trigger="#samosa">
-            Forty grams, six decisions.
+            Eine Pizza, sechs Geheimnisse.
           </SplitReveal>
         </div>
 
@@ -155,7 +155,7 @@ export function Samosa() {
         </div>
 
         <div className="absolute bottom-8 right-[var(--gutter)] z-10 hidden items-baseline gap-3 md:flex motion-reduce:hidden" aria-hidden>
-          <span className="eyebrow text-ink-mute">Disassembly</span>
+          <span className="eyebrow text-ink-mute">Zerlegt</span>
           <span className="display text-[2.5rem] tabular-nums leading-none">
             <span ref={readout}>00</span>
             <span className="display-italic text-base">%</span>
