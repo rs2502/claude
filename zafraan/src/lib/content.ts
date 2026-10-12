@@ -30,6 +30,8 @@ export const media = {
   /** video-1: Pasta mit Parmesan (9:16) · video-2: Pasta-Sorten im Flug (16:9) */
   video: (n: 1 | 2) => `${BASE}/media/video-${n}.mp4`,
   image: (n: 1 | 2 | 3 | 4) => `${BASE}/media/image-${n}.jpeg`,
+  /** Standbild aus dem Film, erzeugt von `npm run encode:videos`. */
+  poster: (n: 1 | 2) => `${BASE}/media/video-${n}.jpg`,
 } as const;
 
 export const nav = [

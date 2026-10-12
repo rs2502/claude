@@ -8,7 +8,6 @@ import { Header } from "@/components/chrome/Header";
 import { Cursor } from "@/components/chrome/Cursor";
 import { Loader } from "@/components/chrome/Loader";
 import { PageCurtain } from "@/components/chrome/PageCurtain";
-import { AtmosphereLoader } from "@/components/three/AtmosphereLoader";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -86,7 +85,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Header />
           {children}
           <PageCurtain />
-          <AtmosphereLoader />
           <Cursor />
           <div aria-hidden className="paper-grain" />
         </SmoothScroll>

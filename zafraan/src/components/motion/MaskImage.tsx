@@ -50,7 +50,8 @@ export function MaskImage({
   useEffect(() => {
     if (!frame.current || !inner.current) return;
     const mm = gsap.matchMedia();
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
+    // Nur auf dem Desktop; auf dem Handy stehen Bilder einfach da.
+    mm.add("(prefers-reduced-motion: no-preference) and (hover: hover) and (min-width: 768px)", () => {
       gsap.fromTo(
         frame.current,
         { clipPath: CLIPS[from] },

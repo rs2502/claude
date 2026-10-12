@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { gsap, MQ } from "@/lib/gsap";
 import { media, sauces, type Sauce } from "@/lib/content";
-import { useMood } from "@/hooks/useMood";
 import Image from "next/image";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { TiltCard } from "@/components/ui/TiltCard";
@@ -58,11 +57,10 @@ export function Sauces() {
   const section = useRef<HTMLElement>(null);
   const photo = useRef<HTMLDivElement>(null);
 
-  useMood(section, "sauces");
 
   useEffect(() => {
     const mm = gsap.matchMedia();
-    mm.add(MQ.motion, () => {
+    mm.add(MQ.desktop + ", " + MQ.tablet, () => {
       gsap.fromTo(photo.current, { yPercent: -4, scale: 1.08 }, { yPercent: 4, scale: 1, ease: "none", scrollTrigger: { trigger: section.current, start: "top bottom", end: "bottom top", scrub: true } });
     });
     mm.add(MQ.desktop + ", " + MQ.tablet, () => {

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { media, menu, site } from "@/lib/content";
 import { MaskImage } from "@/components/motion/MaskImage";
-import { MoodZone } from "@/components/motion/MoodZone";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { Folio } from "@/components/ui/SectionHead";
 import { ButtonLink } from "@/components/ui/Button";
@@ -17,7 +16,6 @@ export default function MenuPage() {
   return (
     <>
       <main id="main" className="relative pt-[calc(var(--header-h)+6rem)]">
-        <MoodZone mood="story" />
         <header className="container-editorial grid-editorial gap-y-10 pb-16">
           <div className="col-span-12 lg:col-span-7">
             <Folio no="—" label="Cucina Italiana" className="mb-10" />

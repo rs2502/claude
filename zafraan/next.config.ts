@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     // Tree-shake the heavy barrels so only what we import ships.
-    optimizePackageImports: ["three", "@react-three/drei", "framer-motion", "gsap", "react-use"],
+    optimizePackageImports: ["framer-motion", "gsap", "react-use"],
   },
   ...(isExport
     ? {}

@@ -11,6 +11,8 @@ type Props = {
   hero?: boolean;
   /** Only for the hero: render src server-side so it downloads immediately. */
   src?: string;
+  /** Standbild, bis der Film läuft (und falls das Handy Autoplay blockiert). */
+  poster?: string;
 };
 
 /**
@@ -19,7 +21,7 @@ type Props = {
  * the paper colour, which keeps layout stable (no CLS — it always fills an
  * absolutely-sized parent).
  */
-export const ScrubVideo = forwardRef<HTMLVideoElement, Props>(function ScrubVideo({ className, label, hero, src }, ref) {
+export const ScrubVideo = forwardRef<HTMLVideoElement, Props>(function ScrubVideo({ className, label, hero, src, poster }, ref) {
   return (
     <video
       ref={ref}
@@ -30,6 +32,7 @@ export const ScrubVideo = forwardRef<HTMLVideoElement, Props>(function ScrubVide
       disablePictureInPicture
       disableRemotePlayback
       src={src}
+      poster={poster}
       preload={src ? "auto" : "none"}
       tabIndex={-1}
       aria-hidden={label ? undefined : true}

@@ -12,8 +12,6 @@
     "export": "STATIC_EXPORT=1 BASE_PATH=/reinart-projects/risto next build"
   },
   "dependencies": {
-    "@react-three/drei": "^10.7.9",
-    "@react-three/fiber": "^9.8.1",
     "clsx": "^2.1.1",
     "framer-motion": "^14.1.0",
     "gsap": "^3.15.0",
@@ -23,15 +21,13 @@
     "react-dom": "^19.3.0",
     "react-intersection-observer": "^11.0.1",
     "react-use": "^17.6.1",
-    "split-type": "^0.3.4",
-    "three": "^0.186.1"
+    "split-type": "^0.3.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@types/three": "^0.186.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3"
   }

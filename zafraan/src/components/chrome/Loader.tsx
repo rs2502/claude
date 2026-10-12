@@ -3,6 +3,7 @@
 import { animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { experience } from "@/lib/store";
+import { PLAYBACK_QUERY } from "@/hooks/useScrubVideo";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 const EASE_CURTAIN = [0.76, 0, 0.24, 1] as const;
@@ -70,7 +71,9 @@ export function Loader() {
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const started = performance.now();
-    const minDuration = reduce ? 300 : 2200;
+    // Phones never buffer a film before it plays, so they only wait for fonts.
+    const phone = window.matchMedia(PLAYBACK_QUERY).matches;
+    const minDuration = reduce ? 300 : phone ? 900 : 1800;
     let fonts = 0;
     let film = 0;
     let shown = 0;
@@ -88,21 +91,21 @@ export function Loader() {
     hero?.addEventListener("progress", readFilm);
     hero?.addEventListener("canplaythrough", giveUp);
     hero?.addEventListener("error", giveUp);
-    if (!hero) film = 1;
-    const ceiling = setTimeout(giveUp, 7000); // never hold a visitor hostage
+    if (!hero || phone) film = 1;
+    const ceiling = setTimeout(giveUp, 3500); // never hold a visitor hostage
 
     const loop = (now: number) => {
       readFilm();
       const time = Math.min(1, (now - started) / minDuration);
       const real = fonts * 0.2 + film * 0.8;
       const goal = Math.min(real, time) * 100;
-      shown += (goal - shown) * 0.08;
+      shown += (goal - shown) * 0.14;
       if (goal >= 100 && shown > 99.5) shown = 100;
       if (counter.current) counter.current.textContent = String(Math.floor(shown)).padStart(3, "0");
       if (bar.current) bar.current.style.transform = `scaleX(${shown / 100})`;
       if (shown === 100 && !finished) {
         finished = true;
-        exit(reduce);
+        exit(reduce || phone);
         return;
       }
       raf = requestAnimationFrame(loop);

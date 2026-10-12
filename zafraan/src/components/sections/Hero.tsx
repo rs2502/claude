@@ -5,7 +5,6 @@ import { gsap, MQ } from "@/lib/gsap";
 import { media } from "@/lib/content";
 import { pointer, useExperience } from "@/lib/store";
 import { useScrubVideo } from "@/hooks/useScrubVideo";
-import { useMood } from "@/hooks/useMood";
 import { ScrubVideo } from "@/components/motion/ScrubVideo";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { ButtonLink } from "@/components/ui/Button";
@@ -31,7 +30,6 @@ export function Hero() {
   const cue = useRef<HTMLSpanElement>(null);
   const loaded = useExperience((s) => s.loaded);
 
-  useMood(section, "hero");
   useScrubVideo({ video, trigger: section, src: media.video(1), eager: true, start: "top top", end: "bottom bottom", stillAt: 0.35 });
 
   // Entrance: the film settles from a slight over-scale as the loader opens.
@@ -43,12 +41,12 @@ export function Hero() {
 
   useEffect(() => {
     const mm = gsap.matchMedia();
-    mm.add({ desktop: MQ.desktop, tablet: MQ.tablet, mobile: MQ.mobile }, (ctx) => {
-      const { mobile } = ctx.conditions as { mobile: boolean };
-      const trigger = { trigger: section.current, start: "top top", end: "bottom bottom", scrub: mobile ? 0.4 : 1 };
+    // Nur auf dem Desktop: Auf dem Handy ist der Einstieg ein ruhiger Bildschirm.
+    mm.add(MQ.desktop + ", " + MQ.tablet, () => {
+      const trigger = { trigger: section.current, start: "top top", end: "bottom bottom", scrub: 1 };
 
       // The thali expands: the film grows toward the viewer…
-      gsap.to(depthLayer.current, { scale: mobile ? 1.08 : 1.18, ease: "none", scrollTrigger: trigger });
+      gsap.to(depthLayer.current, { scale: 1.18, ease: "none", scrollTrigger: trigger });
       // …while the type travels at a third of the speed and dissolves.
       gsap.to(type.current, { yPercent: -18, ease: "none", scrollTrigger: trigger });
       gsap.to(type.current, {
@@ -68,7 +66,6 @@ export function Hero() {
           .to(el, { autoAlpha: 0, duration: 0.1 }, 0.9);
       });
 
-      if (mobile) return;
       // Pointer depth: film leans with the hand, type leans against it.
       const mx = gsap.quickTo(mediaLayer.current, "x", { duration: 1.4, ease: "power3.out" });
       const my = gsap.quickTo(mediaLayer.current, "y", { duration: 1.4, ease: "power3.out" });
@@ -87,11 +84,11 @@ export function Hero() {
   }, []);
 
   return (
-    <section ref={section} id="top" aria-labelledby="hero-title" className="relative h-[320vh] max-md:h-[220vh] motion-reduce:h-svh">
+    <section ref={section} id="top" aria-labelledby="hero-title" className="relative h-[320vh] max-md:h-svh motion-reduce:h-svh">
       <div className="sticky top-0 h-svh overflow-hidden bg-paper">
         <div ref={depthLayer} data-hero-plate className={cn(PLATE, "will-change-transform max-md:bottom-auto max-md:h-[50svh] md:right-[7vw] md:top-1/2 md:-translate-y-1/2")}>
           <div ref={mediaLayer} className="absolute -inset-6 will-change-transform">
-            <ScrubVideo ref={video} hero src={media.video(1)} label="Ein Teller Pasta, auf den frisch gehobelter Parmesan rieselt; Dampf steigt auf." />
+            <ScrubVideo ref={video} hero src={media.video(1)} poster={media.poster(1)} label="Ein Teller Pasta, auf den frisch gehobelter Parmesan rieselt; Dampf steigt auf." />
           </div>
         </div>
         {/* A single, functional veil — only where type needs to sit. */}

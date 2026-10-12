@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap, MQ } from "@/lib/gsap";
 import { craftSteps, media } from "@/lib/content";
-import { useMood } from "@/hooks/useMood";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { MaskImage } from "@/components/motion/MaskImage";
 import { Folio } from "@/components/ui/SectionHead";
@@ -21,7 +20,6 @@ export function Craft() {
   const fillV = useRef<HTMLSpanElement>(null);
   const counter = useRef<HTMLSpanElement>(null);
 
-  useMood(section, "craft");
 
   useEffect(() => {
     const mm = gsap.matchMedia();

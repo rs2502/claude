@@ -3,18 +3,15 @@
 import { useSyncExternalStore } from "react";
 
 /**
- * A tiny external store for cross-cutting experience state (loader, scene
- * mood, transitions). Avoids a context re-render cascade on every update.
+ * A tiny external store for cross-cutting experience state (loader,
+ * page transitions). Avoids a context re-render cascade on every update.
  */
-export type Mood = "hero" | "story" | "pasta" | "ingredients" | "craft" | "sauces" | "dining" | "reserve";
-
 type State = {
   loaded: boolean;
-  mood: Mood;
   transitioning: boolean;
 };
 
-let state: State = { loaded: false, mood: "hero", transitioning: false };
+let state: State = { loaded: false, transitioning: false };
 const listeners = new Set<() => void>();
 
 export const experience = {
@@ -35,12 +32,12 @@ export function useExperience<T>(select: (s: State) => T): T {
   return useSyncExternalStore(
     experience.subscribe,
     () => select(state),
-    () => select({ loaded: false, mood: "hero", transitioning: false }),
+    () => select({ loaded: false, transitioning: false }),
   );
 }
 
 /** Pointer, normalised to -1..1, read inside rAF loops (never triggers React). */
-export const pointer = { x: 0, y: 0, sx: 0, sy: 0 };
+export const pointer = { x: 0, y: 0 };
 if (typeof window !== "undefined") {
   window.addEventListener(
     "pointermove",

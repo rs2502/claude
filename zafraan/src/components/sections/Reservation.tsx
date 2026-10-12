@@ -1,5 +1,4 @@
 import { site } from "@/lib/content";
-import { MoodZone } from "@/components/motion/MoodZone";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { Folio } from "@/components/ui/SectionHead";
 import { ButtonLink } from "@/components/ui/Button";
@@ -7,7 +6,6 @@ import { ButtonLink } from "@/components/ui/Button";
 export function Reservation() {
   return (
     <section id="reserve" tabIndex={-1} aria-labelledby="reserve-title" className="relative py-[clamp(9rem,26vh,18rem)]">
-      <MoodZone mood="reserve" />
       <div className="container-editorial grid-editorial gap-y-20">
         <div className="col-span-12 lg:col-span-6">
           <Folio no="08" label="Reservierung" className="mb-10" />

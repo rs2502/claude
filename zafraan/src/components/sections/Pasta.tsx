@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import { gsap, MQ } from "@/lib/gsap";
 import { media, pastaShapes } from "@/lib/content";
 import { useScrubVideo } from "@/hooks/useScrubVideo";
-import { useMood } from "@/hooks/useMood";
 import { ScrubVideo } from "@/components/motion/ScrubVideo";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { Folio } from "@/components/ui/SectionHead";
@@ -19,7 +18,8 @@ export function Pasta() {
   const video = useRef<HTMLVideoElement>(null);
   const fill = useRef<HTMLSpanElement>(null);
 
-  useMood(section, "pasta");
+  const timeline = useRef<gsap.core.Timeline | null>(null);
+
   useScrubVideo({
     video,
     trigger: section,
@@ -27,19 +27,19 @@ export function Pasta() {
     start: "top top",
     end: "bottom bottom",
     stillAt: 0.45,
+    // Desktop: Scrollposition · Handy: Abspielposition des Films.
     onProgress: (p) => {
       if (fill.current) fill.current.style.transform = `scaleX(${p})`;
+      if (timeline.current) gsap.to(timeline.current, { progress: p, duration: 0.3, ease: "power2.out", overwrite: true });
     },
   });
 
+  // Namen und Gerichte erscheinen genau dann, wenn die Nudel im Film zu sehen ist.
   useEffect(() => {
     const mm = gsap.matchMedia();
     mm.add(MQ.motion, () => {
-      const tl = gsap.timeline({
-        defaults: { ease: "none" },
-        scrollTrigger: { trigger: section.current, start: "top top", end: "bottom bottom", scrub: 0.6 },
-      });
-      tl.set({}, {}, 1); // Zeitleiste = gesamte Scrollstrecke
+      const tl = gsap.timeline({ paused: true, defaults: { ease: "none" } });
+      tl.set({}, {}, 1); // Zeitleiste = gesamter Film
       pastaShapes.forEach((s) => {
         const [a, b] = s.window;
         const el = section.current!.querySelector(`[data-shape="${s.id}"]`);
@@ -51,13 +51,17 @@ export function Pasta() {
           .to(el, { autoAlpha: 0, y: -10, duration: 0.04 }, b)
           .fromTo(tick, { color: "#8f847d" }, { color: "#2b2320", duration: 0.02 }, a);
       });
+      timeline.current = tl;
+      return () => {
+        timeline.current = null;
+      };
     });
     return () => mm.revert();
   }, []);
 
   return (
-    <section ref={section} id="pasta" aria-labelledby="pasta-title" className="relative h-[420vh] max-md:h-[300vh] motion-reduce:h-auto">
-      <div className="sticky top-0 flex h-svh flex-col justify-center overflow-hidden motion-reduce:relative motion-reduce:py-24">
+    <section ref={section} id="pasta" aria-labelledby="pasta-title" className="relative h-[420vh] max-md:h-auto motion-reduce:h-auto">
+      <div className="sticky top-0 flex h-svh flex-col justify-center overflow-hidden max-md:relative max-md:h-auto max-md:py-24 motion-reduce:relative motion-reduce:py-24">
         <div className="container-editorial relative">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-6">
             <div>
@@ -67,28 +71,28 @@ export function Pasta() {
               </SplitReveal>
             </div>
             <p className="max-w-[22rem] text-[0.9375rem] leading-relaxed text-ink-soft">
-              Von Spaghetti bis Tortellini — scrollen Sie langsam und sehen Sie, welche Nudel in welchem Gericht steckt.
+              Von Spaghetti bis Tortellini — sehen Sie, welche Nudel in welchem Gericht steckt.
             </p>
           </div>
 
           {/* Die Bildtafel im Querformat */}
           {/* Immer exakt 16:9 wie der Film — auf breiten Bildschirmen wird die Tafel schmaler statt beschnitten. */}
           <div className="relative mx-auto aspect-video w-[min(100%,calc(60svh*16/9))] overflow-hidden rounded-[3px] bg-ink shadow-lift">
-            <ScrubVideo ref={video} label="Spaghetti, Penne und Tortellini schweben nacheinander durch das Bild." />
+            <ScrubVideo ref={video} poster={media.poster(2)} label="Spaghetti, Penne und Tortellini schweben nacheinander durch das Bild." />
 
             {/* Der Name der Nudel, unten links auf dem Film */}
             <div className="pointer-events-none absolute inset-x-0 bottom-0 p-[clamp(1rem,3vw,2.5rem)] motion-reduce:hidden" aria-hidden>
               {pastaShapes.map((s) => (
                 <div key={s.id} data-shape={s.id} className="invisible absolute bottom-[clamp(1rem,3vw,2.5rem)] left-[clamp(1rem,3vw,2.5rem)] right-[clamp(1rem,3vw,2.5rem)] text-canvas">
-                  <p className="eyebrow mb-2 text-canvas/60">{s.it}</p>
-                  <p className="display overflow-clip pb-[0.06em] text-[clamp(2.4rem,6vw,6rem)] leading-none">
+                  <p className="eyebrow mb-2 text-canvas/60 max-md:hidden">{s.it}</p>
+                  <p className="display overflow-clip pb-[0.06em] text-[clamp(1.6rem,6vw,6rem)] leading-none">
                     {s.name.split("").map((ch, i) => (
                       <span key={i} data-letter className="inline-block">
                         {ch}
                       </span>
                     ))}
                   </p>
-                  <p data-dishes className="mt-3 max-w-[40rem] text-[clamp(0.8rem,1.1vw,0.95rem)] text-canvas/80">
+                  <p data-dishes className="mt-1.5 max-w-[40rem] text-[clamp(0.7rem,1.1vw,0.95rem)] text-canvas/80 md:mt-3">
                     {s.dishes}
                   </p>
                 </div>

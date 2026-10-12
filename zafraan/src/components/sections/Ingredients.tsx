@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { gsap, MQ } from "@/lib/gsap";
 import { ingredients } from "@/lib/content";
-import { useMood } from "@/hooks/useMood";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { Folio } from "@/components/ui/SectionHead";
 import { Glyph } from "@/components/ui/Glyph";
@@ -24,7 +23,6 @@ export function Ingredients() {
   const [active, setActive] = useState("pomodoro");
   const current = byId[active];
 
-  useMood(section, "ingredients");
 
   useEffect(() => {
     const mm = gsap.matchMedia();

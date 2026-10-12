@@ -4,6 +4,7 @@ import SplitType from "split-type";
 import { createElement, useEffect, useRef, type ElementType, type ReactNode } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
+import { PLAYBACK_QUERY } from "@/hooks/useScrubVideo";
 
 type Props = {
   as?: ElementType;
@@ -47,6 +48,8 @@ export function SplitReveal({
     const el = ref.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Handys: Text steht sofort da (nur die Überschrift oben blendet ein).
+    if (!play && window.matchMedia(PLAYBACK_QUERY).matches) return;
     if (play === false) {
       gsap.set(el, { autoAlpha: 0 });
       return;

@@ -1,6 +1,5 @@
 import { media } from "@/lib/content";
 import { MaskImage } from "@/components/motion/MaskImage";
-import { MoodZone } from "@/components/motion/MoodZone";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { Folio } from "@/components/ui/SectionHead";
 
@@ -8,7 +7,6 @@ import { Folio } from "@/components/ui/SectionHead";
 export function Story() {
   return (
     <section id="story" tabIndex={-1} aria-labelledby="story-title" className="relative py-[clamp(7rem,18vh,14rem)]">
-      <MoodZone mood="story" />
       <div className="container-editorial grid-editorial gap-y-16">
         <div className="relative col-span-12 md:col-span-6 lg:col-span-5">
           <MaskImage

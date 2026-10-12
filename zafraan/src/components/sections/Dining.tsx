@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { gsap, MQ } from "@/lib/gsap";
 import { media, site } from "@/lib/content";
-import { useMood } from "@/hooks/useMood";
 import Image from "next/image";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { MaskImage } from "@/components/motion/MaskImage";
@@ -29,11 +28,10 @@ export function Dining() {
   const stage = useRef<HTMLDivElement>(null);
   const filmLayer = useRef<HTMLDivElement>(null);
 
-  useMood(section, "dining");
 
   useEffect(() => {
     const mm = gsap.matchMedia();
-    mm.add(MQ.motion, () => {
+    mm.add(MQ.desktop + ", " + MQ.tablet, () => {
       // Background parallax: the room drifts slower than the page and settles in scale.
       gsap.fromTo(
         filmLayer.current,
