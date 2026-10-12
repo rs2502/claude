@@ -1,0 +1,24 @@
+{
+  "category": "kinetic-type",
+  "duration_s": 15,
+  "fps": 30,
+  "canvas": { "w": 1920, "h": 1080, "aspect": "16:9" },
+  "style": "Swiss-editorial showreel. Hard graphic colour fields, heavy grotesk type, mono HUD, film grain. Every scene demonstrates one craft principle and hands off to the next with a different transition (bar-expand, iris, square wipe, hard cut + glitch, whip spin).",
+  "palette": ["#0C0C10", "#F1ECE2", "#FF4A1C", "#2B3BFF", "#D7FF3A"],
+  "font": "Archivo Black + League Gothic + JetBrains Mono",
+  "beats": [0.55, 1.35, 2.3, 2.7, 3.25, 3.8, 4.35, 5.1, 7.6, 9.15, 10.0, 12.4, 13.25],
+  "export": "mp4",
+  "asset_needs": [],
+  "block": "grain-overlay",
+  "customize": { "opacity": 0.09 },
+  "content": {
+    "scenes": [
+      { "id": "s1", "start": 0.0, "end": 2.3, "text": "MOTION", "emphasis_words": ["MOTION"], "emotion": "hook", "motion": "dot drop with squash/stretch, line sweep, masked letter rise, bar expands into colour field", "beats": [0.55, 1.35] },
+      { "id": "s2", "start": 2.3, "end": 5.1, "text": "MOTION IS TIMING / WEIGHT / TENSION / FEELING", "emphasis_words": ["TIMING", "WEIGHT", "TENSION", "FEELING"], "emotion": "build", "motion": "slot word swap, each word with its own ease; live ease-curve graph draws the ease in use; rider dot becomes iris", "beats": [2.7, 3.25, 3.8, 4.35] },
+      { "id": "s3", "start": 5.1, "end": 7.6, "text": "RHYTHM", "emphasis_words": ["RHYTHM"], "emotion": "build", "motion": "16x9 shape grid, centre-out stagger, circle-to-diamond morph, wave, implode, square wipe", "beats": [5.1, 6.1] },
+      { "id": "s4", "start": 7.6, "end": 10.0, "text": "450 FRAMES. NONE WASTED.", "emphasis_words": ["450", "NONE WASTED."], "emotion": "punch", "motion": "count-up, 30-tick film strip fill, slam + shake, RGB glitch into hard cut", "beats": [7.7, 9.15, 9.8] },
+      { "id": "s5", "start": 10.0, "end": 12.4, "text": "THE 12 PRINCIPLES", "emphasis_words": ["APPEAL"], "emotion": "build", "motion": "3D drum ticks through the 12 principles of animation, parallax side drums, whip spin with blur", "beats": [10.2, 11.7, 12.4] },
+      { "id": "s6", "start": 12.4, "end": 15.0, "text": "CLAUDE.", "emphasis_words": ["CLAUDE"], "emotion": "resolve", "motion": "masked wordmark rise, the dot from scene 1 returns as the full stop with a bounce, shockwave, hold", "beats": [13.25] }
+    ]
+  }
+}

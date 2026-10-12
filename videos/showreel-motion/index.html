@@ -1,0 +1,1206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      :root {
+        --ink: #0c0c10;
+        --paper: #f1ece2;
+        --verm: #f03c12;
+        --cobalt: #2b3bff;
+        --lime: #d7ff3a;
+        --display: "Archivo Black", sans-serif;
+        --tall: "League Gothic", sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--ink);
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--ink);
+        font-family: var(--display);
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      .abs {
+        position: absolute;
+      }
+      .mono {
+        font-family: var(--mono);
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .mask {
+        display: block;
+        overflow: hidden;
+      }
+      .ch {
+        display: inline-block;
+      }
+      .hair-grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(to right, rgba(241, 236, 226, 0.06) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(241, 236, 226, 0.06) 1px, transparent 1px);
+        background-size: 120px 120px;
+      }
+      .vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.45) 100%);
+        pointer-events: none;
+      }
+
+      /* ---------- S1 PHYSICS ---------- */
+      #s1 {
+        background: var(--ink);
+      }
+      #s1-ghost {
+        right: -60px;
+        bottom: -140px;
+        font-family: var(--tall);
+        font-size: 760px;
+        line-height: 1;
+        color: transparent;
+        -webkit-text-stroke: 2px rgba(241, 236, 226, 0.08);
+      }
+      #s1-word {
+        left: 0;
+        right: 0;
+        bottom: 556px;
+        display: flex;
+        justify-content: center;
+      }
+      #s1-word .mask {
+        font-size: 300px;
+        line-height: 0.86;
+        color: var(--paper);
+        letter-spacing: -0.02em;
+        padding-top: 20px;
+      }
+      #s1-line {
+        left: 0;
+        top: 536px;
+        width: 1920px;
+        height: 8px;
+        background: var(--verm);
+        transform-origin: 50% 50%;
+      }
+      #s1-dot {
+        left: 915px;
+        top: 446px;
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: var(--verm);
+        transform-origin: 50% 100%;
+      }
+      #s1-shadow {
+        left: 900px;
+        top: 532px;
+        width: 120px;
+        height: 16px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.6);
+        filter: blur(6px);
+      }
+      #s1-cap {
+        left: 140px;
+        top: 620px;
+        font-size: 22px;
+        color: rgba(241, 236, 226, 0.6);
+      }
+      #s1-cap2 {
+        right: 140px;
+        top: 620px;
+        font-size: 22px;
+        color: rgba(241, 236, 226, 0.6);
+      }
+
+      /* ---------- S2 EASING ---------- */
+      #s2 {
+        background: var(--verm);
+      }
+      #s2-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding: 120px 140px;
+        gap: 10px;
+      }
+      #s2-l1 {
+        font-size: 150px;
+        line-height: 1;
+        color: var(--ink);
+        perspective: 900px;
+      }
+      #s2-slot {
+        position: relative;
+        width: 1260px;
+        height: 250px;
+        overflow: hidden;
+        font-size: 228px;
+        line-height: 250px;
+        color: var(--paper);
+      }
+      .s2-w {
+        position: absolute;
+        left: 0;
+        top: 0;
+        white-space: nowrap;
+        display: block;
+        transform-origin: 0% 50%;
+      }
+      #s2-graph {
+        right: 140px;
+        bottom: 150px;
+        width: 340px;
+        height: 340px;
+      }
+      #s2-graph svg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        overflow: visible;
+      }
+      .s2-axis {
+        position: absolute;
+        background: var(--ink);
+      }
+      #s2-ax-x {
+        left: 20px;
+        bottom: 20px;
+        width: 300px;
+        height: 3px;
+        transform-origin: 0 50%;
+      }
+      #s2-ax-y {
+        left: 20px;
+        bottom: 20px;
+        width: 3px;
+        height: 300px;
+        transform-origin: 50% 100%;
+      }
+      #s2-rider-x {
+        left: 20px;
+        bottom: 20px;
+        width: 0;
+        height: 0;
+      }
+      #s2-rider-y {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 0;
+        height: 0;
+      }
+      #s2-rider {
+        position: absolute;
+        left: -14px;
+        top: -14px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--paper);
+        box-shadow: 0 0 0 5px var(--ink);
+      }
+      #s2-iris {
+        position: absolute;
+        left: -40px;
+        top: -40px;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--paper);
+      }
+      #s2-elabel {
+        right: 140px;
+        bottom: 96px;
+        width: 340px;
+        height: 34px;
+        font-size: 24px;
+        color: var(--ink);
+      }
+      .s2-el {
+        position: absolute;
+        left: 20px;
+        top: 0;
+        white-space: nowrap;
+      }
+      #s2-tag {
+        right: 140px;
+        top: 150px;
+        font-size: 22px;
+        color: var(--ink);
+        text-align: right;
+      }
+
+      /* ---------- S3 RHYTHM ---------- */
+      #s3 {
+        background: var(--paper);
+      }
+      #s3-grid {
+        position: absolute;
+        inset: 0;
+      }
+      .cell {
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .shp {
+        display: block;
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+      }
+      #s3-word {
+        left: 0;
+        right: 0;
+        top: 390px;
+        height: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 250px;
+        line-height: 1;
+        color: var(--ink);
+      }
+      #s3-band {
+        left: 0;
+        top: 400px;
+        width: 1920px;
+        height: 280px;
+        background: var(--paper);
+        transform-origin: 0% 50%;
+      }
+      .s3-rule {
+        left: 0;
+        width: 1920px;
+        height: 6px;
+        background: var(--ink);
+      }
+      #s3-rule-a {
+        top: 400px;
+        transform-origin: 0% 50%;
+      }
+      #s3-rule-b {
+        top: 674px;
+        transform-origin: 100% 50%;
+      }
+      #s3-wipe {
+        left: 810px;
+        top: 390px;
+        width: 300px;
+        height: 300px;
+        background: var(--ink);
+      }
+
+      /* ---------- S4 TIMING ---------- */
+      #s4 {
+        background: var(--ink);
+      }
+      #s4-num-wrap {
+        left: 120px;
+        top: 90px;
+        width: 900px;
+        height: 700px;
+      }
+      .s4-num {
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-family: var(--tall);
+        font-size: 700px;
+        line-height: 0.92;
+        color: var(--paper);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      #s4-num-g {
+        color: #30ff70;
+        mix-blend-mode: screen;
+        opacity: 0;
+      }
+      #s4-num-r {
+        color: #ff3030;
+        mix-blend-mode: screen;
+        opacity: 0;
+      }
+      #s4-num-b {
+        color: #3050ff;
+        mix-blend-mode: screen;
+        opacity: 0;
+      }
+      #s4-right {
+        left: 1000px;
+        top: 200px;
+        width: 800px;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+      #s4-frames {
+        font-size: 150px;
+        line-height: 0.9;
+        color: var(--verm);
+      }
+      #s4-spec {
+        font-size: 30px;
+        color: rgba(241, 236, 226, 0.75);
+        white-space: nowrap;
+      }
+      #s4-none {
+        font-size: 96px;
+        line-height: 1;
+        color: var(--paper);
+        white-space: nowrap;
+        transform-origin: 0% 50%;
+        margin-top: 30px;
+      }
+      #s4-strip {
+        left: 140px;
+        right: 140px;
+        bottom: 120px;
+        height: 70px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .tick {
+        display: block;
+        width: 34px;
+        height: 70px;
+        background: rgba(241, 236, 226, 0.14);
+        transform-origin: 50% 100%;
+      }
+      .tick-fill {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: var(--verm);
+        transform-origin: 50% 100%;
+      }
+      #s4-strip-l {
+        left: 140px;
+        bottom: 210px;
+        font-size: 20px;
+        color: rgba(241, 236, 226, 0.55);
+      }
+
+      /* ---------- S5 PRINCIPLES ---------- */
+      #s5 {
+        background: var(--cobalt);
+      }
+      #s5-stage {
+        position: absolute;
+        inset: 0;
+        perspective: 1400px;
+      }
+      .drum-wrap {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 480px;
+        height: 120px;
+        display: flex;
+        justify-content: center;
+        perspective: 1400px;
+      }
+      .drum {
+        position: relative;
+        width: 1500px;
+        height: 120px;
+        transform-style: preserve-3d;
+      }
+      .face {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1500px;
+        height: 120px;
+        line-height: 120px;
+        text-align: center;
+        font-size: 104px;
+        color: var(--paper);
+        white-space: nowrap;
+        backface-visibility: hidden;
+      }
+      #s5-side-l {
+        left: -520px;
+        right: auto;
+        width: 1500px;
+        top: 160px;
+      }
+      #s5-side-r {
+        left: auto;
+        right: -520px;
+        width: 1500px;
+        top: 800px;
+      }
+      #s5-side-l .face,
+      #s5-side-r .face {
+        color: transparent;
+        -webkit-text-stroke: 2px rgba(241, 236, 226, 0.35);
+      }
+      .brk {
+        width: 46px;
+        height: 46px;
+        border-color: var(--lime);
+        border-style: solid;
+      }
+      #s5-sel {
+        left: 160px;
+        top: 440px;
+        width: 1600px;
+        height: 200px;
+      }
+      #brk-tl {
+        left: 0;
+        top: 0;
+        border-width: 6px 0 0 6px;
+      }
+      #brk-tr {
+        right: 0;
+        top: 0;
+        border-width: 6px 6px 0 0;
+      }
+      #brk-bl {
+        left: 0;
+        bottom: 0;
+        border-width: 0 0 6px 6px;
+      }
+      #brk-br {
+        right: 0;
+        bottom: 0;
+        border-width: 0 6px 6px 0;
+      }
+      #s5-title {
+        left: 140px;
+        top: 150px;
+        font-size: 24px;
+        color: var(--paper);
+      }
+      #s5-count {
+        right: 140px;
+        bottom: 120px;
+        height: 120px;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-start;
+        font-family: var(--tall);
+        font-size: 120px;
+        line-height: 120px;
+        color: var(--paper);
+      }
+      #s5-count-strip {
+        display: block;
+      }
+      #s5-count-strip span {
+        display: block;
+        height: 120px;
+      }
+      #s5-count-of {
+        display: block;
+        color: rgba(241, 236, 226, 0.72);
+        padding-left: 14px;
+      }
+
+      /* ---------- S6 RESOLVE ---------- */
+      #s6 {
+        background: var(--ink);
+      }
+      #s6-lock {
+        left: 0;
+        right: 0;
+        top: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      #s6-row {
+        display: flex;
+        align-items: flex-end;
+      }
+      #s6-word {
+        display: flex;
+      }
+      #s6-word .mask {
+        font-size: 270px;
+        line-height: 0.9;
+        color: var(--paper);
+        letter-spacing: -0.02em;
+        padding-top: 24px;
+      }
+      #s6-dot-slot {
+        position: relative;
+        width: 92px;
+        height: 72px;
+        margin-left: 14px;
+        margin-bottom: 18px;
+      }
+      #s6-dot {
+        position: absolute;
+        left: 4px;
+        top: 0;
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: var(--verm);
+        transform-origin: 50% 100%;
+      }
+      #s6-ring {
+        position: absolute;
+        left: -6px;
+        top: -10px;
+        width: 92px;
+        height: 92px;
+        border-radius: 50%;
+        border: 4px solid var(--verm);
+      }
+      #s6-rule {
+        display: block;
+        width: 1200px;
+        height: 3px;
+        margin-top: 34px;
+        background: rgba(241, 236, 226, 0.4);
+        transform-origin: 0 50%;
+      }
+      #s6-sub {
+        display: flex;
+        justify-content: space-between;
+        width: 1200px;
+        margin-top: 26px;
+        font-size: 26px;
+        color: rgba(241, 236, 226, 0.8);
+      }
+      #s6-sub .ch {
+        white-space: pre;
+      }
+
+      /* ---------- HUD ---------- */
+      #hud {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        color: var(--paper);
+        z-index: 50;
+      }
+      .hud-t {
+        position: absolute;
+        font-size: 20px;
+        white-space: nowrap;
+      }
+      #hud-tl {
+        left: 60px;
+        top: 50px;
+      }
+      #hud-tr {
+        right: 60px;
+        top: 50px;
+        font-variant-numeric: tabular-nums;
+      }
+      #hud-bl {
+        left: 60px;
+        bottom: 50px;
+        height: 24px;
+        width: 420px;
+      }
+      .hud-lab {
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+      #hud-br {
+        right: 60px;
+        bottom: 50px;
+      }
+      #hud-bar {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 1920px;
+        height: 6px;
+        background: currentColor;
+        transform-origin: 0 50%;
+      }
+      #hud-rec {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: currentColor;
+        margin-right: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="15"
+      data-fps="30"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- ============ S1 PHYSICS ============ -->
+      <div id="s1" class="clip scene" data-start="0" data-duration="2.3" data-track-index="1">
+        <div class="hair-grid"></div>
+        <div id="s1-ghost" class="abs" data-layout-ignore>01</div>
+        <div id="s1-word" class="abs" data-split="MOTION"></div>
+        <div id="s1-shadow" class="abs"></div>
+        <div id="s1-dot" class="abs"></div>
+        <div id="s1-line" class="abs"></div>
+        <div id="s1-cap" class="abs mono">squash / stretch</div>
+        <div id="s1-cap2" class="abs mono">gravity 9.81 m/s²</div>
+        <div class="vignette"></div>
+      </div>
+
+      <!-- ============ S2 EASING ============ -->
+      <div id="s2" class="clip scene" data-start="2.3" data-duration="2.8" data-track-index="2">
+        <div id="s2-content">
+          <div id="s2-l1" data-split="MOTION IS"></div>
+          <div id="s2-slot" data-layout-allow-overlap>
+            <span data-layout-allow-overlap class="s2-w" id="w1">TIMING</span>
+            <span data-layout-allow-overlap class="s2-w" id="w2">WEIGHT</span>
+            <span data-layout-allow-overlap class="s2-w" id="w3">TENSION</span>
+            <span data-layout-allow-overlap class="s2-w" id="w4" data-split="FEELING"></span>
+          </div>
+        </div>
+        <div id="s2-tag" class="abs mono">02 — easing is emotion</div>
+        <div id="s2-graph" class="abs">
+          <div id="s2-ax-x" class="s2-axis"></div>
+          <div id="s2-ax-y" class="s2-axis"></div>
+          <svg id="s2-svg" width="340" height="340" viewBox="0 0 340 340"></svg>
+          <div id="s2-rider-x" class="abs">
+            <div id="s2-rider-y">
+              <div id="s2-iris"></div>
+              <div id="s2-rider"></div>
+            </div>
+          </div>
+        </div>
+        <div id="s2-elabel" class="abs mono" data-layout-allow-overlap>
+          <span data-layout-allow-overlap class="s2-el" id="el1">ease: power4.out</span>
+          <span data-layout-allow-overlap class="s2-el" id="el2">ease: bounce.out</span>
+          <span data-layout-allow-overlap class="s2-el" id="el3">ease: elastic.out</span>
+          <span data-layout-allow-overlap class="s2-el" id="el4">ease: expo.inOut</span>
+        </div>
+      </div>
+
+      <!-- ============ S3 RHYTHM ============ -->
+      <div id="s3" class="clip scene" data-start="5.1" data-duration="2.5" data-track-index="3">
+        <div id="s3-grid"></div>
+        <div id="s3-band" class="abs"></div>
+        <div id="s3-rule-a" class="abs s3-rule"></div>
+        <div id="s3-rule-b" class="abs s3-rule"></div>
+        <div id="s3-word" class="abs" data-split="RHYTHM" data-layout-allow-occlusion></div>
+        <div id="s3-wipe" class="abs"></div>
+      </div>
+
+      <!-- ============ S4 TIMING ============ -->
+      <div id="s4" class="clip scene" data-start="7.6" data-duration="2.4" data-track-index="4">
+        <div class="hair-grid"></div>
+        <div id="s4-num-wrap" class="abs" data-layout-allow-overlap>
+          <div class="s4-num" id="s4-num-r" data-layout-allow-overlap>450</div>
+          <div class="s4-num" id="s4-num-b" data-layout-allow-overlap>450</div>
+          <div class="s4-num" id="s4-num-g" data-layout-allow-overlap>450</div>
+          <div class="s4-num" id="s4-num">000</div>
+        </div>
+        <div id="s4-right" class="abs">
+          <div class="mask"><div id="s4-frames">FRAMES</div></div>
+          <div id="s4-spec" class="mono" data-split="15 sec × 30 fps"></div>
+          <div id="s4-none">NONE WASTED.</div>
+        </div>
+        <div id="s4-strip-l" class="abs mono">1 second / 30 frames</div>
+        <div id="s4-strip" class="abs"></div>
+        <div class="vignette"></div>
+      </div>
+
+      <!-- ============ S5 PRINCIPLES ============ -->
+      <div id="s5" class="clip scene" data-start="10" data-duration="2.4" data-track-index="5">
+        <div id="s5-stage">
+          <div class="drum-wrap" id="s5-side-l" data-layout-ignore><div class="drum" id="drum-l"></div></div>
+          <div class="drum-wrap" id="s5-side-r" data-layout-ignore><div class="drum" id="drum-r"></div></div>
+          <div class="drum-wrap" id="s5-main" data-layout-allow-overlap><div class="drum" id="drum-m"></div></div>
+        </div>
+        <div id="s5-sel" class="abs">
+          <div id="brk-tl" class="abs brk"></div>
+          <div id="brk-tr" class="abs brk"></div>
+          <div id="brk-bl" class="abs brk"></div>
+          <div id="brk-br" class="abs brk"></div>
+        </div>
+        <div id="s5-title" class="abs mono">05 — the 12 principles of animation · thomas &amp; johnston</div>
+        <div id="s5-count" class="abs">
+          <span id="s5-count-strip"></span><span id="s5-count-of">/12</span>
+        </div>
+      </div>
+
+      <!-- ============ S6 RESOLVE ============ -->
+      <div id="s6" class="clip scene" data-start="12.4" data-duration="2.6" data-track-index="6">
+        <div class="hair-grid"></div>
+        <div id="s6-lock" class="abs">
+          <div id="s6-row">
+            <div id="s6-word" data-split="CLAUDE"></div>
+            <div id="s6-dot-slot">
+              <div id="s6-ring"></div>
+              <div id="s6-dot"></div>
+            </div>
+          </div>
+          <div id="s6-rule"></div>
+          <div id="s6-sub" class="mono">
+            <span id="s6-sub-a" data-split="motion design"></span>
+            <span id="s6-sub-b" data-split="written in code"></span>
+            <span id="s6-sub-c" data-split="frame by frame"></span>
+          </div>
+        </div>
+        <div class="vignette"></div>
+      </div>
+
+      <!-- ============ HUD (full duration) ============ -->
+      <div id="hud" class="clip" data-start="0" data-duration="15" data-track-index="7">
+        <div id="hud-tl" class="hud-t mono"><span id="hud-rec"></span>claude · showreel ’26</div>
+        <div id="hud-tr" class="hud-t mono">tc 00:00:00:00</div>
+        <div id="hud-bl" class="hud-t mono" data-layout-allow-overlap>
+          <span data-layout-allow-overlap class="hud-lab" id="lab1">01 — physics</span>
+          <span data-layout-allow-overlap class="hud-lab" id="lab2">02 — easing</span>
+          <span data-layout-allow-overlap class="hud-lab" id="lab3">03 — rhythm</span>
+          <span data-layout-allow-overlap class="hud-lab" id="lab4">04 — timing</span>
+          <span data-layout-allow-overlap class="hud-lab" id="lab5">05 — principles</span>
+          <span data-layout-allow-overlap class="hud-lab" id="lab6">06 — resolve</span>
+        </div>
+        <div id="hud-br" class="hud-t mono">1920 × 1080 · 30 fps · hyperframes</div>
+        <div id="hud-bar"></div>
+      </div>
+
+      <!-- ============ SOUND (scripts/sound.py, cue-locked to this timeline) ============ -->
+      <audio
+        id="soundtrack"
+        src="assets/audio/soundtrack.wav"
+        data-start="0"
+        data-duration="15"
+        data-track-index="9"
+        data-volume="1"
+      ></audio>
+
+      <!-- ============ GRAIN (registry: grain-overlay) ============ -->
+      <div id="grain-overlay" class="clip" data-start="0" data-duration="15" data-track-index="8">
+        <div class="grain-texture"></div>
+      </div>
+    </div>
+
+    <style>
+      @keyframes hf-grain-noise {
+        0%,
+        100% {
+          transform: translate(0, 0);
+        }
+        10% {
+          transform: translate(-5%, -5%);
+        }
+        20% {
+          transform: translate(-10%, 5%);
+        }
+        30% {
+          transform: translate(5%, -10%);
+        }
+        40% {
+          transform: translate(-5%, 15%);
+        }
+        50% {
+          transform: translate(-10%, 5%);
+        }
+        60% {
+          transform: translate(15%, 0);
+        }
+        70% {
+          transform: translate(0, 10%);
+        }
+        80% {
+          transform: translate(-15%, 0);
+        }
+        90% {
+          transform: translate(10%, 5%);
+        }
+      }
+      #grain-overlay {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 100;
+        overflow: hidden;
+      }
+      #grain-overlay .grain-texture {
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        opacity: 0.09;
+        animation: hf-grain-noise 0.5s steps(1) infinite;
+      }
+    </style>
+
+    <script>
+      // ---------- deterministic DOM build ----------
+      function split(el, masked) {
+        const text = el.getAttribute("data-split");
+        el.textContent = "";
+        const out = [];
+        for (const c of text) {
+          const s = document.createElement("span");
+          s.className = "ch";
+          s.textContent = c === " " ? " " : c;
+          if (masked) {
+            const m = document.createElement("span");
+            m.className = "mask";
+            m.appendChild(s);
+            el.appendChild(m);
+          } else {
+            el.appendChild(s);
+          }
+          out.push(s);
+        }
+        return out;
+      }
+      const s1Chars = split(document.getElementById("s1-word"), true);
+      const s2Chars = split(document.getElementById("s2-l1"), false);
+      const w4Chars = split(document.getElementById("w4"), false);
+      const s3Chars = split(document.getElementById("s3-word"), false);
+      const s4Spec = split(document.getElementById("s4-spec"), false);
+      const s6Chars = split(document.getElementById("s6-word"), true);
+      const s6Sub = [
+        ...split(document.getElementById("s6-sub-a"), false),
+        ...split(document.getElementById("s6-sub-b"), false),
+        ...split(document.getElementById("s6-sub-c"), false),
+      ];
+
+      // S3 grid: 16 x 9 cells, palette cycles on the diagonal
+      const COLS = 16,
+        ROWS = 9,
+        CELL = 120;
+      const gridEl = document.getElementById("s3-grid");
+      const shapeColors = ["#0c0c10", "#f03c12", "#2b3bff"];
+      const shapes = [];
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          cell.style.left = c * CELL + "px";
+          cell.style.top = r * CELL + "px";
+          const s = document.createElement("span");
+          s.className = "shp";
+          s.style.background = shapeColors[(r + c) % 3];
+          cell.appendChild(s);
+          gridEl.appendChild(cell);
+          shapes.push(s);
+        }
+      }
+
+      // S4 film strip: 30 frames in one second
+      const stripEl = document.getElementById("s4-strip");
+      const fills = [];
+      for (let i = 0; i < 30; i++) {
+        const t = document.createElement("span");
+        t.className = "tick";
+        const f = document.createElement("span");
+        f.className = "tick-fill";
+        t.appendChild(f);
+        stripEl.appendChild(t);
+        fills.push(f);
+      }
+
+      // S5 drums: the 12 principles on a 12-sided cylinder (30° per face)
+      const PRINCIPLES = [
+        "SQUASH & STRETCH",
+        "ANTICIPATION",
+        "STAGING",
+        "STRAIGHT AHEAD",
+        "FOLLOW THROUGH",
+        "SLOW IN & OUT",
+        "ARCS",
+        "SECONDARY ACTION",
+        "TIMING",
+        "EXAGGERATION",
+        "SOLID DRAWING",
+        "APPEAL",
+      ];
+      const R = 224; // 120 / (2 * tan 15deg)
+      function buildDrum(id) {
+        const d = document.getElementById(id);
+        PRINCIPLES.forEach((p, i) => {
+          const f = document.createElement("div");
+          f.className = "face";
+          f.setAttribute("data-layout-allow-overlap", "");
+          f.textContent = p;
+          f.style.transform = "rotateX(" + -i * 30 + "deg) translateZ(" + R + "px)";
+          d.appendChild(f);
+        });
+      }
+      buildDrum("drum-m");
+      buildDrum("drum-l");
+      buildDrum("drum-r");
+      const countStrip = document.getElementById("s5-count-strip");
+      for (let i = 1; i <= 12; i++) {
+        const s = document.createElement("span");
+        s.textContent = String(i).padStart(2, "0");
+        countStrip.appendChild(s);
+      }
+
+      // S2 ease curves, sampled from the exact eases the words use
+      const EASES = ["power4.out", "bounce.out", "elastic.out(1,0.35)", "expo.inOut"];
+      const svg = document.getElementById("s2-svg");
+      const curves = EASES.map((name) => {
+        const fn = gsap.parseEase(name);
+        let d = "";
+        for (let i = 0; i <= 80; i++) {
+          const x = i / 80;
+          const px = 20 + x * 300;
+          const py = 320 - fn(x) * 300;
+          d += (i === 0 ? "M" : "L") + px.toFixed(2) + " " + py.toFixed(2);
+        }
+        const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        p.setAttribute("d", d);
+        p.setAttribute("pathLength", "1");
+        p.setAttribute("fill", "none");
+        p.setAttribute("stroke", "#0c0c10");
+        p.setAttribute("stroke-width", "6");
+        p.setAttribute("stroke-linecap", "round");
+        p.setAttribute("stroke-linejoin", "round");
+        p.style.strokeDasharray = "1";
+        p.style.strokeDashoffset = "1";
+        svg.appendChild(p);
+        return p;
+      });
+
+      // ---------- timeline ----------
+      const tl = gsap.timeline({ paused: true });
+
+      // HUD — timecode, progress, scene labels
+      const tc = document.getElementById("hud-tr");
+      const proxy = { f: 0 };
+      const pad = (n) => String(n).padStart(2, "0");
+      tl.to(
+        proxy,
+        {
+          f: 449,
+          duration: 15,
+          ease: "none",
+          onUpdate: () => {
+            const f = Math.round(proxy.f);
+            tc.textContent = "tc 00:00:" + pad(Math.floor(f / 30)) + ":" + pad(f % 30);
+          },
+        },
+        0,
+      );
+      tl.fromTo("#hud-bar", { scaleX: 0 }, { scaleX: 1, duration: 15, ease: "none" }, 0);
+      tl.fromTo("#hud-rec", { opacity: 1 }, { opacity: 0.15, duration: 0.5, ease: "sine.inOut", repeat: 29, yoyo: true }, 0);
+      const labTimes = [0, 2.3, 5.1, 7.6, 10, 12.4, 15];
+      const hudInk = ["#f1ece2", "#0c0c10", "#0c0c10", "#f1ece2", "#f1ece2", "#f1ece2"];
+      hudInk.forEach((c, i) => tl.set("#hud", { color: c }, labTimes[i]));
+      for (let i = 0; i < 6; i++) {
+        const el = "#lab" + (i + 1);
+        tl.fromTo(el, { autoAlpha: 0, x: -16 }, { autoAlpha: 1, x: 0, duration: 0.25, ease: "power3.out" }, labTimes[i] + 0.12);
+        if (i < 5) tl.to(el, { autoAlpha: 0, duration: 0.08, ease: "none" }, labTimes[i + 1] - 0.08);
+      }
+
+      // ===== S1 PHYSICS (0 – 2.3) =====
+      // drop, squash, rebound, settle
+      tl.fromTo("#s1-dot", { y: -620, scaleX: 0.8, scaleY: 1.25 }, { y: 0, scaleX: 0.85, scaleY: 1.2, duration: 0.42, ease: "power2.in" }, 0.15);
+      tl.fromTo("#s1-shadow", { scaleX: 0.2, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.42, ease: "power2.in" }, 0.15);
+      tl.to("#s1-dot", { scaleX: 1.5, scaleY: 0.55, duration: 0.07, ease: "power1.out" }, 0.57);
+      tl.to("#s1-dot", { y: -230, scaleX: 0.9, scaleY: 1.12, duration: 0.26, ease: "power2.out" }, 0.64);
+      tl.to("#s1-shadow", { scaleX: 0.5, opacity: 0.4, duration: 0.26, ease: "power2.out" }, 0.64);
+      tl.to("#s1-dot", { y: 0, scaleX: 0.95, scaleY: 1.06, duration: 0.24, ease: "power2.in" }, 0.9);
+      tl.to("#s1-shadow", { scaleX: 1, opacity: 1, duration: 0.24, ease: "power2.in" }, 0.9);
+      tl.to("#s1-dot", { scaleX: 1.25, scaleY: 0.78, duration: 0.06, ease: "power1.out" }, 1.15);
+      tl.to("#s1-dot", { scaleX: 1, scaleY: 1, duration: 0.3, ease: "elastic.out(1,0.4)" }, 1.21);
+      tl.fromTo("#s1-cap", { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: 0.5, ease: "expo.out" }, 0.6);
+      tl.fromTo("#s1-cap2", { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.5, ease: "expo.out" }, 0.66);
+      tl.fromTo("#s1-ghost", { x: 120 }, { x: -40, duration: 2.3, ease: "none" }, 0);
+      // dot gives its energy to the line
+      tl.fromTo("#s1-line", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "expo.out" }, 1.32);
+      tl.to("#s1-dot", { scale: 0, duration: 0.18, ease: "back.in(3)" }, 1.32);
+      tl.to("#s1-shadow", { opacity: 0, duration: 0.15, ease: "none" }, 1.32);
+      // masked letter rise, each letter its own overshoot
+      s1Chars.forEach((c, i) => {
+        tl.fromTo(c, { yPercent: 110 }, { yPercent: 0, duration: 0.55, ease: "back.out(" + (1.2 + (i % 3) * 0.6) + ")" }, 1.38 + i * 0.045);
+      });
+      // bar swallows the frame → vermillion field
+      tl.to(["#s1-cap", "#s1-cap2"], { autoAlpha: 0, duration: 0.15, ease: "power2.in" }, 1.9);
+      tl.to("#s1-line", { scaleY: 140, duration: 0.32, ease: "expo.in" }, 1.98);
+      tl.to(s1Chars, { yPercent: -30, duration: 0.3, ease: "power3.in", stagger: 0.02 }, 1.98);
+
+      // ===== S2 EASING (2.3 – 5.1) =====
+      s2Chars.forEach((c, i) => {
+        tl.fromTo(c, { rotationX: -95, opacity: 0, transformOrigin: "50% 100%" }, { rotationX: 0, opacity: 1, duration: 0.42, ease: "back.out(2)" }, 2.36 + i * 0.03);
+      });
+      tl.fromTo("#s2-ax-x", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power3.out" }, 2.45);
+      tl.fromTo("#s2-ax-y", { scaleY: 0 }, { scaleY: 1, duration: 0.4, ease: "power3.out" }, 2.5);
+      tl.fromTo("#s2-tag", { autoAlpha: 0, y: -14 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: "circ.out" }, 2.5);
+      tl.fromTo("#s2-rider", { scale: 0 }, { scale: 1, duration: 0.25, ease: "back.out(3)" }, 2.55);
+      tl.set("#s2-iris", { scale: 0 }, 0);
+      gsap.set(["#w1", "#w2", "#w3", "#w4"], { autoAlpha: 0 });
+      gsap.set([".s2-el"], { autoAlpha: 0 });
+
+      const wT = [2.7, 3.25, 3.8, 4.35];
+      const wDur = 0.5;
+      // word entrances — each with the ease it names
+      tl.set(["#w1"], { autoAlpha: 1 }, wT[0]);
+      tl.fromTo("#w1", { yPercent: 100 }, { yPercent: 0, duration: wDur, ease: EASES[0] }, wT[0]);
+      tl.set(["#w2"], { autoAlpha: 1 }, wT[1]);
+      tl.fromTo("#w2", { yPercent: -110 }, { yPercent: 0, duration: wDur, ease: EASES[1] }, wT[1]);
+      tl.set(["#w3"], { autoAlpha: 1 }, wT[2]);
+      tl.fromTo("#w3", { scaleX: 0.15 }, { scaleX: 1, duration: wDur, ease: EASES[2] }, wT[2]);
+      tl.set(["#w4"], { autoAlpha: 1 }, wT[3]);
+      tl.fromTo(w4Chars, { x: (i) => (i - 3) * 120, opacity: 0 }, { x: 0, opacity: 1, duration: wDur, ease: EASES[3] }, wT[3]);
+      // word exits — fast, accelerating away
+      tl.to("#w1", { yPercent: -100, duration: 0.16, ease: "power3.in" }, wT[1] - 0.04);
+      tl.to("#w2", { yPercent: 110, duration: 0.16, ease: "power3.in" }, wT[2] - 0.04);
+      tl.to("#w3", { scaleX: 0, opacity: 0, duration: 0.14, ease: "power3.in" }, wT[3] - 0.04);
+      tl.set(["#w1", "#w2", "#w3"], { autoAlpha: 0 }, wT[3] + 0.12);
+      // curve + rider per word
+      wT.forEach((t, i) => {
+        tl.fromTo(curves[i], { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: wDur, ease: "none" }, t);
+        if (i > 0) tl.to(curves[i - 1], { opacity: 0.18, duration: 0.2, ease: "none" }, t);
+        tl.fromTo("#s2-rider-x", { x: 0 }, { x: 300, duration: wDur, ease: "none" }, t);
+        tl.fromTo("#s2-rider-y", { y: 0 }, { y: -300, duration: wDur, ease: EASES[i] }, t);
+        tl.fromTo("#el" + (i + 1), { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.2, ease: "power2.out" }, t);
+        if (i < 3) tl.to("#el" + (i + 1), { autoAlpha: 0, duration: 0.08, ease: "none" }, wT[i + 1] - 0.02);
+      });
+      // rider becomes the iris → paper
+      tl.to("#el4", { autoAlpha: 0, duration: 0.1, ease: "none" }, 4.85);
+      tl.to("#s2-rider", { scale: 1.6, duration: 0.15, ease: "power2.out" }, 4.88);
+      tl.fromTo("#s2-iris", { scale: 0 }, { scale: 62, duration: 0.3, ease: "power3.in" }, 4.8);
+
+      // ===== S3 RHYTHM (5.1 – 7.6) =====
+      tl.fromTo(shapes, { scale: 0 }, { scale: 1, duration: 0.38, ease: "back.out(2.6)", stagger: { grid: [ROWS, COLS], from: "center", amount: 0.45 } }, 5.12);
+      tl.fromTo(shapes, { borderRadius: "50%", rotation: 0 }, { borderRadius: "6%", rotation: 135, duration: 0.34, ease: "expo.inOut", stagger: { grid: [ROWS, COLS], from: "start", amount: 0.42 } }, 5.72);
+      tl.fromTo("#s3-band", { scaleX: 0 }, { scaleX: 1, duration: 0.32, ease: "expo.out" }, 5.88);
+      tl.fromTo("#s3-rule-a", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power4.out" }, 5.84);
+      tl.fromTo("#s3-rule-b", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power4.out" }, 5.9);
+      s3Chars.forEach((c, i) => {
+        tl.fromTo(c, { scale: 1.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "power4.out" }, 5.98 + [2, 0, 4, 1, 5, 3][i] * 0.05);
+      });
+      tl.to(shapes, { y: -34, duration: 0.14, ease: "sine.out", yoyo: true, repeat: 1, stagger: { grid: [ROWS, COLS], from: "end", axis: "x", amount: 0.4 } }, 6.38);
+      // implode toward the centre
+      tl.to(
+        shapes,
+        {
+          x: (i) => (7.5 - (i % COLS)) * CELL * 0.92,
+          y: (i) => (4 - Math.floor(i / COLS)) * CELL * 0.92,
+          scale: 0.25,
+          rotation: 315,
+          duration: 0.42,
+          ease: "power4.in",
+          stagger: { grid: [ROWS, COLS], from: "edges", amount: 0.12 },
+        },
+        6.98,
+      );
+      tl.to(s3Chars, { scale: 0, duration: 0.2, ease: "back.in(2)", stagger: { each: 0.015, from: "center" } }, 6.98);
+      tl.to("#s3-band", { scaleY: 0, duration: 0.22, ease: "power3.in" }, 7.08);
+      tl.to(["#s3-rule-a", "#s3-rule-b"], { scaleX: 0, duration: 0.2, ease: "power3.in" }, 7.1);
+      // rotating square wipe → ink
+      tl.fromTo("#s3-wipe", { scale: 0, rotation: 45 }, { scale: 7.5, rotation: 0, duration: 0.3, ease: "expo.in" }, 7.3);
+
+      // ===== S4 TIMING (7.6 – 10.0) =====
+      const num = document.getElementById("s4-num");
+      const cnt = { v: 0 };
+      tl.fromTo(
+        cnt,
+        { v: 0 },
+        {
+          v: 450,
+          duration: 1.2,
+          ease: "expo.out",
+          onUpdate: () => {
+            num.textContent = String(Math.round(cnt.v)).padStart(3, "0");
+          },
+        },
+        7.7,
+      );
+      tl.fromTo("#s4-num", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power4.out" }, 7.66);
+      tl.fromTo("#s4-frames", { yPercent: 100 }, { yPercent: 0, duration: 0.6, ease: "expo.out" }, 7.85);
+      tl.fromTo(s4Spec, { opacity: 0 }, { opacity: 1, duration: 0.01, ease: "none", stagger: 0.03 }, 8.05);
+      tl.fromTo(fills, { scaleY: 0 }, { scaleY: 1, duration: 0.12, ease: "power2.out", stagger: 1.1 / 30 }, 7.75);
+      tl.fromTo("#s4-strip-l", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3, ease: "none" }, 7.8);
+      // slam + 3-frame shake
+      tl.fromTo("#s4-none", { scale: 2.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.22, ease: "power4.in" }, 9.0);
+      tl.to("#s4-right", { keyframes: [{ x: -14, y: 6 }, { x: 10, y: -4 }, { x: -5, y: 2 }, { x: 0, y: 0 }], duration: 0.16, ease: "none" }, 9.22);
+      tl.to("#s4-num-wrap", { keyframes: [{ y: 8 }, { y: -5 }, { y: 0 }], duration: 0.12, ease: "none" }, 9.22);
+      // RGB glitch into the hard cut
+      tl.set(["#s4-num-r", "#s4-num-b", "#s4-num-g"], { opacity: 1 }, 9.72);
+      tl.set("#s4-num", { opacity: 0 }, 9.72);
+      tl.to("#s4-num-g", { keyframes: [{ y: -10 }, { y: 12 }, { y: -4 }, { y: 20 }, { y: 0 }], duration: 0.28, ease: "none" }, 9.72);
+      tl.to("#s4-num-r", { keyframes: [{ x: -26 }, { x: 18 }, { x: -40 }, { x: 8 }, { x: -60 }], duration: 0.28, ease: "none" }, 9.72);
+      tl.to("#s4-num-b", { keyframes: [{ x: 22 }, { x: -16 }, { x: 34 }, { x: -6 }, { x: 64 }], duration: 0.28, ease: "none" }, 9.72);
+      tl.to("#s4-num-wrap", { keyframes: [{ skewX: -14 }, { skewX: 9 }, { skewX: -4 }, { skewX: 18 }], duration: 0.28, ease: "none" }, 9.72);
+      tl.to(fills, { backgroundColor: "#d7ff3a", duration: 0.01, ease: "none", stagger: 0.005 }, 9.72);
+
+      // ===== S5 PRINCIPLES (10.0 – 12.4) =====
+      tl.fromTo("#drum-m", { rotationX: -70 }, { rotationX: 0, duration: 0.22, ease: "power3.out" }, 10.0);
+      tl.fromTo("#s5-main", { scale: 1.25, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "power3.out" }, 10.0);
+      tl.fromTo("#drum-l", { rotationX: 0 }, { rotationX: 300, duration: 2.4, ease: "none" }, 10.0);
+      tl.fromTo("#drum-r", { rotationX: 90 }, { rotationX: -250, duration: 2.4, ease: "none" }, 10.0);
+      tl.fromTo(["#brk-tl", "#brk-tr", "#brk-bl", "#brk-br"], { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(3)", stagger: 0.04 }, 10.1);
+      tl.fromTo("#s5-title", { autoAlpha: 0, x: -20 }, { autoAlpha: 1, x: 0, duration: 0.4, ease: "expo.out" }, 10.12);
+      tl.fromTo("#s5-count", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, ease: "none" }, 10.15);
+      // mechanical ticks — one principle every 0.135s
+      for (let k = 1; k < 12; k++) {
+        const t = 10.25 + (k - 1) * 0.135;
+        tl.to("#drum-m", { rotationX: k * 30, duration: 0.12, ease: "back.out(3)" }, t);
+        tl.to("#s5-count-strip", { y: -120 * k, duration: 0.12, ease: "back.out(2)" }, t);
+        tl.fromTo("#s5-sel", { scale: 1.035 }, { scale: 1, duration: 0.12, ease: "power2.out", immediateRender: k === 1 }, t);
+      }
+      // whip spin, blur, push in → resolve
+      tl.to("#drum-m", { rotationX: 11 * 30 + 720, duration: 0.42, ease: "power3.in" }, 11.98);
+      tl.to("#s5-main", { scale: 2.2, filter: "blur(18px)", opacity: 0, duration: 0.42, ease: "power3.in" }, 11.98);
+      tl.to(["#s5-sel", "#s5-title", "#s5-count", "#s5-side-l", "#s5-side-r"], { opacity: 0, duration: 0.2, ease: "power2.in" }, 12.1);
+
+      // ===== S6 RESOLVE (12.4 – 15.0) =====
+      s6Chars.forEach((c, i) => {
+        tl.fromTo(c, { yPercent: 115, filter: "blur(10px)" }, { yPercent: 0, filter: "blur(0px)", duration: 0.7, ease: "expo.out" }, 12.44 + i * 0.05);
+      });
+      // the dot from scene 1 comes home as the full stop
+      tl.fromTo("#s6-dot", { y: -760, scaleX: 0.8, scaleY: 1.3 }, { y: 0, scaleX: 0.85, scaleY: 1.2, duration: 0.4, ease: "power2.in" }, 12.85);
+      tl.to("#s6-dot", { scaleX: 1.5, scaleY: 0.55, duration: 0.06, ease: "power1.out" }, 13.25);
+      tl.to("#s6-dot", { y: -110, scaleX: 0.92, scaleY: 1.1, duration: 0.2, ease: "power2.out" }, 13.31);
+      tl.to("#s6-dot", { y: 0, scaleX: 1, scaleY: 1, duration: 0.18, ease: "power2.in" }, 13.51);
+      tl.to("#s6-dot", { keyframes: [{ scaleX: 1.2, scaleY: 0.82 }, { scaleX: 1, scaleY: 1 }], duration: 0.22, ease: "sine.out" }, 13.69);
+      tl.fromTo("#s6-ring", { scale: 0.3, opacity: 1 }, { scale: 5, opacity: 0, duration: 0.8, ease: "expo.out" }, 13.27);
+      tl.fromTo("#s6-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "expo.inOut" }, 13.35);
+      tl.fromTo(s6Sub, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out", stagger: 0.014 }, 13.55);
+      tl.fromTo("#s6-lock", { scale: 1 }, { scale: 1.025, duration: 1.4, ease: "sine.inOut" }, 13.6);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
