@@ -153,26 +153,40 @@ try{if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').match
   footer a:hover{color:#fff}
   footer .small{color:#9c8e76;font-size:13px;margin-top:8px}
 
-  /* ===== START-ANIMATION (nur Hero, beim Öffnen) ===== */
+  /* ===== START-ANIMATION (oberer Bereich, beim Öffnen) ===== */
   html.hx .hero .reveal{opacity:1;transform:none;transition:none}
   html.hx .brand{animation:hxFade .8s ease .05s both}
-  html.hx .hero .eyebrow::before{transform-origin:0 50%;animation:hxLine .6s cubic-bezier(.6,0,.2,1) .25s both}
-  html.hx .hero .eyebrow .et{display:inline-block;animation:hxSlide .7s cubic-bezier(.2,.8,.2,1) .45s both}
-  html.hx .hero h1 .w{display:inline-block;overflow:hidden;vertical-align:top;padding:0 .08em .14em 0;margin:0 -.08em -.14em 0}
-  html.hx .hero h1 .wi{display:inline-block;transform:translateY(110%);animation:hxRise .9s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.55s + var(--i) * 80ms)}
-  html.hx .hero h1 em{background:linear-gradient(var(--accent),var(--accent)) no-repeat 0 96%/0 3px;animation:hxUnder .7s cubic-bezier(.6,0,.2,1) 1.45s both}
-  html.hx .hero .sub{animation:hxUp .8s cubic-bezier(.2,.8,.2,1) 1.25s both}
+  /* Eyebrow: Linie zieht auf, Text tippt sich */
+  html.hx .hero .eyebrow::before{transform-origin:0 50%;animation:hxLine .6s cubic-bezier(.6,0,.2,1) .2s both}
+  html.hx .hero .eyebrow .et{white-space:pre}
+  html.hx .hero .eyebrow .c{opacity:0;animation:hxType .01s linear both;animation-delay:calc(.45s + var(--i) * 28ms)}
+  /* Überschrift: Buchstabe für Buchstabe */
+  html.hx .hero h1 .w{display:inline-block;white-space:nowrap}
+  html.hx .hero h1 .c{display:inline-block;opacity:0;transform:translateY(.55em) rotate(10deg);transform-origin:0 100%;
+    animation:hxChar .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.55s + var(--i) * 32ms)}
+  html.hx .hero h1 em{position:relative;display:inline-block}
+  html.hx .hero h1 em .c{animation-name:hxCharPop,hxWave;animation-duration:.8s,7s;animation-timing-function:cubic-bezier(.2,.9,.3,1.35),ease-in-out;
+    animation-iteration-count:1,infinite;animation-fill-mode:both,none;
+    animation-delay:calc(.55s + var(--i) * 32ms),calc(3.4s + var(--j) * 60ms)}
+  html.hx .hero h1 em .sw{position:absolute;left:-2%;bottom:-.16em;width:104%;height:.32em;overflow:visible;pointer-events:none}
+  html.hx .hero h1 em .sw path{fill:none;stroke:var(--accent);stroke-width:3.2;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;
+    opacity:0;animation:hxDraw .9s cubic-bezier(.6,0,.2,1) 1.75s both}
+  /* Untertitel Wort für Wort, dann Buttons und Leiste */
+  html.hx .hero .sub .sw2{display:inline-block;opacity:0;transform:translateY(8px);animation:hxUp .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(2.05s + var(--i) * 45ms)}
   html.hx .hero-cta .cta{animation:hxPop .6s cubic-bezier(.2,.9,.3,1.25) both}
-  html.hx .hero-cta .cta.primary{animation-delay:1.45s}
-  html.hx .hero-cta .cta.outline{animation-delay:1.58s}
-  html.hx .hero .infobar{animation:hxUp .8s cubic-bezier(.2,.8,.2,1) 1.75s both}
+  html.hx .hero-cta .cta.primary{animation-delay:2.55s}
+  html.hx .hero-cta .cta.outline{animation-delay:2.68s}
+  html.hx .hero .infobar{animation:hxUp .8s cubic-bezier(.2,.8,.2,1) 2.85s both}
+  /* Foto */
   html.hx .hero-media{border-radius:24px;overflow:hidden;box-shadow:var(--shadow);animation:hxWipe 1.2s cubic-bezier(.6,0,.2,1) .35s both}
   html.hx .hero-media .hero-photo{box-shadow:none;animation:hxZoom 1.8s cubic-bezier(.2,.8,.2,1) .35s both,hxBreath 14s ease-in-out 2.2s infinite alternate}
   @keyframes hxFade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
   @keyframes hxLine{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-  @keyframes hxSlide{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
-  @keyframes hxRise{to{transform:none}}
-  @keyframes hxUnder{to{background-size:100% 3px}}
+  @keyframes hxType{to{opacity:1}}
+  @keyframes hxChar{to{opacity:1;transform:none}}
+  @keyframes hxCharPop{0%{opacity:0;transform:translateY(.7em) scale(.6) rotate(-12deg)}60%{opacity:1}100%{opacity:1;transform:none}}
+  @keyframes hxWave{0%,8%,100%{transform:none}4%{transform:translateY(-.14em)}}
+  @keyframes hxDraw{0%{opacity:0;stroke-dashoffset:1}1%{opacity:1}100%{opacity:1;stroke-dashoffset:0}}
   @keyframes hxUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
   @keyframes hxPop{from{opacity:0;transform:translateY(10px) scale(.92)}to{opacity:1;transform:none}}
   @keyframes hxWipe{from{-webkit-clip-path:inset(100% 0 0 0 round 24px);clip-path:inset(100% 0 0 0 round 24px)}to{-webkit-clip-path:inset(0 0 0 0 round 24px);clip-path:inset(0 0 0 0 round 24px)}}
@@ -284,31 +298,42 @@ try{if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').match
 </footer>
 
 <script>
-/* Start-Animation: Überschrift in Wörter zerlegen (Text bleibt gleich) */
+/* Start-Animation: Texte in Buchstaben/Wörter zerlegen (der Text selbst bleibt gleich) */
 (function(){
   if(!document.documentElement.classList.contains('hx'))return;
-  var eb=document.querySelector('.hero .eyebrow');
-  if(eb&&eb.firstChild&&eb.firstChild.nodeType===3){var et=document.createElement('span');et.className='et';et.textContent=eb.textContent;eb.textContent='';eb.appendChild(et);}
-  var h=document.querySelector('.hero h1'); if(!h)return; var i=0;
-  (function walk(node){
-    Array.prototype.slice.call(node.childNodes).forEach(function(c){
-      if(c.nodeType===3){
-        var f=document.createDocumentFragment();
-        c.textContent.split(/([ \t\n]+)/).forEach(function(part){
-          if(!part)return;
-          if(/^[ \t\n]+$/.test(part)){f.appendChild(document.createTextNode(part));return;}
-          part.split(/( )/).forEach(function(p){
-            if(!p)return;
-            if(p===' '){f.appendChild(document.createTextNode(p));return;}
-            var w=document.createElement('span');w.className='w';
-            var wi=document.createElement('span');wi.className='wi';wi.style.setProperty('--i',i++);wi.textContent=p;
-            w.appendChild(wi);f.appendChild(w);
+  function chars(el, wrapWords){
+    var i=0;
+    (function walk(node){
+      Array.prototype.slice.call(node.childNodes).forEach(function(c){
+        if(c.nodeType===3){
+          var f=document.createDocumentFragment();
+          c.textContent.split(/([ \t\n ]+)/).forEach(function(part){
+            if(!part)return;
+            if(/^[ \t\n ]+$/.test(part)){f.appendChild(document.createTextNode(part));return;}
+            var holder=f;
+            if(wrapWords){var w=document.createElement('span');w.className='w';f.appendChild(w);holder=w;}
+            Array.from(part).forEach(function(ch){
+              var s=document.createElement('span');s.className='c';s.style.setProperty('--i',i++);s.textContent=ch;holder.appendChild(s);
+            });
           });
-        });
-        node.replaceChild(f,c);
-      }else if(c.nodeType===1){walk(c);}
-    });
-  })(h);
+          node.replaceChild(f,c);
+        }else if(c.nodeType===1){walk(c);}
+      });
+    })(el);
+  }
+  var eb=document.querySelector('.hero .eyebrow');
+  if(eb){var et=document.createElement('span');et.className='et';et.textContent=eb.textContent;eb.textContent='';eb.appendChild(et);chars(et,false);}
+  var h=document.querySelector('.hero h1');
+  if(h){
+    chars(h,true);
+    var em=h.querySelector('em');
+    if(em){
+      Array.prototype.forEach.call(em.querySelectorAll('.c'),function(c,j){c.style.setProperty('--j',j);});
+      em.insertAdjacentHTML('beforeend','<svg class="sw" viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M3 13 C 40 5, 75 17, 110 10 S 170 4, 197 9"/></svg>');
+    }
+  }
+  var sub=document.querySelector('.hero .sub');
+  if(sub){var k=0;sub.innerHTML=sub.textContent.split(/(\s+)/).map(function(p){return /^\s+$/.test(p)||!p?p:'<span class="sw2" style="--i:'+(k++)+'">'+p+'</span>';}).join('');}
 })();
 </script>
 <script>
