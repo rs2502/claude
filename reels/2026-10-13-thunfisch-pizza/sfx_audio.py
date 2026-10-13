@@ -1,7 +1,9 @@
-"""Procedural SFX track for the tuna pizza reel, synced to the cuts.
+"""Procedural SFX + music track for the tuna pizza reel, synced to the cuts.
 
 Everything is synthesised (no samples), so there are no licensing issues.
-Writes a 48 kHz stereo WAV with the full mix plus one WAV per layer.
+Cut times come from timeline.py. The beat runs at 128 BPM so the oven shot
+lands on the downbeat of bar 4. Writes a 48 kHz stereo WAV with the full mix
+plus one WAV per layer.
 
 Usage: python3 sfx_audio.py <out_dir>
 """
@@ -12,14 +14,14 @@ import numpy as np
 from scipy.io import wavfile
 from scipy.signal import butter, fftconvolve, sosfilt
 
+import timeline as tl
+
 SR = 48000
-DUR = 179 / 24  # 7.458 s, matches the video
-FPS = 24
+DUR = tl.DURATION
+T = {k: v / tl.FPS for k, v in tl.STARTS.items()}  # output shot start times
+BPM = 128
+BEAT = 60 / BPM
 rng = np.random.default_rng(11)
-
-
-def t_of(frame):
-    return frame / FPS
 
 
 def env(n, attack, decay, curve=4.0):
@@ -223,65 +225,159 @@ def place(layer, sound, t, gain_db, pan=0.0):
     buf[i:i + len(seg), 1] += seg * g * r * 1.414
 
 
+def karplus(f, sec=0.35, damp=0.996):
+    n = int(sec * SR)
+    period = int(SR / f)
+    buf = rng.uniform(-1, 1, period)
+    out = np.empty(n)
+    for i in range(0, n, period):
+        m = min(period, n - i)
+        out[i:i + m] = buf[:m]
+        buf = damp * 0.5 * (buf + np.roll(buf, -1))
+    return out * np.exp(-np.linspace(0, 4, n))
+
+
+def kick():
+    sec = 0.35
+    tt = np.arange(int(sec * SR)) / SR
+    freq = 48 + 110 * np.exp(-tt * 28)
+    body = np.sin(2 * np.pi * np.cumsum(freq) / SR) * np.exp(-tt * 9)
+    click = filt(noise(sec), "bandpass", [1500, 6000]) * np.exp(-tt * 300) * 0.4
+    return norm(np.tanh(2 * (body + click)))
+
+
+def clap():
+    sec = 0.25
+    n = int(sec * SR)
+    tt = np.arange(n) / SR
+    e = np.zeros(n)
+    for d in (0, 0.011, 0.022):
+        e += (tt >= d) * np.exp(-np.clip(tt - d, 0, None) * (140 if d < 0.02 else 22))
+    return norm(filt(noise(sec), "bandpass", [900, 5000]) * e)
+
+
+def hat(open_=False):
+    sec = 0.22 if open_ else 0.05
+    tt = np.arange(int(sec * SR)) / SR
+    return norm(filt(noise(sec), "highpass", 7000, 4) * np.exp(-tt * (14 if open_ else 90)))
+
+
+def bass_note(f, sec):
+    n = int(sec * SR)
+    tt = np.arange(n) / SR
+    saw = 2 * ((f * tt) % 1) - 1
+    x = filt(0.6 * saw + np.sin(2 * np.pi * f * tt), "lowpass", 380, 4)
+    e = np.minimum(1, tt / 0.004) * np.exp(-tt * 3) * (1 - (tt / sec) ** 6)
+    return norm(x * e)
+
+
+CHORDS = [  # (bass root Hz, mandolin chord tones Hz) per bar: Am - F - C - G
+    (110.0, [440.0, 523.25, 659.25]),
+    (87.31, [349.23, 440.0, 523.25]),
+    (130.81, [523.25, 659.25, 783.99]),
+    (98.0, [392.0, 493.88, 587.33]),
+]
+KICKS = [0, 6, 10]          # 16th steps within a bar
+CLAPS = [4, 12]
+MUSIC_STOP = 14 * BEAT      # beat stops right before the final reveal
+
+
+def music():
+    s16 = BEAT / 4
+    bars = int(np.ceil(MUSIC_STOP / (4 * BEAT)))
+    for bar in range(bars):
+        t0 = bar * 4 * BEAT
+        root, tones = CHORDS[bar % 4]
+        fill = bar == 2  # bar 3, beat 4: snare roll into the oven drop
+        for step in range(16):
+            t = t0 + step * s16
+            if t >= MUSIC_STOP - 0.01:
+                break
+            in_fill = fill and step >= 12
+            if step in KICKS and not in_fill:
+                place("music", kick(), t, -6)
+            if step in CLAPS and not in_fill:
+                place("music", clap(), t, -11)
+            if in_fill:
+                place("music", clap(), t, -22 + (step - 12) * 3)
+            elif step % 2 == 0:
+                place("music", hat(step == 14), t, -21 if step % 4 else -18, 0.25)
+            if step in (0, 6, 10) and not in_fill:
+                length = {0: 6, 6: 4, 10: 6}[step] * s16
+                place("music", bass_note(root, length), t, -9)
+            if not in_fill:  # mandolin tremolo arpeggio
+                f = tones[[0, 1, 2, 1][step % 4]] * (2 if step >= 8 and step % 8 == 7 else 1)
+                place("music", karplus(f, 0.3), t, -20 if step % 2 else -17, -0.3 + 0.6 * (step % 2))
+    # tape-stop style ending: one pitched-down bass + kick on the stop
+    place("music", bass_note(55.0, 0.5), MUSIC_STOP, -10)
+
+
 def build():
     # Ambience bed under everything
     place("ambience", room_tone(), 0, -34)
+    music()
 
-    # A 0.00 hook: ingredients rain onto the sauce
+    # A hook: toppings rain onto the sauce (slow-mo, so the landings spread out)
     place("impacts", boom(), 0.0, -4)
-    place("whoosh", whoosh(0.55, 4000, 400, 0.2), 0.0, -10, -0.2)
-    for j, t in enumerate([0.30, 0.36, 0.41, 0.47, 0.52, 0.56]):
+    place("whoosh", whoosh(0.8, 4000, 400, 0.2), 0.0, -10, -0.2)
+    for t in [0.45, 0.55, 0.66, 0.74, 0.83, 0.92, 1.0]:
         place("foley", plop(), t, -14, rng.uniform(-0.6, 0.6))
 
-    # B 0.625 flash-forward to the finished pizza
-    place("whoosh", whoosh(0.3, 600, 6000), t_of(15) - 0.22, -9, 0.4)
-    place("impacts", boom(0.5, 90, 45), t_of(15), -9)
-    place("foley", sizzle(0.4), t_of(15), -16)
+    # B flash-forward to the finished pizza
+    place("whoosh", whoosh(0.3, 600, 6000), T["B"] - 0.22, -9, 0.4)
+    place("impacts", boom(0.5, 90, 45), T["B"], -9)
+    place("foley", sizzle(0.4), T["B"], -16)
 
-    # C 1.04 chef slaps flour
-    place("whoosh", whoosh(0.3, 500, 3000), t_of(25) - 0.2, -13, -0.4)
-    place("foley", poof(0.7), t_of(25) + 0.04, -8)
-    place("foley", thud(), t_of(25) + 0.08, -10)
+    # C chef slaps flour
+    place("whoosh", whoosh(0.3, 500, 3000), T["C"] - 0.2, -13, -0.4)
+    place("foley", poof(0.7), T["C"] + 0.04, -8)
+    place("foley", thud(), T["C"] + 0.08, -10)
 
-    # D 1.75 hands press dough
-    place("foley", thud(), t_of(42), -8)
-    place("foley", thud(), t_of(42) + 0.22, -12)
-    place("foley", poof(0.35), t_of(42) + 0.02, -16)
+    # D hands press dough
+    place("foley", thud(), T["D"], -8)
+    place("foley", thud(), T["D"] + 0.22, -12)
+    place("foley", poof(0.35), T["D"] + 0.02, -16)
 
-    # E 2.17 sauce spiral
-    place("whoosh", whoosh(0.25, 800, 4000), t_of(52) - 0.18, -15, 0.3)
-    place("foley", squelch(0.72), t_of(52) + 0.02, -9)
+    # E sauce spiral
+    place("whoosh", whoosh(0.25, 800, 4000), T["E"] - 0.18, -15, 0.3)
+    place("foley", squelch(0.72), T["E"] + 0.02, -9)
 
-    # F 2.875 cheese sprinkle
-    place("foley", sprinkle(0.92), t_of(69), -11, 0.15)
+    # F cheese sprinkle
+    place("foley", sprinkle(0.92), T["F"], -11, 0.15)
 
-    # G 3.79 toppings drop
-    place("whoosh", whoosh(0.4, 3500, 350, 0.35), t_of(91) - 0.12, -9, -0.3)
-    place("impacts", boom(0.7, 100, 40), t_of(91), -6)
-    for t in [3.93, 3.98, 4.03, 4.08]:
-        place("foley", plop(), t, -14, rng.uniform(-0.5, 0.5))
+    # H tuna placed
+    place("whoosh", whoosh(0.25, 3000, 600), T["H"] - 0.15, -15, -0.3)
+    place("foley", plop(220), T["H"] + 0.08, -11)
+    place("foley", plop(260), T["H"] + 0.35, -13)
 
-    # H 4.125 tuna placed
-    place("foley", plop(220), t_of(99) + 0.08, -12)
-    place("foley", plop(260), t_of(99) + 0.35, -14)
+    # I pizza onto the peel
+    place("whoosh", whoosh(0.3, 400, 2500), T["I"] - 0.2, -14, 0.5)
+    place("foley", scrape(0.7), T["I"] + 0.05, -12, -0.2)
 
-    # I 4.71 pizza onto the peel
-    place("whoosh", whoosh(0.3, 400, 2500), t_of(113) - 0.2, -14, 0.5)
-    place("foley", scrape(0.7), t_of(113) + 0.05, -12, -0.2)
+    # J zoom + time-lapse into the oven (bar 4 downbeat)
+    place("whoosh", whoosh(0.45, 300, 5000, 0.85), T["J"] - 0.38, -6)
+    place("impacts", boom(0.6, 70, 35), T["J"], -7)
+    place("foley", fire(0.6), T["J"], -8)
 
-    # J 5.5 zoom into the oven
-    place("whoosh", whoosh(0.45, 300, 5000, 0.85), t_of(132) - 0.38, -6)
-    place("impacts", boom(0.6, 70, 35), t_of(132), -9)
-    place("foley", fire(0.85), t_of(132), -8)
+    # K finished close-up
+    place("impacts", boom(0.6, 95, 42), T["K"], -8)
+    place("foley", sizzle(1.4), T["K"], -14)
 
-    # K 6.29 finished close-up
-    place("impacts", boom(0.6, 95, 42), t_of(152), -8)
-    place("foley", sizzle(0.7), t_of(152), -13)
-
-    # L 6.75 chef presents: ding + glint, then riser into the loop
-    place("accents", ding(), t_of(162) + 0.05, -9)
-    place("accents", shimmer(0.7), t_of(166), -20, 0.3)
+    # L chef presents: ding + glint, then riser into the loop
+    place("accents", ding(), T["L"] + 0.05, -8)
+    place("accents", shimmer(0.7), T["L"] + 4 / tl.FPS, -20, 0.3)
     place("whoosh", riser(0.45), DUR - 0.45, -14)
+
+
+def duck_envelope(n):
+    """Pull the music down under the big impacts (simple side-chain)."""
+    g = np.ones(n)
+    for t in [0.0, T["B"], T["J"], T["K"]]:
+        i = int(t * SR)
+        rel = int(0.3 * SR)
+        seg = 1 - 0.55 * np.exp(-np.linspace(0, 4, rel))
+        g[i:i + rel] = np.minimum(g[i:i + rel], seg[: max(0, min(rel, n - i))])
+    return g
 
 
 def reverb(x, sec=0.7, mix=0.14):
@@ -300,7 +396,9 @@ def main(out_dir):
     mix = np.zeros((n, 2))
     for name, buf in LAYERS.items():
         buf = buf[:n]
-        if name != "ambience":
+        if name == "music":
+            buf = reverb(buf, 0.5, 0.08) * duck_envelope(n)[:, None]
+        elif name != "ambience":
             buf = reverb(buf)
         LAYERS[name] = buf
         mix += buf
@@ -308,7 +406,7 @@ def main(out_dir):
     fade = int(0.01 * SR)
     mix[:fade] *= np.linspace(0, 1, fade)[:, None]
     mix[-fade:] *= np.linspace(1, 0, fade)[:, None]
-    wavfile.write(os.path.join(out_dir, "sfx_mix.wav"), SR, (norm(mix, 0.89) * 32767).astype(np.int16))
+    wavfile.write(os.path.join(out_dir, "sfx_mix.wav"), SR, (norm(mix, 0.89 * 0.78) * 32767).astype(np.int16))
     for name, buf in LAYERS.items():
         wavfile.write(os.path.join(out_dir, f"stem_{name}.wav"), SR, (np.clip(buf, -1, 1) * 32767).astype(np.int16))
     print("layers:", ", ".join(LAYERS))
