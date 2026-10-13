@@ -1,12 +1,10 @@
-# Startseite mit Intro-Animation
+# Startseite mit Start-Animation
 
-`startseite.html` ist deine Originalseite plus ein kurzes Intro beim Öffnen:
-Logo schreibt sich (ca. 2,5 s), dann gleitet der Vorhang nach oben und das
-Hero-Foto wird von unten aufgedeckt. Nur ergänzt, nichts an der Seite geändert.
-
-- Kein Video, keine Zusatzdateien (Logo steckt in der Datei)
-- Erscheint nur beim ersten Aufruf pro Besuch, Tipp/Klick überspringt es
-- Bei „Bewegung reduzieren“ am Gerät: kein Intro
+`startseite.html` ist deine Originalseite. Ergänzt ist nur eine Animation des oberen
+Bereichs beim Öffnen (ca. 2 s): Linie + „Cucina Italiana“, Überschrift Wort für Wort,
+Strich unter „Lebensfreude“, Untertitel, Buttons, Infoleiste, Foto wird aufgedeckt
+und zoomt sanft. Kein Logo, kein Video, keine Zusatzdateien.
+Bei „Bewegung reduzieren“ am Gerät erscheint alles ohne Animation.
 
 ## Einbau
 `startseite.html` in den Ordner `start` hochladen und die alte überschreiben.
