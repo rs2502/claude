@@ -182,7 +182,8 @@
         <source src="assets/italia-hero.webm" type="video/webm">
       </video>
       <script>
-      /* Läuft das Video nicht (z. B. iPhone), zeigen wir dieselbe Animation als Bild. */
+      /* Läuft das Video nicht (z. B. iPhone), zeigen wir dieselbe Animation als Bild.
+         Getauscht wird erst, wenn das Bild wirklich geladen ist – sonst bleibt das Standbild stehen. */
       (function () {
         var v = document.getElementById('heroVideo');
         if (!v) return;
@@ -191,12 +192,13 @@
           if (done || (!v.paused && v.currentTime > 0.1)) return;
           done = true;
           var img = new Image();
-          img.className = 'hero-photo';
-          img.style.display = 'block';
-          img.alt = 'Burrata, Carpaccio und unser Logo';
-          img.onerror = function () { img.onerror = null; img.src = v.poster; };
-          img.src = 'assets/italia-hero-anim.avif';
-          v.replaceWith(img);
+          img.onload = function () {
+            img.className = 'hero-photo';
+            img.style.display = 'block';
+            img.alt = 'Burrata, Carpaccio und unser Logo';
+            if (v.parentNode) v.parentNode.replaceChild(img, v);
+          };
+          img.src = 'assets/italia-hero-anim.webp';
         }
         var quellen = v.getElementsByTagName('source');
         if (quellen.length) quellen[quellen.length - 1].addEventListener('error', zeigeBild);
