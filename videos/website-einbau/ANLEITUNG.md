@@ -21,3 +21,10 @@ bis `</video>`) durch den Inhalt von `zeile-ersetzen.html` ersetzen (ab „ERSET
 
 ## 4. Speichern, hochladen, auf dem iPhone neu laden
 Falls Safari noch die alte Seite zeigt: Tab schließen und Seite neu öffnen.
+
+## Zusatz für Strato: damit auch das echte Video auf dem iPhone läuft
+1. `htaccess.txt` nach `/start/assets/` hochladen.
+2. Dort umbenennen in **`.htaccess`** (Punkt am Anfang, kein `.txt` am Ende).
+   Liegt dort schon eine `.htaccess`, den Inhalt stattdessen unten anhängen.
+3. Auf dem iPhone `https://ristorante-pizzeria-italia.com/start/assets/italia-hero.mp4` öffnen.
+   Spielt es: fertig. Zeigt die Startseite dann einen Fehler, die Datei einfach wieder löschen.

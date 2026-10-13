@@ -1,0 +1,19 @@
+# Videos & Animation für iPhone/Safari richtig ausliefern (nur für diesen Ordner)
+# Datei nach dem Hochladen in  .htaccess  umbenennen (mit Punkt, ohne .txt)
+
+<IfModule mod_mime.c>
+  AddType video/mp4  .mp4
+  AddType video/webm .webm
+  AddType image/avif .avif
+</IfModule>
+
+# Videos nicht komprimieren – sonst kann Safari sie nicht stückweise laden
+<IfModule mod_deflate.c>
+  SetEnvIfNoCase Request_URI "\.(mp4|webm|avif)$" no-gzip dont-vary
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(mp4|webm)$">
+    Header set Accept-Ranges bytes
+  </FilesMatch>
+</IfModule>
