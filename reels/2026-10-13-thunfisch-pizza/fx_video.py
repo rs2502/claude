@@ -82,16 +82,18 @@ rng = np.random.default_rng(7)
 def grade(img):
     img = cv2.LUT(img, LUT)
     hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV).astype(np.float32)
-    hsv[..., 1] = np.clip(hsv[..., 1] * 1.12, 0, 255)
+    hsv[..., 1] = np.clip(hsv[..., 1] * 0.97, 0, 255)  # source is already very warm
     img = cv2.cvtColor(hsv.astype(np.uint8), cv2.COLOR_HSV2RGB).astype(np.float32)
-    img[..., 0] *= 1.035  # warm
-    img[..., 2] *= 0.96
+    img[..., 0] *= 0.985  # pull the orange cast back slightly
+    img[..., 2] *= 1.03
     return img
 
 
 def glow(img, amount):
-    bright = np.clip(img - 150, 0, None) * 1.6
-    halo = cv2.GaussianBlur(bright, (0, 0), 28)
+    # neutral (luma-based) halo so the glow brightens instead of tinting orange
+    luma = img @ np.array([0.2126, 0.7152, 0.0722], np.float32)
+    bright = np.clip(luma - 170, 0, None) * 1.2
+    halo = cv2.GaussianBlur(bright, (0, 0), 28)[..., None]
     return img + halo * amount
 
 
@@ -183,12 +185,16 @@ def process(f, frame):
 
 def main(src, dst):
     dec = subprocess.Popen(
-        ["ffmpeg", "-v", "error", "-i", src, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+        ["ffmpeg", "-v", "error", "-i", src, "-vf", "scale=in_color_matrix=bt709:in_range=tv",
+         "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
         stdout=subprocess.PIPE)
     enc = subprocess.Popen(
         ["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24",
          "-s", f"{OUT_W}x{OUT_H}", "-r", str(FPS), "-i", "-",
-         "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p",
+         "-c:v", "libx264", "-preset", "slow", "-crf", "20",
+         "-vf", "scale=out_color_matrix=bt709:out_range=tv", "-pix_fmt", "yuv420p",
+         "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709",
+         "-color_range", "tv",
          "-movflags", "+faststart", dst],
         stdin=subprocess.PIPE)
     size = SRC_W * SRC_H * 3

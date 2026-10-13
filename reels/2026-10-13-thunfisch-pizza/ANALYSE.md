@@ -42,14 +42,14 @@ Schnittrhythmus: alle 0,3–0,9 s. Das ist für Food-Reels genau richtig.
 
 | Effekt | Wo |
 |---|---|
-| Color Grade: S-Kurve, +12 % Sättigung, wärmer | ganzes Reel |
+| Color Grade: leichte S-Kurve für mehr Kontrast, Farben farbneutral zum Original (BT.709) | ganzes Reel |
 | Vignette + feines Film-Grain | ganzes Reel |
 | Punch-in-Zoom (7–12 %, ease-out über 6 Frames) | auf jedem Schnitt |
 | Langsamer Push-in innerhalb jedes Shots (2,5 %, im Finale 6 %) | jeder Shot |
 | Weißer Flash + RGB-Split (Chromatic Aberration) | 0:00, B (0:00.63), G (0:03.79), K (0:06.33) |
 | Camera-Shake | Hook-Einschlag, Teig drücken, Toppings-Drop, Thunfisch, Finale |
 | Zoom-Blur-Transition (rein in den Ofen) | I → J (0:05.38–0:05.63) |
-| Ofen-Glow mit Flackern (Bloom) | J |
+| Ofen-Glow mit Flackern (neutraler Bloom, keine Farbverschiebung) | J |
 | Leichter Glow | K + L |
 | Light-Sweep / Glanzreflex über die Pizza | L (0:06.88–0:07.38) |
 | Weiß-Ramp in den letzten 3 Frames → nahtloser Loop in den Flash bei 0:00 | Ende |
