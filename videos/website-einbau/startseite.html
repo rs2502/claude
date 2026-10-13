@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f7f1e8">
+<title>Ristorante Pizzeria Italia · Bruchhausen-Vilsen</title>
+<meta name="description" content="Ristorante Pizzeria Italia in Bruchhausen-Vilsen — italienische Küche mit frischen Zutaten, in warmer Atmosphäre. Tisch reservieren, Speisekarte ansehen, Feiern & Catering.">
+<style>
+  /* Sichtbarer Tastatur-Fokus (Barrierefreiheit) */
+  a:focus-visible, button:focus-visible{ outline:3px solid var(--accent,#b8542e); outline-offset:3px; border-radius:8px; }
+  /* Selbst gehostete Headline-Schrift (auf eigenem Server, kein Google-Aufruf) */
+  @font-face{font-family:'Playfair Display';src:url('fonts/PlayfairDisplay-VariableFont_wght.ttf?v=1') format('truetype');font-weight:400 900;font-style:normal;font-display:swap}
+  @font-face{font-family:'Playfair Display';src:url('fonts/PlayfairDisplay-Italic-VariableFont_wght.ttf?v=1') format('truetype');font-weight:400 900;font-style:italic;font-display:swap}
+  :root{
+    --bg:#f7f1e8; --paper:#fffdf9; --card:#ffffff;
+    --accent:#b8542e; --accent-d:#9a4524; --gold:#bb9540; --gold-soft:#e9dcb8;
+    --ink:#2f2922; --muted:#857c6e; --line:#ece2d1;
+    --dark:#241910; --dark2:#170f08;
+    --shadow:0 18px 50px rgba(120,90,50,.14);
+    --maxw:1140px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:18px;line-height:1.6;overflow-x:hidden}
+  img{display:block;max-width:100%}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 30px}
+  .serif{font-family:Georgia,"Times New Roman",serif}
+  em{font-style:italic}
+
+  .reveal{opacity:0;transform:translateY(36px);transition:opacity .8s cubic-bezier(.2,.8,.2,1),transform .8s cubic-bezier(.2,.8,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  .reveal.d1{transition-delay:.1s}.reveal.d2{transition-delay:.2s}.reveal.d3{transition-delay:.3s}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1!important;transform:none!important;transition:none}*{scroll-behavior:auto}}
+
+  /* Nav */
+  header{position:sticky;top:0;z-index:100;background:rgba(247,241,232,.86);backdrop-filter:blur(10px);border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s}
+  header.solid{border-bottom-color:var(--line);box-shadow:0 2px 18px rgba(120,90,50,.06)}
+  .nav{display:flex;align-items:center;justify-content:center;gap:16px;min-height:62px;padding:16px 0 10px}
+  .brand{font-family:"Playfair Display","Didot",Georgia,"Times New Roman",serif;font-size:clamp(16px,3.8vw,19px);line-height:1.1;font-weight:600;color:var(--ink);letter-spacing:.2px;white-space:nowrap;text-align:center}
+  .brand .st{color:var(--gold);font-size:.62em;letter-spacing:2px;vertical-align:2px;margin:0 8px}
+  .brand b{color:var(--accent);font-weight:600;font-style:italic}
+  .nav .spacer{flex:1}
+  .nav .nlink{font-size:15.5px;color:var(--ink);opacity:.82;transition:opacity .2s;display:none}
+  .nav .nlink:hover{opacity:1;color:var(--accent)}
+  .btn{background:var(--accent);color:#fff;padding:11px 22px;border-radius:999px;font-weight:600;font-size:15px;transition:opacity .35s ease,transform .35s ease,background .2s ease;white-space:nowrap;border:0;cursor:pointer}
+  .btn:hover{background:var(--accent-d);transform:translateY(-2px)}
+  @media(min-width:900px){.nav .nlink{display:inline}}
+
+  /* Hero */
+  .hero{padding:6px 0 36px}
+  .hero-grid{display:grid;grid-template-columns:1fr;gap:34px;align-items:center}
+  @media(min-width:920px){.hero-grid{grid-template-columns:1.15fr .85fr;gap:54px;padding-top:28px}}
+  .eyebrow{display:flex;align-items:center;gap:9px;color:var(--accent);font-weight:700;font-size:clamp(9px,2.4vw,12px);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;white-space:nowrap}
+  .eyebrow::before{content:"";width:28px;height:2px;background:var(--accent);display:inline-block;flex-shrink:0}
+  .hero h1{font-family:"Playfair Display","Didot",Georgia,"Times New Roman",serif;font-weight:700;font-size:clamp(26px,5.6vw,52px);line-height:1.07;letter-spacing:.2px;color:var(--ink)}
+  .hero h1 em{color:var(--accent);font-style:italic;font-weight:700}
+  .hero h1 .nw{white-space:nowrap}
+  .hero .sub{color:var(--muted);font-size:clamp(17px,2.2vw,20px);max-width:540px;margin-top:12px;line-height:1.35}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:32px}
+  .cta{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:600;padding:15px 20px;border-radius:999px;font-size:16px;white-space:nowrap;transition:transform .2s,background .2s,color .2s,box-shadow .2s;cursor:pointer;border:0}
+  .cta.primary{background:var(--accent);color:#fff;box-shadow:0 12px 30px rgba(184,84,46,.28)}
+  .cta.primary:hover{background:var(--accent-d);transform:translateY(-3px)}
+  .cta.outline{background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow)}
+  .cta.outline:hover{color:var(--accent);transform:translateY(-3px);box-shadow:0 16px 40px rgba(120,90,50,.2)}
+  .cta svg{width:19px;height:19px;flex-shrink:0}
+  .hero-cta .cta{flex:1;justify-content:center}
+  @media(min-width:920px){.hero-cta .cta{flex:0 0 auto}}
+  .rating{color:var(--gold);font-weight:700;font-size:14px;white-space:nowrap;flex-shrink:0}
+  .infobar{display:grid;grid-template-columns:1fr 1fr;margin-top:24px;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);max-width:560px}
+  .ib{padding:15px 18px}
+  .ib+.ib{border-left:1px solid var(--line);text-align:right}
+  .ib b{display:block;font-size:14px;color:var(--ink);font-weight:700}
+  .ib span{display:block;font-size:14px;color:var(--muted);margin-top:3px}
+  .iblink{text-decoration:none;color:inherit;transition:background .2s}
+  .iblink:hover{background:#faf3e7}
+  .iblink span{color:var(--accent);font-weight:600}
+
+  .hero-media{position:relative;order:-1}
+  @media(min-width:920px){.hero-media{order:0}}
+  .hero-photo{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:24px;box-shadow:var(--shadow);background:#e6dccb}
+  .badge-card{position:absolute;left:12px;bottom:12px;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:12px 16px 12px 12px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;max-width:calc(100% - 24px)}
+  @media(min-width:920px){.badge-card{left:-8px;bottom:-18px;max-width:78%}}
+  .badge-card img{width:54px;height:54px;border-radius:12px;object-fit:cover;flex-shrink:0}
+  .badge-card .t small{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);font-weight:700}
+  .badge-card .t b{font-family:Georgia,serif;font-size:17px;color:var(--ink)}
+
+  /* sections */
+  .pad{padding:90px 0}
+  .sec-eyebrow{display:flex;align-items:center;gap:14px;color:var(--accent);font-weight:700;font-size:13px;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px}
+  .sec-eyebrow::before{content:"";width:42px;height:2px;background:var(--accent)}
+  h2.title{font-family:"Playfair Display","Didot",Georgia,"Times New Roman",serif;font-weight:600;font-size:clamp(30px,5vw,48px);line-height:1.08;color:var(--ink)}
+  h2.title em{color:var(--accent)}
+  .lead{color:var(--muted);font-size:clamp(16px,2.2vw,19px);max-width:680px;margin-top:18px}
+
+  .pillars{display:grid;grid-template-columns:1fr;gap:20px;margin-top:46px}
+  @media(min-width:760px){.pillars{grid-template-columns:repeat(3,1fr)}}
+  .pillar{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:30px 26px;box-shadow:var(--shadow);transition:transform .3s,box-shadow .3s}
+  .pillar:hover{transform:translateY(-8px);box-shadow:0 26px 60px rgba(120,90,50,.2)}
+  .pillar .ic{font-size:32px}
+  .pillar h3{font-family:Georgia,serif;font-size:22px;margin:14px 0 8px;color:var(--ink)}
+  .pillar p{color:var(--muted);font-size:16px}
+
+  /* marquee */
+  .marquee{padding:30px 0;background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}
+  .marquee .row{display:flex;gap:16px;width:max-content;animation:scrollx 40s linear infinite}
+  .marquee:hover .row{animation-play-state:paused}
+  .marquee img{height:190px;width:270px;object-fit:cover;border-radius:14px}
+  @keyframes scrollx{to{transform:translateX(-50%)}}
+  @media(prefers-reduced-motion:reduce){.marquee .row{animation:none;flex-wrap:wrap;width:auto;justify-content:center}}
+
+  /* Sternekoch (dark) */
+  .chef{background:var(--dark);color:#efe4d2}
+  .chef .grid{display:grid;grid-template-columns:1fr;gap:40px;align-items:center}
+  @media(min-width:880px){.chef .grid{grid-template-columns:1fr 1.1fr;gap:56px}}
+  .chef .ph{border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.4);aspect-ratio:4/3;background:#3a2a1c}
+  .chef .ph img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s}
+  .chef .ph:hover img{transform:scale(1.06)}
+  .chef .sec-eyebrow{color:var(--gold)}
+  .chef .sec-eyebrow::before{background:var(--gold)}
+  .chef h2{font-family:"Playfair Display","Didot",Georgia,"Times New Roman",serif;font-weight:600;font-size:clamp(28px,4.6vw,42px);color:#fff;line-height:1.1}
+  .chef p{color:#cdbda6;font-size:17px;margin-top:18px}
+  .chef .quote{font-family:Georgia,serif;font-style:italic;color:var(--gold);font-size:21px;margin-top:20px}
+
+  /* Feiern (terracotta) */
+  .feiern{background:var(--accent);color:#fff;text-align:center}
+  .feiern h2{font-family:"Playfair Display","Didot",Georgia,"Times New Roman",serif;font-weight:600;font-size:clamp(30px,5vw,46px);color:#fff}
+  .feiern .tags{display:flex;flex-wrap:wrap;gap:10px 14px;justify-content:center;margin:24px 0 12px;font-size:16px}
+  .feiern .lead2{color:#ffe9df;max-width:660px;margin:0 auto 30px;font-size:clamp(16px,2.2vw,19px)}
+  .feiern .cta.light{background:#fff;color:var(--accent)}
+  .feiern .cta.light:hover{background:#fff;transform:translateY(-3px)}
+
+  /* info */
+  .info{display:grid;grid-template-columns:1fr;gap:24px;margin-top:42px}
+  @media(min-width:760px){.info{grid-template-columns:1fr 1fr}}
+  .infocard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:30px;box-shadow:var(--shadow)}
+  .infocard h3{font-family:Georgia,serif;font-size:22px;color:var(--accent);margin-bottom:14px}
+  .infocard .r{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:16px}
+  .infocard .r:last-of-type{border-bottom:0}
+  .infocard .r b{font-weight:600}
+  .infocard a{color:var(--accent);font-weight:600}
+  .infocard .closed{color:var(--muted)}
+  .acts{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+
+  footer{background:var(--dark2);color:#e8ddca;text-align:center;padding:52px 24px}
+  footer .fbrand{font-family:Georgia,serif;font-size:24px;color:#fff}
+  footer .fbrand b{color:var(--gold)}
+  footer .flinks{display:flex;gap:8px 18px;justify-content:center;flex-wrap:wrap;margin:18px 0;font-size:15px}
+  footer a{color:var(--gold-soft)}
+  footer a:hover{color:#fff}
+  footer .small{color:#9c8e76;font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<header id="hdr">
+  <div class="wrap nav">
+    <a class="brand" href="#top"><span class="st" aria-hidden="true">★★★</span>Ristorante Pizzeria <b>Italia</b><span class="st" aria-hidden="true">★★★</span></a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow reveal">Cucina Italiana · Bruchhausen-Vilsen</div>
+      <h1 class="reveal d1"><span class="nw">Echte italienische</span> <em>Lebensfreude</em>&nbsp;in Bruchhausen-Vilsen.</h1>
+      <p class="sub reveal d2">Frisch gekocht, herzlich serviert — und immer mit dem Geschmack Italiens.</p>
+      <div class="hero-cta reveal d2">
+        <a class="cta primary" href="/reservierungsportal/"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Reservieren</a>
+        <a class="cta outline" href="https://www.google.com/maps/dir/?api=1&amp;destination=Engelbergplatz+4+27305+Bruchhausen-Vilsen" target="_blank" rel="noopener"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>Route starten</a>
+      </div>
+      <div class="infobar reveal d2">
+        <div class="ib"><b id="todayLabel">Öffnungszeiten heute</b><span id="todayHours">—</span></div>
+        <a class="ib iblink" href="/app/"><b>Speisekarte</b><span>Jetzt ansehen →</span></a>
+      </div>
+    </div>
+    <div class="hero-media reveal d1">
+      <video id="heroVideo" class="hero-photo" style="display:block" autoplay muted loop playsinline preload="auto" poster="assets/italia-hero-poster.jpg" aria-label="Video: Burrata, Carpaccio und unser Logo">
+        <source src="assets/italia-hero.mp4" type="video/mp4">
+        <source src="assets/italia-hero.webm" type="video/webm">
+      </video>
+      <script>
+      /* Läuft das Video nicht (z. B. iPhone), zeigen wir dieselbe Animation als Bild. */
+      (function () {
+        var v = document.getElementById('heroVideo');
+        if (!v) return;
+        var done = false;
+        function zeigeBild() {
+          if (done || (!v.paused && v.currentTime > 0.1)) return;
+          done = true;
+          var img = new Image();
+          img.className = 'hero-photo';
+          img.style.display = 'block';
+          img.alt = 'Burrata, Carpaccio und unser Logo';
+          img.onerror = function () { img.onerror = null; img.src = v.poster; };
+          img.src = 'assets/italia-hero-anim.avif';
+          v.replaceWith(img);
+        }
+        var quellen = v.getElementsByTagName('source');
+        if (quellen.length) quellen[quellen.length - 1].addEventListener('error', zeigeBild);
+        var p = v.play && v.play();
+        if (p && p.catch) p.catch(function (e) { if (e && e.name === 'NotAllowedError') zeigeBild(); });
+        setTimeout(zeigeBild, 3500);
+      })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ÜBER UNS -->
+<section class="pad" id="ueber">
+  <div class="wrap">
+    <div class="sec-eyebrow reveal">Willkommen</div>
+    <h2 class="title reveal">Qualität, Kreativität &amp; <em>herzlicher Service</em></h2>
+    <p class="lead reveal d1">Lassen Sie sich verwöhnen mit raffinierten Nudelgerichten, knusprigen Pizzen, gegrilltem Fleisch und frischem Fisch.</p>
+    <div class="pillars">
+      <div class="pillar reveal d1"><div class="ic">🌿</div><h3>Frische Qualität</h3><p>Täglich frische, sorgfältig ausgewählte Zutaten — die Basis jeder guten italienischen Küche.</p></div>
+      <div class="pillar reveal d2"><div class="ic">👨‍🍳</div><h3>Kreative Küche</h3><p>Raffinierte Nudelgerichte, Pizzen aus dem Ofen, gegrilltes Fleisch und frischer Fisch.</p></div>
+      <div class="pillar reveal d3"><div class="ic">🍷</div><h3>Herzlicher Service</h3><p>Aufmerksam und persönlich — damit Sie sich vom ersten Moment an wohlfühlen.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee" aria-hidden="true">
+  <div class="row">
+    <img src="/app/img/pizza.webp" alt=""><img src="/app/img/pasta.webp" alt=""><img src="/app/img/carne.webp" alt=""><img src="/app/img/pesce.webp" alt=""><img src="/app/img/insalate.webp" alt=""><img src="/app/img/dolci.webp" alt="">
+    <img src="/app/img/pizza.webp" alt=""><img src="/app/img/pasta.webp" alt=""><img src="/app/img/carne.webp" alt=""><img src="/app/img/pesce.webp" alt=""><img src="/app/img/insalate.webp" alt=""><img src="/app/img/dolci.webp" alt="">
+  </div>
+</div>
+
+<!-- FEIERN -->
+<section class="feiern pad" id="feiern">
+  <div class="wrap">
+    <h2 class="reveal">Mit uns feiern Sie <em>richtig</em>.</h2>
+    <div class="tags reveal d1">Hochzeit · Geburtstag · Firmenfeier · Jubiläum · Catering</div>
+    <p class="lead2 reveal d1">…oder andere Festlichkeiten — mit uns wird Ihr Event zu einem kulinarischen Erlebnis.</p>
+    <a class="cta light reveal d2" href="mailto:kontakt@ristorante-pizzeria-italia.com">Anfrage senden →</a>
+  </div>
+</section>
+
+<!-- ZEITEN & KONTAKT -->
+<section class="pad" id="kontakt">
+  <div class="wrap">
+    <div class="sec-eyebrow reveal">Besuchen Sie uns</div>
+    <h2 class="title reveal">Öffnungszeiten &amp; <em>Kontakt</em></h2>
+    <div class="info">
+      <div class="infocard reveal d1">
+        <h3>Öffnungszeiten</h3>
+        <div class="r"><b>Montag</b><span>11:30–14:30 · 17:30–22:30</span></div>
+        <div class="r"><b>Dienstag</b><span class="closed">Ruhetag</span></div>
+        <div class="r"><b>Mittwoch</b><span class="closed">Ruhetag</span></div>
+        <div class="r"><b>Do – Sa</b><span>11:30–14:30 · 17:30–22:30</span></div>
+        <div class="r"><b>Sonntag</b><span>11:30–14:00 · 17:00–22:00</span></div>
+      </div>
+      <div class="infocard reveal d2">
+        <h3>Kontakt</h3>
+        <div class="r"><b>Adresse</b><span>Engelbergplatz 4, 27305 Bruchhausen-Vilsen</span></div>
+        <div class="r"><b>Telefon</b><a href="tel:+4942524597">04252 4597</a></div>
+        <div class="r"><b>E-Mail</b><a href="mailto:kontakt@ristorante-pizzeria-italia.com">kontakt@…</a></div>
+        <div class="acts">
+          <a class="cta primary" style="padding:12px 20px;font-size:15px" href="https://www.google.com/maps/dir/?api=1&amp;destination=Engelbergplatz+4+27305+Bruchhausen-Vilsen" target="_blank" rel="noopener"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>Route starten</a>
+          <a class="cta outline" style="padding:12px 20px;font-size:15px" href="tel:+4942524597"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>Anrufen</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="fbrand">Ristorante Pizzeria <b>Italia</b></div>
+  <div class="flinks">
+    <a href="/app/">Speisekarte</a><span>·</span>
+    <a href="/reservierungsportal/">Reservierung</a><span>·</span>
+    <a href="/Impressionen/">Impressionen</a><span>·</span>
+    <a href="/Impressum/impressum.html">Impressum</a><span>·</span>
+    <a href="/Datenschutz/datenschutz.html">Datenschutz</a>
+  </div>
+  <div class="small">© Ristorante Pizzeria Italia · Engelbergplatz 4 · 27305 Bruchhausen-Vilsen</div>
+  <div class="small">Abbildungen mit Künstlicher Intelligenz erstellt.</div>
+</footer>
+
+<script>
+const hdr=document.getElementById('hdr');
+const onScroll=()=>hdr.classList.toggle('solid',window.scrollY>20);
+onScroll();window.addEventListener('scroll',onScroll,{passive:true});
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.14});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// Öffnungsstatus nach Wochentag + Uhrzeit
+(function(){
+  const wk=['So','Mo','Di','Mi','Do','Fr','Sa'];
+  const t=(h,m)=>h*60+m;
+  const sched={
+    0:[[t(11,30),t(14,0)],[t(17,0),t(22,0)]],
+    1:[[t(11,30),t(14,30)],[t(17,30),t(22,30)]],
+    2:[],3:[],
+    4:[[t(11,30),t(14,30)],[t(17,30),t(22,30)]],
+    5:[[t(11,30),t(14,30)],[t(17,30),t(22,30)]],
+    6:[[t(11,30),t(14,30)],[t(17,30),t(22,30)]]
+  };
+  const fmt=x=>String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0');
+  const now=new Date(),day=now.getDay(),cur=now.getHours()*60+now.getMinutes();
+  const lab=document.getElementById('todayLabel'),h=document.getElementById('todayHours');
+  if(!lab||!h)return;
+  const set=(l,s,open)=>{lab.textContent=l;h.textContent=s;lab.style.color=open?'#4f7a3a':'';};
+  // Betriebsferien (Format 'YYYY-MM-DD'). Leer lassen = keine Ferien.
+  const FERIEN=[{von:'2026-07-02',bis:'2026-07-13'}]; // weitere Zeiträume hier ergänzen
+  const pad=n=>String(n).padStart(2,'0');
+  const todayStr=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+  const fer=FERIEN.find(f=>todayStr>=f.von&&todayStr<=f.bis);
+  if(fer){const e=new Date(fer.bis);e.setDate(e.getDate()+1);set('Betriebsferien','wieder ab '+pad(e.getDate())+'.'+pad(e.getMonth()+1)+'.',false);return;}
+  const today=sched[day];
+  const openNow=today.find(r=>cur>=r[0]&&cur<r[1]);
+  if(openNow){set('Jetzt geöffnet','bis '+fmt(openNow[1]),true);return;}
+  const later=today.find(r=>cur<r[0]);
+  if(later){set('Geschlossen','Öffnet um '+fmt(later[0]),false);return;}
+  for(let i=1;i<=7;i++){const dd=(day+i)%7,rs=sched[dd];if(rs.length){set('Geschlossen','Öffnet '+(i===1?'morgen ':wk[dd]+' ')+fmt(rs[0][0]),false);return;}}
+})();
+</script>
+</body>
+</html>
