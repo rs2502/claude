@@ -156,39 +156,44 @@ try{if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').match
   /* ===== START-ANIMATION (oberer Bereich, beim Öffnen) ===== */
   html.hx .hero .reveal{opacity:1;transform:none;transition:none}
   html.hx .brand{animation:hxFade .8s ease .05s both}
-  /* Eyebrow: Linie zieht auf, Text tippt sich */
-  html.hx .hero .eyebrow::before{transform-origin:0 50%;animation:hxLine .6s cubic-bezier(.6,0,.2,1) .2s both}
-  html.hx .hero .eyebrow .et{white-space:pre}
-  html.hx .hero .eyebrow .c{opacity:0;animation:hxType .01s linear both;animation-delay:calc(.45s + var(--i) * 28ms)}
-  /* Überschrift: Buchstabe für Buchstabe */
-  html.hx .hero h1 .w{display:inline-block;white-space:nowrap}
-  html.hx .hero h1 .c{display:inline-block;opacity:0;transform:translateY(.55em) rotate(10deg);transform-origin:0 100%;
-    animation:hxChar .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.55s + var(--i) * 32ms)}
-  html.hx .hero h1 em{position:relative;display:inline-block}
-  html.hx .hero h1 em .c{animation-name:hxCharPop,hxWave;animation-duration:.8s,7s;animation-timing-function:cubic-bezier(.2,.9,.3,1.35),ease-in-out;
-    animation-iteration-count:1,infinite;animation-fill-mode:both,none;
-    animation-delay:calc(.55s + var(--i) * 32ms),calc(3.4s + var(--j) * 60ms)}
-  html.hx .hero h1 em .sw{position:absolute;left:-2%;bottom:-.16em;width:104%;height:.32em;overflow:visible;pointer-events:none}
-  html.hx .hero h1 em .sw path{fill:none;stroke:var(--accent);stroke-width:3.2;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;
-    opacity:0;animation:hxDraw .9s cubic-bezier(.6,0,.2,1) 1.75s both}
-  /* Untertitel Wort für Wort, dann Buttons und Leiste */
-  html.hx .hero .sub .sw2{display:inline-block;opacity:0;transform:translateY(8px);animation:hxUp .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(2.05s + var(--i) * 45ms)}
+  /* Eyebrow „atmet ein“: weit gesperrt -> normal */
+  html.hx .hero .eyebrow::before{transform-origin:0 50%;animation:hxLine .7s cubic-bezier(.6,0,.2,1) .15s both}
+  html.hx .hero .eyebrow .et{display:inline-block;animation:hxBreathIn 1.3s cubic-bezier(.2,.8,.2,1) .2s both}
+  /* Überschrift: Wörter klappen in 3D auf */
+  html.hx .hero h1{perspective:700px}
+  html.hx .hero h1 .w,html.hx .hero h1 em{display:inline-block;transform-origin:50% 100%;backface-visibility:hidden;
+    animation:hxFlip 1s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.45s + var(--i) * 110ms)}
+  /* „Lebensfreude“: Kontur, dann steigt die Füllung wie Rotwein, danach Glanzlicht */
+  html.hx .hero h1 em{color:transparent;-webkit-text-fill-color:transparent;-webkit-text-stroke:1.3px var(--accent);
+    background-image:linear-gradient(105deg,transparent 42%,rgba(255,240,225,.75) 50%,transparent 58%),url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20200%20300%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20fill%3D%22%23b8542e%22%20d%3D%22M0%20100%20C%2025%2088%2C%2050%2088%2C%2075%20100%20S%20125%20112%2C%20150%20100%20S%20200%2088%2C%20200%20100%20L200%20300%20L0%20300%20Z%22/%3E%3C/svg%3E");
+    background-repeat:no-repeat,repeat-x;background-size:250% 100%,2.2em 300%;background-position:160% 0,0 0;
+    -webkit-background-clip:text;background-clip:text;padding:0 .06em .12em 0;margin:0 -.06em -.12em 0;
+    animation-name:hxFlip,hxPour,hxGloss;animation-duration:1s,2.8s,7s;
+    animation-timing-function:cubic-bezier(.2,.8,.2,1),cubic-bezier(.35,.1,.35,1),ease-in-out;
+    animation-iteration-count:1,1,infinite;animation-fill-mode:both,both,none;
+    animation-delay:calc(.45s + var(--i) * 110ms),1.1s,4.2s}
+  /* Untertitel wird scharf, Buttons, Leiste */
+  html.hx .hero .sub{animation:hxFocus 1.1s cubic-bezier(.2,.8,.2,1) 1.75s both}
   html.hx .hero-cta .cta{animation:hxPop .6s cubic-bezier(.2,.9,.3,1.25) both}
-  html.hx .hero-cta .cta.primary{animation-delay:2.55s}
-  html.hx .hero-cta .cta.outline{animation-delay:2.68s}
-  html.hx .hero .infobar{animation:hxUp .8s cubic-bezier(.2,.8,.2,1) 2.85s both}
+  html.hx .hero-cta .cta.primary{animation-delay:2.15s;position:relative;overflow:hidden}
+  html.hx .hero-cta .cta.outline{animation-delay:2.28s}
+  html.hx .hero-cta .cta.primary::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:45%;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);animation:hxShine 1s ease-in-out 2.9s both}
+  html.hx .hero .infobar{animation:hxUp .8s cubic-bezier(.2,.8,.2,1) 2.45s both}
   /* Foto */
   html.hx .hero-media{border-radius:24px;overflow:hidden;box-shadow:var(--shadow);animation:hxWipe 1.2s cubic-bezier(.6,0,.2,1) .35s both}
   html.hx .hero-media .hero-photo{box-shadow:none;animation:hxZoom 1.8s cubic-bezier(.2,.8,.2,1) .35s both,hxBreath 14s ease-in-out 2.2s infinite alternate}
+
   @keyframes hxFade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
   @keyframes hxLine{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-  @keyframes hxType{to{opacity:1}}
-  @keyframes hxChar{to{opacity:1;transform:none}}
-  @keyframes hxCharPop{0%{opacity:0;transform:translateY(.7em) scale(.6) rotate(-12deg)}60%{opacity:1}100%{opacity:1;transform:none}}
-  @keyframes hxWave{0%,8%,100%{transform:none}4%{transform:translateY(-.14em)}}
-  @keyframes hxDraw{0%{opacity:0;stroke-dashoffset:1}1%{opacity:1}100%{opacity:1;stroke-dashoffset:0}}
-  @keyframes hxUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  @keyframes hxBreathIn{from{opacity:0;letter-spacing:.9em;filter:blur(4px)}to{opacity:1;letter-spacing:1.2px;filter:none}}
+  @keyframes hxFlip{from{opacity:0;transform:translateY(.25em) rotateX(-95deg)}45%{opacity:1}to{opacity:1;transform:none}}
+  @keyframes hxPour{from{background-position:160% 0,0 0}to{background-position:160% 0,-8.8em 100%}}
+  @keyframes hxGloss{0%,62%{background-position:160% 0,0 100%}88%,100%{background-position:-60% 0,0 100%}}
+  @keyframes hxFocus{from{opacity:0;filter:blur(10px);transform:translateY(6px)}to{opacity:1;filter:none;transform:none}}
   @keyframes hxPop{from{opacity:0;transform:translateY(10px) scale(.92)}to{opacity:1;transform:none}}
+  @keyframes hxShine{to{left:130%}}
+  @keyframes hxUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
   @keyframes hxWipe{from{-webkit-clip-path:inset(100% 0 0 0 round 24px);clip-path:inset(100% 0 0 0 round 24px)}to{-webkit-clip-path:inset(0 0 0 0 round 24px);clip-path:inset(0 0 0 0 round 24px)}}
   @keyframes hxZoom{from{transform:scale(1.18)}to{transform:scale(1)}}
   @keyframes hxBreath{from{transform:scale(1)}to{transform:scale(1.05)}}
@@ -298,42 +303,26 @@ try{if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').match
 </footer>
 
 <script>
-/* Start-Animation: Texte in Buchstaben/Wörter zerlegen (der Text selbst bleibt gleich) */
+/* Start-Animation: Wörter markieren (der Text selbst bleibt gleich) */
 (function(){
   if(!document.documentElement.classList.contains('hx'))return;
-  function chars(el, wrapWords){
-    var i=0;
-    (function walk(node){
-      Array.prototype.slice.call(node.childNodes).forEach(function(c){
-        if(c.nodeType===3){
-          var f=document.createDocumentFragment();
-          c.textContent.split(/([ \t\n ]+)/).forEach(function(part){
-            if(!part)return;
-            if(/^[ \t\n ]+$/.test(part)){f.appendChild(document.createTextNode(part));return;}
-            var holder=f;
-            if(wrapWords){var w=document.createElement('span');w.className='w';f.appendChild(w);holder=w;}
-            Array.from(part).forEach(function(ch){
-              var s=document.createElement('span');s.className='c';s.style.setProperty('--i',i++);s.textContent=ch;holder.appendChild(s);
-            });
-          });
-          node.replaceChild(f,c);
-        }else if(c.nodeType===1){walk(c);}
-      });
-    })(el);
-  }
   var eb=document.querySelector('.hero .eyebrow');
-  if(eb){var et=document.createElement('span');et.className='et';et.textContent=eb.textContent;eb.textContent='';eb.appendChild(et);chars(et,false);}
-  var h=document.querySelector('.hero h1');
-  if(h){
-    chars(h,true);
-    var em=h.querySelector('em');
-    if(em){
-      Array.prototype.forEach.call(em.querySelectorAll('.c'),function(c,j){c.style.setProperty('--j',j);});
-      em.insertAdjacentHTML('beforeend','<svg class="sw" viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M3 13 C 40 5, 75 17, 110 10 S 170 4, 197 9"/></svg>');
-    }
-  }
-  var sub=document.querySelector('.hero .sub');
-  if(sub){var k=0;sub.innerHTML=sub.textContent.split(/(\s+)/).map(function(p){return /^\s+$/.test(p)||!p?p:'<span class="sw2" style="--i:'+(k++)+'">'+p+'</span>';}).join('');}
+  if(eb){var et=document.createElement('span');et.className='et';et.textContent=eb.textContent;eb.textContent='';eb.appendChild(et);}
+  var h=document.querySelector('.hero h1'); if(!h)return; var i=0;
+  (function walk(node){
+    Array.prototype.slice.call(node.childNodes).forEach(function(c){
+      if(c.nodeType===3){
+        var f=document.createDocumentFragment();
+        c.textContent.split(/([ \t\n ]+)/).forEach(function(p){
+          if(!p)return;
+          if(/^[ \t\n ]+$/.test(p)){f.appendChild(document.createTextNode(p));return;}
+          var w=document.createElement('span');w.className='w';w.style.setProperty('--i',i++);w.textContent=p;f.appendChild(w);
+        });
+        node.replaceChild(f,c);
+      }else if(c.nodeName==='EM'){c.style.setProperty('--i',i++);}
+      else if(c.nodeType===1){walk(c);}
+    });
+  })(h);
 })();
 </script>
 <script>
