@@ -1,0 +1,290 @@
+{
+  "ok": true,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 10,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "timeline_track_too_dense",
+        "severity": "warning",
+        "message": "Track 2 has 4 timed elements in this HTML file. Smaller sub-compositions keep timelines easier to read, iterate on, and diff.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "/home/user/claude/edits/demo/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move coherent scene groups into separate .html files under compositions/ and mount them from the parent with data-composition-src so the timeline stays easier to inspect, revise, and validate."
+      },
+      {
+        "code": "unknown_variable_binding",
+        "severity": "warning",
+        "message": "<div> binds data-var-text=\"kicker\" but no variable \"kicker\" is declared in data-composition-variables, so the binding will silently keep the authored fallback.",
+        "selector": "#kicker",
+        "dataAttributes": {},
+        "sourceFile": "/home/user/claude/edits/demo/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Declare the variable on the composition root (<html>, or the [data-composition-id] root element for a template/fragment comp): data-composition-variables='[{\"id\":\"kicker\",\"type\":\"string\",\"label\":\"kicker\",\"default\":\"...\"}]', or fix the binding id."
+      },
+      {
+        "code": "unknown_variable_binding",
+        "severity": "warning",
+        "message": "<div> binds data-var-text=\"title\" but no variable \"title\" is declared in data-composition-variables, so the binding will silently keep the authored fallback.",
+        "selector": "#title",
+        "dataAttributes": {},
+        "sourceFile": "/home/user/claude/edits/demo/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Declare the variable on the composition root (<html>, or the [data-composition-id] root element for a template/fragment comp): data-composition-variables='[{\"id\":\"title\",\"type\":\"string\",\"label\":\"title\",\"default\":\"...\"}]', or fix the binding id."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"glowwrap\"> is a timeline element that contains nested <div id=\"glow\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#glowwrap",
+        "dataAttributes": {},
+        "sourceFile": "/home/user/claude/edits/demo/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"glowwrap\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"head\"> is a timeline element that contains nested <div id=\"kicker\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#head",
+        "dataAttributes": {},
+        "sourceFile": "/home/user/claude/edits/demo/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"head\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"donutwrap\"> is a timeline element that contains nested <img id=\"donut\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#donutwrap",
+        "dataAttributes": {},
+        "sourceFile": "/home/user/claude/edits/demo/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"donutwrap\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"g0\"> is a timeline element that contains nested <div id=\"g0in\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#g0",
+        "dataAttributes": {},
+        "sourceFile": "/home/user/claude/edits/demo/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"g0\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"g1\"> is a timeline element that contains nested <div id=\"g1in\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#g1",
+        "dataAttributes": {},
+        "sourceFile": "/home/user/claude/edits/demo/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"g1\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"g2\"> is a timeline element that contains nested <div id=\"g2in\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#g2",
+        "dataAttributes": {},
+        "sourceFile": "/home/user/claude/edits/demo/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"g2\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"g3\"> is a timeline element that contains nested <div id=\"g3in\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#g3",
+        "dataAttributes": {},
+        "sourceFile": "/home/user/claude/edits/demo/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"g3\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      }
+    ],
+    "filesScanned": 1
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "duration": 7,
+    "samples": [
+      0.389,
+      1.167,
+      1.944,
+      2.722,
+      3.5,
+      4.278,
+      5.056,
+      5.833,
+      6.611
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 0,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": true,
+    "samples": [
+      0.389,
+      1.944,
+      3.5,
+      5.056,
+      6.611
+    ],
+    "checked": 26,
+    "passed": 26
+  },
+  "craft": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 2,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "line_unread",
+        "severity": "warning",
+        "message": "\"This donut was made\" (4 words) is on screen 1.06 s (±0.01 s), under its 1.27 s floor: hold it about 0.5 s + 0.3 s a word (1.70 s here) before it leaves or changes; see references/motion.md.",
+        "text": "This donut was made",
+        "selector": "#g0in",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 177.48,
+          "y": 1185.54,
+          "width": 713.21,
+          "height": 191.56999999999994
+        },
+        "time": 0.273,
+        "words": 4,
+        "seconds": 1.063,
+        "floorSeconds": 1.275
+      },
+      {
+        "code": "line_unread",
+        "severity": "warning",
+        "message": "\"Every word you read\" (4 words) is on screen 1.07 s (±0.01 s), under its 1.27 s floor: hold it about 0.5 s + 0.3 s a word (1.70 s here) before it leaves or changes; see references/motion.md.",
+        "text": "Every word you read",
+        "selector": "#g2in",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 180.16,
+          "y": 1190.28,
+          "width": 713.12,
+          "height": 188.41000000000008
+        },
+        "time": 3.203,
+        "words": 4,
+        "seconds": 1.07,
+        "floorSeconds": 1.275
+      }
+    ],
+    "enabled": true,
+    "step": 0.125,
+    "samples": 56
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  }
+}

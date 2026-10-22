@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="gsap.min.js"></script>
+    <style>
+      :root {
+        --ground: #14101f;
+        --ground-2: #2a1640;
+        --ink: #ffffff;
+        --accent: #ff4f8b;
+        --font-display: "Archivo Black";
+        --font-body: "Inter";
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden;
+        background: radial-gradient(circle at 50% 42%, var(--ground-2) 0%, var(--ground) 62%); }
+      #glow { position: absolute; left: 90px; top: 380px; width: 900px; height: 900px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(255,79,139,0.35) 0%, rgba(255,79,139,0) 70%); }
+      #kicker { position: absolute; top: 230px; width: 100%; text-align: center; font-family: var(--font-body);
+        font-weight: 700; font-size: 34px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); }
+      #title { position: absolute; top: 285px; width: 100%; text-align: center; font-family: var(--font-display);
+        font-size: 96px; line-height: 1.02; color: var(--ink); }
+      #donut { position: absolute; left: -60px; top: 230px; width: 1200px; height: 1200px; }
+      .cap { position: absolute; top: 1150px; width: 100%; overflow: visible; }
+      .capin { width: 100%; padding: 0 60px; text-align: center; font-family: var(--font-display);
+        font-size: 70px; line-height: 1.12; color: var(--ink); text-shadow: 0 6px 24px rgba(0,0,0,0.45); }
+      .w { display: inline-block; margin: 0 0.1em; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="7" data-width="1080" data-height="1920">
+      <div id="glowwrap" class="clip" data-start="0" data-duration="7" data-track-index="0"><div id="glow"></div></div>
+      <div id="head" class="clip" data-start="0" data-duration="7" data-track-index="1">
+        <div id="kicker" data-var-text="kicker">Claude Code edit setup</div>
+        <div id="title" data-var-text="title">Made by Claude</div>
+      </div>
+      <div id="donutwrap" class="clip" data-start="0" data-duration="7" data-track-index="4"><img id="donut" src="assets/donut.png" alt="Donut rendered in Blender" /></div>
+      <div id="g0" class="clip cap" data-start="0.22" data-duration="1.14" data-track-index="2"><div class="capin" id="g0in"><span class="w" id="g0w0">This</span> <span class="w" id="g0w1">donut</span> <span class="w" id="g0w2">was</span> <span class="w" id="g0w3">made</span></div></div>
+      <div id="g1" class="clip cap" data-start="1.36" data-duration="1.78" data-track-index="2"><div class="capin" id="g1in"><span class="w" id="g1w0">for</span> <span class="w" id="g1w1">free</span> <span class="w" id="g1w2">in</span> <span class="w" id="g1w3">Blender.</span></div></div>
+      <div id="g2" class="clip cap" data-start="3.14" data-duration="1.16" data-track-index="2"><div class="capin" id="g2in"><span class="w" id="g2w0">Every</span> <span class="w" id="g2w1">word</span> <span class="w" id="g2w2">you</span> <span class="w" id="g2w3">read</span></div></div>
+      <div id="g3" class="clip cap" data-start="4.3" data-duration="2.2" data-track-index="2"><div class="capin" id="g3in"><span class="w" id="g3w0">was</span> <span class="w" id="g3w1">timed</span> <span class="w" id="g3w2">by</span> <span class="w" id="g3w3">Whisper.</span></div></div>
+      <audio id="voice" class="clip" data-start="0.3" data-duration="6.1" data-track-index="5" src="assets/voice.wav"></audio>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#donut", { scale: 0.85, rotation: -12 }, { scale: 1, rotation: 8, duration: 6.9, ease: "sine.inOut" }, 0);
+      tl.fromTo("#donut", { y: 0 }, { y: -26, duration: 1.7, ease: "sine.inOut", yoyo: true, repeat: 3 }, 0);
+      tl.fromTo("#glow", { scale: 0.9, opacity: 0.7 }, { scale: 1.1, opacity: 1, duration: 6.9, ease: "sine.inOut" }, 0);
+      tl.fromTo("#title", { y: 18 }, { y: 0, duration: 0.5, ease: "power3.out" }, 0);
+      tl.fromTo("#g0in", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.18, ease: "power3.out" }, 0.22);
+      tl.to("#g0w0", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 0.3);
+      tl.to("#g0w0", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 0.4);
+      tl.to("#g0w1", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 0.54);
+      tl.to("#g0w1", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 0.64);
+      tl.to("#g0w2", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 0.82);
+      tl.to("#g0w2", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 0.92);
+      tl.to("#g0w3", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 1.14);
+      tl.to("#g0w3", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 1.24);
+      tl.to("#g0in", { opacity: 0, duration: 0.12, ease: "power2.in" }, 1.23);
+      tl.fromTo("#g1in", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.18, ease: "power3.out" }, 1.36);
+      tl.to("#g1w0", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 1.44);
+      tl.to("#g1w0", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 1.54);
+      tl.to("#g1w1", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 1.74);
+      tl.to("#g1w1", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 1.84);
+      tl.to("#g1w2", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 2.02);
+      tl.to("#g1w2", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 2.12);
+      tl.to("#g1w3", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 2.2);
+      tl.to("#g1w3", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 2.3);
+      tl.to("#g1in", { opacity: 0, duration: 0.12, ease: "power2.in" }, 3.01);
+      tl.fromTo("#g2in", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.18, ease: "power3.out" }, 3.14);
+      tl.to("#g2w0", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 3.22);
+      tl.to("#g2w0", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 3.32);
+      tl.to("#g2w1", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 3.62);
+      tl.to("#g2w1", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 3.72);
+      tl.to("#g2w2", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 3.98);
+      tl.to("#g2w2", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 4.08);
+      tl.to("#g2w3", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 4.16);
+      tl.to("#g2w3", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 4.26);
+      tl.to("#g2in", { opacity: 0, duration: 0.12, ease: "power2.in" }, 4.17);
+      tl.fromTo("#g3in", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.18, ease: "power3.out" }, 4.3);
+      tl.to("#g3w0", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 4.38);
+      tl.to("#g3w0", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 4.48);
+      tl.to("#g3w1", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 4.66);
+      tl.to("#g3w1", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 4.76);
+      tl.to("#g3w2", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 5.06);
+      tl.to("#g3w2", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 5.16);
+      tl.to("#g3w3", { color: "#FF4F8B", scale: 1.12, duration: 0.08, ease: "power2.out" }, 5.36);
+      tl.to("#g3w3", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 5.46);
+      tl.to("#g3in", { opacity: 0, duration: 0.12, ease: "power2.in" }, 6.37);
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
