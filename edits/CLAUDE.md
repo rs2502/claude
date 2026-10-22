@@ -22,10 +22,11 @@ uv pip install --python ~/.local/edit-tools/.venv/bin/python --only-binary llvml
 
 ### Network limits of this container
 
-The network policy blocks the model hosts: `openaipublic.azureedge.net` (Whisper),
-`huggingface.co` (CLAP), `dl.fbaipublicfiles.com` (Demucs), plus `download.pytorch.org`,
-`download.blender.org` and `cdn.jsdelivr.net`. Until those are allowed in the
-environment's network settings, the models can't download.
+The model hosts must be allowed in the environment's network settings:
+`openaipublic.azureedge.net` (Whisper), `dl.fbaipublicfiles.com` (Demucs) and, for CLAP,
+`huggingface.co` plus its file servers `*.hf.co` (`cas-server.xethub.hf.co`,
+`us.aws.cdn.hf.co`). Blocked and worked around: `download.pytorch.org`,
+`download.blender.org`, `cdn.jsdelivr.net`.
 HyperFrames compositions must load GSAP locally (`gsap.min.js` next to `index.html`,
 taken from npm: `npm pack gsap@3.14.2`), not from jsDelivr, or the render fails.
 
