@@ -1,0 +1,8 @@
+renders/
+*.mp4
+stems/
+test/
+hf-test/renders/
+hf-test/node_modules/
+transcript.json
+events.json
