@@ -2,11 +2,11 @@
  {
   "text": "Training",
   "start": 0.0,
-  "end": 0.3
+  "end": 0.28
  },
  {
   "text": "bei",
-  "start": 0.3,
+  "start": 0.28,
   "end": 0.52
  },
  {
@@ -16,207 +16,207 @@
  },
  {
   "text": "Drei",
-  "start": 1.2,
-  "end": 1.52
+  "start": 1.12,
+  "end": 1.44
  },
  {
   "text": "Fragen",
-  "start": 1.52,
-  "end": 1.88
+  "start": 1.44,
+  "end": 1.8
  },
  {
   "text": "kurz",
-  "start": 1.88,
-  "end": 2.28
+  "start": 1.8,
+  "end": 2.18
  },
  {
   "text": "beantwortet.",
-  "start": 2.28,
-  "end": 3.1
+  "start": 2.18,
+  "end": 2.94
  },
  {
-  "text": "Stell",
-  "start": 4.06,
-  "end": 4.54
+  "text": "Stellt",
+  "start": 3.26,
+  "end": 3.52
  },
  {
   "text": "sich",
-  "start": 4.54,
-  "end": 4.72
+  "start": 3.52,
+  "end": 3.66
  },
  {
   "text": "das",
-  "start": 4.72,
-  "end": 4.88
+  "start": 3.66,
+  "end": 3.8
  },
  {
   "text": "Gerät",
-  "start": 4.88,
-  "end": 5.22
+  "start": 3.8,
+  "end": 4.16
  },
  {
   "text": "ein?",
-  "start": 5.22,
-  "end": 5.44
+  "start": 4.16,
+  "end": 4.36
  },
  {
   "text": "Ja,",
-  "start": 6.12,
-  "end": 6.36
+  "start": 4.76,
+  "end": 4.92
  },
  {
   "text": "per",
-  "start": 6.68,
-  "end": 6.76
+  "start": 5.26,
+  "end": 5.34
  },
  {
   "text": "Chip.",
-  "start": 6.76,
-  "end": 6.98
+  "start": 5.34,
+  "end": 5.54
  },
  {
   "text": "Du",
-  "start": 7.4,
-  "end": 7.46
+  "start": 5.94,
+  "end": 6.04
  },
  {
   "text": "machst",
-  "start": 7.46,
-  "end": 7.66
+  "start": 6.04,
+  "end": 6.22
  },
  {
   "text": "gar",
-  "start": 7.66,
-  "end": 7.94
+  "start": 6.22,
+  "end": 6.52
  },
  {
   "text": "nichts.",
-  "start": 7.94,
-  "end": 8.18
+  "start": 6.52,
+  "end": 6.76
  },
  {
   "text": "Muss",
-  "start": 9.08,
-  "end": 9.38
+  "start": 7.12,
+  "end": 7.32
  },
  {
   "text": "ich",
-  "start": 9.38,
-  "end": 9.56
+  "start": 7.32,
+  "end": 7.5
  },
  {
   "text": "fit",
-  "start": 9.56,
-  "end": 9.74
+  "start": 7.5,
+  "end": 7.68
  },
  {
   "text": "sein?",
-  "start": 9.74,
-  "end": 10.0
+  "start": 7.68,
+  "end": 7.94
  },
  {
-  "text": "Nein,",
-  "start": 10.7,
-  "end": 10.98
+  "text": "Nein.",
+  "start": 8.32,
+  "end": 8.6
  },
  {
-  "text": "das",
-  "start": 11.42,
-  "end": 11.52
+  "text": "Das",
+  "start": 8.98,
+  "end": 9.12
  },
  {
   "text": "Training",
-  "start": 11.52,
-  "end": 11.78
+  "start": 9.12,
+  "end": 9.4
  },
  {
   "text": "startet",
-  "start": 11.78,
-  "end": 12.26
+  "start": 9.4,
+  "end": 9.88
  },
  {
   "text": "genau",
-  "start": 12.26,
-  "end": 12.48
+  "start": 9.88,
+  "end": 10.08
  },
  {
   "text": "da,",
-  "start": 12.48,
-  "end": 12.76
+  "start": 10.08,
+  "end": 10.38
  },
  {
   "text": "wo",
-  "start": 12.88,
-  "end": 13.0
+  "start": 10.5,
+  "end": 10.6
  },
  {
   "text": "du",
-  "start": 13.0,
-  "end": 13.18
+  "start": 10.6,
+  "end": 10.8
  },
  {
   "text": "stehst.",
-  "start": 13.18,
-  "end": 13.72
+  "start": 10.8,
+  "end": 11.34
  },
  {
   "text": "Wie",
-  "start": 14.74,
-  "end": 14.98
+  "start": 11.66,
+  "end": 11.84
  },
  {
   "text": "oft?",
-  "start": 14.98,
-  "end": 15.26
+  "start": 11.84,
+  "end": 12.12
  },
  {
   "text": "Zweimal",
-  "start": 15.92,
-  "end": 16.28
+  "start": 12.48,
+  "end": 12.84
  },
  {
   "text": "pro",
-  "start": 16.28,
-  "end": 16.44
+  "start": 12.84,
+  "end": 13.0
  },
  {
   "text": "Woche",
-  "start": 16.44,
-  "end": 16.66
+  "start": 13.0,
+  "end": 13.22
  },
  {
   "text": "reicht",
-  "start": 16.66,
-  "end": 16.86
+  "start": 13.22,
+  "end": 13.42
  },
  {
   "text": "schon.",
-  "start": 16.86,
-  "end": 17.12
+  "start": 13.42,
+  "end": 13.68
  },
  {
   "text": "Komm",
-  "start": 17.58,
-  "end": 17.72
+  "start": 14.04,
+  "end": 14.2
  },
  {
   "text": "vorbei",
-  "start": 17.72,
-  "end": 18.02
+  "start": 14.2,
+  "end": 14.48
  },
  {
   "text": "und",
-  "start": 18.02,
-  "end": 18.32
+  "start": 14.48,
+  "end": 14.78
  },
  {
   "text": "probier's",
-  "start": 18.32,
-  "end": 18.72
+  "start": 14.78,
+  "end": 15.18
  },
  {
   "text": "aus.",
-  "start": 18.72,
-  "end": 18.88
+  "start": 15.18,
+  "end": 15.32
  }
 ]
