@@ -7,3 +7,4 @@ hf-test/node_modules/
 transcript.json
 events.json
 **/.hyperframes/artifacts/
+**/.transcode-cache/
