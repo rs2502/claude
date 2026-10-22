@@ -2,25 +2,28 @@
 
 ## Edit tools (setup by Kapa, @kappa.ai)
 
-This runs in a Claude Code cloud container (Ubuntu, CPU only). Everything outside
-this repo (Python env, models, Blender) disappears with the container: if a path
-below is missing, reinstall it from the steps in this file.
+Works on the user's Mac (main setup) and in a Claude Code cloud container (Ubuntu, CPU).
+Check `uname` first. If a tool below is missing on the Mac, install it with Kapa's guide
+(Homebrew: `brew install node ffmpeg uv`, `brew install --cask blender`); in the cloud,
+run `bash edits/setup.sh`.
 
 - Tools folder: `~/.local/edit-tools`
-- PY (Whisper, CLAP, Demucs): `~/.local/edit-tools/.venv/bin/python` (Python 3.11,
+- PY (Whisper, CLAP, Demucs): `~/.local/edit-tools/.venv/bin/python` on both (Python 3.11,
   torch 2.2.2, `numpy<2`, transformers 4.44.2, demucs 4.0.1, openai-whisper)
-- Blender: `/usr/bin/blender` (4.0.2 from Ubuntu apt: `apt-get install -y blender`)
+- Blender: Mac `/Applications/Blender.app/Contents/MacOS/Blender` (official build, renders
+  scripts directly); cloud `/usr/bin/blender` (Ubuntu 4.0.2, needs `blender/run.py`, below)
 - HyperFrames: `npx hyperframes@latest ...`; skills live in `~/.claude/skills/hyperframes*`
   (`npx hyperframes@latest skills update`, `npx hyperframes@latest browser ensure`)
+- Test voices: Mac `say -o test.aiff "..."`; cloud `espeak-ng -w test.wav "..."`
 
-Reinstall the Python env (download.pytorch.org is blocked here, so torch comes from PyPI):
+Cloud only: reinstall the Python env (download.pytorch.org is blocked there, so torch comes from PyPI):
 ```bash
 uv venv --python 3.11 ~/.local/edit-tools/.venv
 uv pip install --python ~/.local/edit-tools/.venv/bin/python torch==2.2.2 torchaudio==2.2.2 "numpy<2" transformers==4.44.2 soundfile demucs==4.0.1
 uv pip install --python ~/.local/edit-tools/.venv/bin/python --only-binary llvmlite --only-binary numba openai-whisper
 ```
 
-### Network limits of this container
+### Network limits of the cloud container (the Mac has none of these)
 
 The model hosts must be allowed in the environment's network settings:
 `openaipublic.azureedge.net` (Whisper), `dl.fbaipublicfiles.com` (Demucs) and, for CLAP,
