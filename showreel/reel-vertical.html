@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8">
+<style>
+@font-face{font-family:PF;src:url(pf-normal.woff2) format('woff2');font-weight:400 900;font-style:normal}
+@font-face{font-family:PF;src:url(pf-italic.woff2) format('woff2');font-weight:400 900;font-style:italic}
+:root{--bg:#f7f1e8;--ink:#2f2922;--muted:#857c6e;--line:#ece2d1;--acc:#b8542e;--gold:#bb9540;--card:#fff}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:var(--bg)}
+body{font-family:PF,serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+#stage{position:absolute;inset:0;overflow:hidden;background:var(--bg)}
+#world{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0}
+.abs{position:absolute;white-space:nowrap}
+.m{display:inline-block;overflow:hidden;vertical-align:top;padding:0 .06em .14em;margin:0 -.06em -.14em}
+.i{display:inline-block;will-change:transform}
+.card{position:absolute;background:var(--card);border:1.5px solid var(--line);border-radius:28px;box-shadow:0 18px 50px rgba(120,90,50,.14)}
+svg{display:block}
+</style></head><body>
+<div id="stage"><div id="world">
+
+  <!-- ===== S1 hero ===== -->
+  <div id="s1">
+    <div class="abs" id="eyeLine" style="left:92px;top:528px;height:3px;width:50px;background:var(--ink);transform-origin:0 50%"></div>
+    <div class="abs" id="eyeTxt" style="left:160px;top:512px;font-size:22px;font-weight:700;letter-spacing:3px;color:var(--ink)"><span class="m"><span class="i">CUCINA ITALIANA · BRUCHHAUSEN-VILSEN</span></span></div>
+    <div class="abs" style="left:84px;top:560px;font-size:122px;font-weight:700;line-height:1.06;letter-spacing:.4px">
+      <div><span class="m"><span class="i" id="h1a">Echte</span></span></div>
+      <div><span class="m"><span class="i" id="h1a2">italienische</span></span></div>
+      <div><span class="m"><span class="i" id="h1b" style="color:var(--acc);font-style:italic">Lebensfreude</span></span> <span class="m"><span class="i" id="h1c">in</span></span></div>
+      <div><span class="m"><span class="i" id="h1d">Bruchhausen-</span></span></div>
+      <div><span class="m"><span class="i" id="h1d2">Vilsen.</span></span></div>
+    </div>
+    <div class="abs" id="sub" style="left:90px;top:1230px;width:860px;white-space:normal;font-size:34px;line-height:1.35;color:var(--muted)"><span class="m"><span class="i">Frisch gekocht, herzlich serviert — und immer mit</span></span><br><span class="m"><span class="i">dem Geschmack Italiens.</span></span></div>
+    <div class="abs" id="route" style="left:452px;top:1376px;height:96px;padding:0 38px;border-radius:999px;background:#fff;border:1.5px solid var(--line);box-shadow:0 18px 50px rgba(120,90,50,.14);display:flex;align-items:center;gap:14px;font-size:34px;font-weight:700">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>Route starten</div>
+  </div>
+
+  <!-- ===== S2 hours card ===== -->
+  <div class="card" id="hcard" style="left:90px;top:560px;width:900px;height:800px"></div>
+  <div id="s2txt">
+    <div class="abs" id="htitle" style="left:150px;top:600px;font-size:58px;font-weight:700"><span class="m"><span class="i">Öffnungszeiten</span></span></div>
+  </div>
+
+  <!-- ===== S3 pillars ===== -->
+  <div id="s3"></div>
+
+  <!-- ===== the through-line pill ===== -->
+  <div id="pill" class="abs" style="background:var(--acc);overflow:hidden;box-shadow:0 12px 30px rgba(184,84,46,.28)">
+    <div id="pillLbl" class="abs" style="left:0;top:0;height:96px;width:340px;display:flex;align-items:center;justify-content:center;gap:14px;color:#fff;font-size:34px;font-weight:700">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>Reservieren</span></div>
+  </div>
+  <div id="s2rows"></div>
+
+  <!-- ===== S4 feiern ===== -->
+  <div id="s4" style="color:#fff">
+    <div class="abs" id="ftitle" style="left:0;width:1080px;text-align:center;top:560px;font-size:140px;font-weight:600;line-height:1.06">
+      <div><span class="m"><span class="i" id="fa">Mit uns</span></span></div>
+      <div><span class="m"><span class="i" id="fa2">feiern Sie</span></span></div>
+      <div><span class="m"><span class="i" id="fb" style="font-style:italic">richtig</span></span><span class="m"><span class="i" id="fc">.</span></span></div></div>
+    <div class="abs" id="tags" style="left:0;width:1080px;top:1100px;text-align:center;font-size:44px;font-weight:500;line-height:1.6"></div>
+    <div class="abs" id="fbtn" style="left:0;top:1300px;height:100px;padding:0 50px;border-radius:999px;background:#fff;color:var(--acc);display:flex;align-items:center;font-size:36px;font-weight:700">Anfrage senden →</div>
+  </div>
+
+  <!-- ===== S5 logo ===== -->
+  <div id="s5">
+    <div class="abs" id="logo" style="left:0;width:1080px;top:742px;display:flex;flex-direction:column;align-items:center;font-weight:600;letter-spacing:.5px">
+      <div style="font-size:80px;line-height:1.1"><span class="m"><span class="i" id="lRP">Ristorante Pizzeria</span></span></div>
+      <div style="display:flex;align-items:center;font-size:150px;line-height:1.1">
+        <span id="stL" style="color:var(--gold);font-size:50px;letter-spacing:6px;margin-right:34px"></span>
+        <span class="m" id="lItW"><span class="i" id="lIt" style="color:var(--acc);font-style:italic">Italia</span></span>
+        <span id="stR" style="color:var(--gold);font-size:50px;letter-spacing:6px;margin-left:34px"></span>
+      </div>
+    </div>
+    <div class="abs" id="tag5" style="left:0;width:1080px;top:1110px;text-align:center;font-size:24px;font-weight:700;letter-spacing:5px;color:var(--ink)"><span class="m"><span class="i">CUCINA ITALIANA · BRUCHHAUSEN-VILSEN</span></span></div>
+    <div class="abs" id="url5" style="left:0;width:1080px;top:1162px;text-align:center;font-size:32px;color:var(--muted);letter-spacing:1px"><span class="m"><span class="i">www.ristorante-pizzeria-italia.com</span></span></div>
+  </div>
+
+  <!-- ripple + cursor -->
+  <div id="ripple" class="abs" style="border:3px solid var(--ink);border-radius:50%;width:10px;height:10px;opacity:0"></div>
+  <div id="cursor" class="abs" style="left:0;top:0;transform-origin:0 0">
+    <svg width="44" height="62" viewBox="0 0 22 31"><path d="M1.5 1.5 L1.5 24 L7 18.6 L10.8 27.6 L14.6 26 L10.9 17.2 L18.5 17.2 Z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+  </div>
+</div></div>
+
+<script>
+// ---------- data (verbatim from the website) ----------
+const HOURS=[['Montag','11:30–14:30 · 17:30–22:30'],['Dienstag','Ruhetag'],['Mittwoch','Ruhetag'],['Do – Sa','11:30–14:30 · 17:30–22:30'],['Sonntag','11:30–14:00 · 17:00–22:00']];
+const PILLARS=[['Frische Qualität','Täglich frische, sorgfältig ausgewählte Zutaten — die Basis jeder guten italienischen Küche.'],
+ ['Kreative Küche','Raffinierte Nudelgerichte, Pizzen aus dem Ofen, gegrilltes Fleisch und frischer Fisch.'],
+ ['Herzlicher Service','Aufmerksam und persönlich — damit Sie sich vom ersten Moment an wohlfühlen.']];
+const TAGS=['Hochzeit','Geburtstag','Firmenfeier','Jubiläum','Catering'];
+
+// ---------- layout constants ----------
+const CX=90,CY=560,CW=900,CH=800;               // hours card
+const ROW0=720,RH=118,RX=CX+30,RW=CW-60,RHH=90; // rows
+const PX=120,PY=430,PW=840,PH=310,PG=36;        // pillars (stacked)
+const cardY=i=>PY+i*(PH+PG);
+const chipRect=i=>[PX+44,cardY(i)+56,120,16];
+const rowRect=i=>[RX,ROW0+i*RH+(RH-RHH)/2,RW,RHH];
+const BTN=[90,1376,340,96];
+
+// build rows
+const rowsEl=document.getElementById('s2rows');
+HOURS.forEach((h,i)=>{const y=ROW0+i*RH;
+  rowsEl.insertAdjacentHTML('beforeend',`<div class="abs row" style="left:${RX+30}px;top:${y+34}px;width:${RW-60}px;display:flex;justify-content:space-between;font-size:34px">
+   <span class="m"><span class="i" style="font-weight:700">${h[0]}</span></span><span class="m"><span class="i" style="${h[1]==='Ruhetag'?'color:var(--muted);font-style:italic':''}">${h[1]}</span></span></div>
+   ${i<4?`<div class="abs rl" style="left:${RX+30}px;top:${y+RH-1}px;width:${RW-60}px;height:0;border-top:2px dashed var(--line);transform-origin:0 0"></div>`:''}`);});
+// build pillars
+const s3=document.getElementById('s3');
+PILLARS.forEach((p,i)=>{const x=PX,y=cardY(i);
+  s3.insertAdjacentHTML('beforeend',`<div class="card pc" style="left:${x}px;top:${y}px;width:${PW}px;height:${PH}px"></div>
+  <div class="pt"><div class="abs" style="left:${x+44}px;top:${y+98}px;font-size:48px;font-weight:700"><span class="m"><span class="i">${p[0]}</span></span></div>
+  <div class="abs" style="left:${x+44}px;top:${y+176}px;width:${PW-88}px;white-space:normal;font-size:30px;line-height:1.45;color:var(--muted)">${p[1].split(' ').map(w=>`<span class="m"><span class="i">${w}</span></span>`).join(' ')}</div></div>`);});
+// tags
+{const tg=i=>`<span class="tg" style="display:inline-block">${TAGS[i]}</span>`,dot=i=>`<span class="dot" data-i="${i}" style="display:inline-block;margin:0 .45em">·</span>`;
+ document.getElementById('tags').innerHTML=tg(0)+dot(1)+tg(1)+dot(2)+tg(2)+'<br>'+tg(3)+dot(4)+tg(4);}
+document.getElementById('stL').textContent='★★★';document.getElementById('stR').textContent='★★★';
+document.getElementById('stL').innerHTML=[...'★★★'].map(s=>`<span class="st" style="display:inline-block">${s}</span>`).join('');
+document.getElementById('stR').innerHTML=[...'★★★'].map(s=>`<span class="st" style="display:inline-block">${s}</span>`).join('');
+
+// ---------- math ----------
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const ss=t=>{t=clamp(t);return t*t*(3-2*t)};
+const eio=t=>{t=clamp(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+// damped spring step response, small overshoot (~5%)
+function S(dt,f=2.3,z=.68){if(dt<=0)return 0;const w=2*Math.PI*f,wd=w*Math.sqrt(1-z*z);
+  return 1-Math.exp(-z*w*dt)*(Math.cos(wd*dt)+(z*w/wd)*Math.sin(wd*dt));}
+const lr=(A,B,k)=>A.map((a,i)=>lerp(a,B[i],k));
+
+// ---------- reveal helpers ----------
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+function rev(el,t,t0,out=-1,dir=1){ // mask reveal (in at t0, out at `out`)
+  let k=S(t-t0,2.2,.72); let y=(1-k)*110*dir;
+  if(out>0&&t>out){y=-110*ss((t-out)/.32)*dir}
+  el.style.transform=`translateY(${y}%)`;}
+function grow(el,t,t0,origin='50% 50%',out=-1,f=2.3){let k=S(t-t0,f);
+  if(out>0&&t>out)k*=1-ss((t-out)/.3);
+  el.style.transformOrigin=origin;el.style.transform=`scale(${Math.max(0,k)})`;}
+function show(el,on){el.style.display=on?'':'none'}
+function clipFrom(el,box,R,k,rad){ // reveal el (box) from rect R
+  const [x,y,w,h]=box;const t=lerp(R[1]-y,0,k),l=lerp(R[0]-x,0,k),r=lerp(x+w-(R[0]+R[2]),0,k),b=lerp(y+h-(R[1]+R[3]),0,k);
+  el.style.clipPath=`inset(${t}px ${r}px ${b}px ${l}px round ${rad}px)`;}
+
+// ---------- camera ----------
+const FOC=[[0,530,960],[2.5,470,1100],[3.2,540,960],[4.6,540,1020],[5.4,540,980],[6.2,540,880],[7.4,540,900],[8.4,540,1060],[9.2,540,960],[12,540,940],[15,540,970]];
+function focus(t){for(let i=0;i<FOC.length-1;i++){const a=FOC[i],b=FOC[i+1];if(t<=b[0]){const k=eio((t-a[0])/(b[0]-a[0]));return [lerp(a[1],b[1],k),lerp(a[2],b[2],k)]}}const l=FOC[FOC.length-1];return [l[1],l[2]]}
+const camScale=t=>Math.pow(1.04,t/3); // continuous 1.0→1.04 per scene, carries over
+
+// ---------- cursor path ----------
+const CUR=[[0,980,2150],[2.0,980,2150],[2.42,268,1430],[4.4,760,1000],[4.92,640,ROW0+3*RH+62],[5.6,640,ROW0+3*RH+62],[7.35,chipRect(0)[0]+60,chipRect(0)[1]+10],
+ [7.6,chipRect(0)[0]+60,chipRect(0)[1]+10],[8.0,chipRect(1)[0]+60,chipRect(1)[1]+10],[8.06,chipRect(1)[0]+60,chipRect(1)[1]+10],[8.45,chipRect(2)[0]+60,chipRect(2)[1]+10],
+ [8.6,chipRect(2)[0]+60,chipRect(2)[1]+10],[9.1,900,1560],[11.3,900,1560],[11.86,580,1352],[12.15,580,1352],[12.7,820,2150]];
+function cursorPos(t){for(let i=0;i<CUR.length-1;i++){const a=CUR[i],b=CUR[i+1];if(t<=b[0]){const k=eio((t-a[0])/(b[0]-a[0]));
+  const arc=Math.sin(k*Math.PI)*Math.min(60,Math.hypot(b[1]-a[1],b[2]-a[2])*.08);return [lerp(a[1],b[1],k)+arc*.3,lerp(a[2],b[2],k)-arc]}}const l=CUR[CUR.length-1];return [l[1],l[2]]}
+const CLICKS=[2.5,5.0,7.5,8.5,12.0];
+
+// ---------- pill (through-line) ----------
+const FULL=[-700,-700,2480,3320];
+function pillState(t){ // returns [x,y,w,h,radius,scale]
+  let R=BTN.slice(),rad=42,sc=1;
+  if(t<2.75){sc=S(t-1.5,2.4);
+     const c=CLICKS[0];if(t>c){const d=t-c;sc*= d<.08?1-.08*(d/.08):1-.08*(1-S(d-.08,3,.45))}}
+  else if(t<5.0){R=lr(BTN,rowRect(0),S(t-2.75,1.9));rad=lerp(42,22,ss((t-2.75)/.4))}
+  else if(t<5.5){R=lr(rowRect(0),rowRect(3),S(t-5.0,2.4));rad=22}
+  else if(t<7.5){R=lr(rowRect(3),chipRect(0),S(t-5.5,2.0));rad=lerp(22,8,ss((t-5.5)/.4))}
+  else if(t<8.6){const [cx,cy]=cursorPos(t);const g=S(t-7.5,4,.5);rad=8;
+     R=chipRect(0);if(t>=7.6){R=[cx-60,cy-10,120,16]} if(t>8.5){R=lr(R,chipRect(2),S(t-8.5,3))}
+     sc=1+.18*g*(t<8.5?1:1-S(t-8.5,3,.55));}
+  else if(t<12.0){const c3=[PX,cardY(2),PW,PH];
+     const k1=S(t-8.6,2.6);R=lr(chipRect(2),c3,k1);rad=lerp(8,28,k1);
+     if(t>8.88){const k2=S(t-8.88,1.6,.9);R=lr(R,FULL,k2);rad=lerp(28,0,clamp(k2*1.5))}}
+  else if(t<13.4){const P=[540-220,960-75,440,150];
+     R=lr(FULL,P,S(t-12.0,1.9,.82));rad=lerp(0,70,clamp((t-12)/.25));
+     if(t>12.5){const it=$('#lItW').getBoundingClientRect(),w=wrld(it);const k=S(t-12.5,2.4,.72);
+       const U=[w.x+6,w.y+w.h-4,w.w-12,12];R=lr(P,U,k);rad=lerp(70,7,k)}
+     if(t>13.0){const it=$('#lItW').getBoundingClientRect(),w=wrld(it);const k=ss((t-13.0)/.4);
+       R=[w.x+6+(w.w-12)*k*.5,w.y+w.h-4,(w.w-12)*(1-k),12];rad=6;sc=1}}
+  else {R=[0,0,0,0]}
+  return [...R,rad,sc];}
+let CAM={s:1,f:[540,960]};
+function wrld(r){ // screen rect -> world rect
+  return {x:(r.left-540)/CAM.s+CAM.f[0],y:(r.top-960)/CAM.s+CAM.f[1],w:r.width/CAM.s,h:r.height/CAM.s}}
+
+// ---------- render ----------
+function render(t){
+  const s=camScale(t),f=focus(t);CAM={s,f};
+  $('#world').style.transform=`translate(${540-s*f[0]}px,${960-s*f[1]}px) scale(${s})`;
+
+  // S1
+  show($('#s1'),t<3.3);
+  const out1=2.7;
+  $('#eyeLine').style.transform=`scaleX(${t>out1?1-ss((t-out1)/.3):S(t,2)})`;
+  rev($('#eyeTxt .i'),t,.12,out1);
+  rev($('#h1a'),t,.5,out1+.04);rev($('#h1a2'),t,.62,out1+.06);rev($('#h1d2'),t,1.32,out1+.14);rev($('#h1b'),t,1.0,out1+.08);rev($('#h1c'),t,1.12,out1+.08);rev($('#h1d'),t,1.24,out1+.12);
+  $$('#sub .i').forEach((e,j)=>rev(e,t,1.38+j*.08,out1+.14));
+  grow($('#route'),t,1.62,'0% 50%',out1+.1);
+  // S2
+  const inS2=t>2.9&&t<6.1;show($('#hcard'),inS2);show($('#s2txt'),inS2);show($('#s2rows'),inS2);
+  if(inS2){const k=S(t-3.0,1.8,.75);let kk=k;
+    if(t>5.5)kk=1-ss((t-5.5)/.38);
+    clipFrom($('#hcard'),[CX,CY,CW,CH],rowRect(0),kk,28);
+    $('#hcard').style.transform='none';
+    rev($('#htitle .i'),t,3.35,5.5);
+    $$('#s2rows .row').forEach((r,i)=>{const [a,b]=r.querySelectorAll('.i');rev(a,t,3.5+i*.13,5.48);rev(b,t,3.56+i*.13,5.5);
+      // white text when pill covers row
+      const pr=pillState(t),cy=pr[1]+pr[3]/2,rc=ROW0+i*RH+RH/2;const cov=clamp(1-Math.abs(cy-rc)/50)*(t>3.2?1:0)*(pr[3]>40?1:0);
+      const col=`rgb(${lerp(47,255,cov)},${lerp(41,255,cov)},${lerp(34,255,cov)})`;a.style.color=col;b.style.color=HOURS[i][1]==='Ruhetag'?`rgb(${lerp(133,255,cov)},${lerp(124,255,cov)},${lerp(110,255,cov)})`:col;});
+    $$('#s2rows .rl').forEach((l,i)=>{l.style.transform=`scaleX(${t>5.45?1-ss((t-5.45)/.3):S(t-3.6-i*.13,2)})`});
+  }
+  // S3
+  const inS3=t>5.6&&t<9.5;show($('#s3'),inS3);
+  if(inS3){const cards=$$('.pc'),pts=$$('.pt');
+    // which card holds the chip
+    let over=-1;if(t>7.5&&t<8.62){const cy=cursorPos(t)[1];over=Math.round((cy-PY-66)/(PH+PG));}
+    cards.forEach((c,i)=>{const t0=5.95+i*.5;const k=S(t-t0,1.9,.74);let kk=k;
+      const out=8.62;const hide=(i<2&&t>out)?ss((t-out)/.32):0;
+      const c0=chipRect(i);const cr=(i===0&&hide===0)?c0:[c0[0]+c0[2]/2,c0[1]+c0[3]/2,0,0];clipFrom(c,[PX,cardY(i),PW,PH],cr,kk*(1-hide),28);c.style.visibility=kk*(1-hide)<.03?'hidden':'visible';
+      const lift=(i===over?-16:0);c._l=lerp(c._l||0,lift,.0);c.style.transform=`translateY(${lift*S(.3)}px)`;
+      const lt=over===i?-16:0;c.style.transform=`translateY(${lt}px)`;c.style.transition='none';
+      pts[i].style.transform=`translateY(${lt}px)`;
+      pts[i].querySelectorAll('.i').forEach((e,j)=>rev(e,t,t0+.18+j*.012,i<2?out-.02:8.95));
+      c.style.boxShadow=i===over?'0 26px 60px rgba(120,90,50,.22)':'0 18px 50px rgba(120,90,50,.14)';
+    });
+    // smooth lift: replace instant lift by spring based on enter time
+    cards.forEach((c,i)=>{const enter=[7.5,8.03,8.45][i],leave=[8.0,8.43,8.62][i];let l=0;
+      if(t>enter)l=S(t-enter,3,.6);if(t>leave)l*=1-S(t-leave,3,.6);c.style.transform=`translateY(${-16*l}px)`;pts[i].style.transform=`translateY(${-16*l}px)`;});
+  }
+  // S4
+  const inS4=t>8.95&&t<12.6;show($('#s4'),inS4);
+  if(inS4){const o=12.0;
+    rev($('#fa'),t,9.18,o);rev($('#fa2'),t,9.3,o);rev($('#fb'),t,9.5,o);rev($('#fc'),t,9.6,o);
+    const tg=$$('.tg'),dt=$$('.dot'),T=[10.0,10.5,11.0,11.25,11.5];
+    tg.forEach((e,i)=>grow(e,t,T[i],'50% 80%',o,2.6));dt.forEach(e=>grow(e,t,T[+e.dataset.i]-.05,'50% 50%',o,2.6));
+    const b=$('#fbtn');const bw=b.offsetWidth;b.style.left=(540-bw/2)+'px';
+    let k=S(t-11.62,2.5);if(t>o){const d=t-o;k*= d<.07?1-.1*(d/.07):1-.1;k*=1-ss((t-o-.05)/.25)}
+    b.style.transformOrigin='50% 50%';b.style.transform=`scale(${k})`;
+    const sq=t>o?1-ss((t-o)/.3):1;$('#ftitle').style.transform=`scale(${lerp(.6,1,sq)})`;$('#tags').style.transform=`scale(${lerp(.6,1,sq)})`;
+    $('#ftitle').style.opacity=$('#tags').style.opacity=sq;
+    $('#ftitle').style.transformOrigin=$('#tags').style.transformOrigin='50% 50%';
+  }
+  // S5
+  const inS5=t>12.3;show($('#s5'),inS5);
+  if(inS5){
+    // Italia: rises out of the pill, centred first, then slides to logo position
+    const lw=$('#lIt');const wrap=$('#lItW');
+    rev(lw,t,12.55);
+    const rp=$('#lRP');rev(rp,t,13.0);
+    // slide Italia from centre to final place
+    const lr_=wrap.getBoundingClientRect();
+    if(!render.itOff){const r=wrap.getBoundingClientRect();render.itOff=null}
+    const off=itOff(); const k=S(t-12.95,2.1,.7);
+    wrap.style.transform=`translateX(${off*(1-k)}px)`;
+    $$('#stL .st').forEach((e,i)=>grow(e,t,13.45+(2-i)*.08,'50% 60%',-1,2.8));
+    $$('#stR .st').forEach((e,i)=>grow(e,t,13.45+i*.08,'50% 60%',-1,2.8));
+    rev($('#tag5 .i'),t,14.0);rev($('#url5 .i'),t,14.5);
+    $('#rp_hide')
+  }
+  // pill
+  const P=pillState(t),pill=$('#pill');show(pill,t<13.4);
+  Object.assign(pill.style,{left:P[0]+'px',top:P[1]+'px',width:P[2]+'px',height:P[3]+'px',borderRadius:P[4]+'px',transform:`scale(${P[5]})`,transformOrigin:'50% 50%'});
+  pill.style.boxShadow=t<8.9?'0 12px 30px rgba(184,84,46,.28)':'none';
+  const lbl=$('#pillLbl');lbl.style.opacity=1;lbl.style.transform=`translateY(${t<2.75?(1-S(t-1.75,2.2))*90:-110*ss((t-2.75)/.25)}px)`;
+  // calendar icon draw-in
+  // ripple
+  let rp=0,rpos=null;for(const c of CLICKS){if(t>=c&&t<c+.5){rp=(t-c)/.5;rpos=cursorPos(c)}}
+  const rip=$('#ripple');if(rpos){const d=20+rp*110;Object.assign(rip.style,{left:rpos[0]-d/2+'px',top:rpos[1]-d/2+'px',width:d+'px',height:d+'px',opacity:.35*(1-rp)})}else rip.style.opacity=0;
+
+  // cursor
+  const cp=cursorPos(t),cu=$('#cursor');let cs=1.15;
+  for(const c of CLICKS){const d=t-c;if(d>-.06&&d<.25){cs*=1-.16*Math.exp(-Math.pow((d-.02)/.06,2))}}
+  if(t>7.5&&t<8.5)cs*=.92;
+  cu.style.transform=`translate(${cp[0]-3}px,${cp[1]-3}px) scale(${cs})`;
+}
+// offset needed to centre "Italia" within the frame (in world px, measured once at layout)
+let _off=null;
+function itOff(){if(_off!==null)return _off;const w=$('#lItW');const prev=w.style.transform;w.style.transform='none';
+  const r=w.offsetLeft;  // relative to flex parent
+  const logo=$('#logo');_off=0; w.style.transform=prev;return _off;}
+window.render=render;
+document.fonts.ready.then(()=>{window.READY=true});
+</script>
+</body></html>
