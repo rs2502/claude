@@ -149,31 +149,67 @@
   footer a{color:var(--gold-soft)}
   footer a:hover{color:#fff}
   footer .small{color:#9c8e76;font-size:13px;margin-top:8px}
-  /* ── Animation aus dem Showreel: Logo-Aufbau beim Laden + federnde Buttons ── */
+  /* ════════ Effekte aus dem Showreel ════════ */
   .brand .rp,.brand b,.brand .st span{display:inline-block}
-  .brand b{position:relative}
+
+  /* 1 · Intro: terracotta Bühne mit Logo, schrumpft in den Reservieren-Button */
+  #intro{display:none}
+  html.intro{overflow:hidden}
+  html.intro #intro{display:flex;position:fixed;inset:0;z-index:1000;background:var(--accent);color:#fff;align-items:center;justify-content:center;text-align:center;font-family:"Playfair Display","Didot",Georgia,"Times New Roman",serif;clip-path:inset(0px 0px 0px 0px round 0px);cursor:pointer}
+  #intro .in-logo{transition:transform .55s cubic-bezier(.6,0,.4,1),opacity .4s ease}
+  #intro.out .in-logo{transform:scale(.35);opacity:0}
+  #intro .in-rp{font-weight:600;font-size:clamp(26px,5.4vw,58px);line-height:1.1;overflow:hidden;padding:0 .1em .12em}
+  #intro .in-row{display:flex;align-items:center;justify-content:center;gap:clamp(12px,2.6vw,34px)}
+  #intro .in-it{display:inline-block;font-style:italic;font-weight:600;font-size:clamp(68px,14vw,168px);line-height:1.04;overflow:hidden;padding:0 .12em .14em}
+  #intro .in-rp span,#intro .in-it span{display:inline-block}
+  #intro .in-st{color:var(--gold-soft);font-size:clamp(16px,2.8vw,32px);letter-spacing:5px;white-space:nowrap}
+  #intro .in-st i{font-style:normal;display:inline-block}
+  #intro .in-tag{margin-top:clamp(10px,2vw,22px);padding:0 16px;font:700 clamp(9px,1.3vw,14px)/1.5 "Segoe UI",system-ui,sans-serif;letter-spacing:clamp(1.5px,.4vw,4px);text-transform:uppercase;color:#ffe9df}
+  html.intro #intro .in-it span{animation:fx-up .95s cubic-bezier(.34,1.4,.64,1) .15s both}
+  html.intro #intro .in-rp span{animation:fx-up .8s cubic-bezier(.22,1,.36,1) .5s both}
+  html.intro #intro .in-st i{animation:fx-pop .5s cubic-bezier(.34,1.8,.64,1) both}
+  html.intro #intro .in-st:first-child i:nth-child(3),html.intro #intro .in-st:last-child i:nth-child(1){animation-delay:.8s}
+  html.intro #intro .in-st:first-child i:nth-child(2),html.intro #intro .in-st:last-child i:nth-child(2){animation-delay:.9s}
+  html.intro #intro .in-st:first-child i:nth-child(1),html.intro #intro .in-st:last-child i:nth-child(3){animation-delay:1s}
+  html.intro #intro .in-tag{animation:fx-wipe .7s cubic-bezier(.22,1,.36,1) 1.1s both}
+  .cta.fx-pop{animation:fx-btn .6s cubic-bezier(.34,1.8,.64,1)}
+
+  /* 2 · Öffnungszeiten: Balken gleitet auf den heutigen Tag */
+  #hours{position:relative}
+  #hours .r{position:relative;z-index:1;transition:color .35s}
+  #hours .r.today,#hours .r.today .closed{color:#fff}
+  #hours .today-pill{position:absolute;left:14px;right:14px;z-index:0;border-radius:12px;background:var(--accent);box-shadow:0 10px 24px rgba(184,84,46,.28);transform:scaleX(0);transition:top .75s cubic-bezier(.34,1.45,.64,1),transform .55s cubic-bezier(.34,1.45,.64,1)}
+  #hours .today-pill.on{transform:none}
+
+  /* 3 · Feiern: Fläche wächst beim Scrollen auf volle Breite, Anlässe springen auf */
+  .feiern .tags .tg{display:inline-block}
+  .feiern .tags.in .tg{animation:fx-pop .55s cubic-bezier(.34,1.8,.64,1) both}
+  .feiern .tags.in .tg:nth-child(1){animation-delay:.25s}.feiern .tags.in .tg:nth-child(3){animation-delay:.4s}
+  .feiern .tags.in .tg:nth-child(5){animation-delay:.55s}.feiern .tags.in .tg:nth-child(7){animation-delay:.7s}
+  .feiern .tags.in .tg:nth-child(9){animation-delay:.85s}
+
   @media(prefers-reduced-motion:no-preference){
-    .brand b{animation:lg-rise .8s cubic-bezier(.34,1.45,.64,1) .1s both}
-    .brand b::after{content:"";position:absolute;left:6%;right:6%;bottom:-.06em;height:.13em;border-radius:99px;background:var(--accent);transform:scaleX(0);animation:lg-line 1.5s .2s both}
-    .brand .rp{animation:lg-wipe .75s cubic-bezier(.22,1,.36,1) .55s both}
-    .brand .st span{animation:lg-pop .55s cubic-bezier(.34,1.8,.64,1) both}
-    .brand .st:first-child span:nth-child(3),.brand .st:last-child span:nth-child(1){animation-delay:.85s}
-    .brand .st:first-child span:nth-child(2),.brand .st:last-child span:nth-child(2){animation-delay:.93s}
-    .brand .st:first-child span:nth-child(1),.brand .st:last-child span:nth-child(3){animation-delay:1.01s}
+    .feiern{clip-path:inset(var(--fy,0px) var(--fx,0px) var(--fy,0px) var(--fx,0px) round var(--fr,0px))}
     .cta{transition:transform .5s cubic-bezier(.34,1.56,.64,1),background .2s,color .2s,box-shadow .2s}
     .cta.cta.cta:active,.feiern .cta.light:active{transform:scale(.94);transition-duration:.08s}
   }
-  @keyframes lg-rise{from{transform:translateY(100%);clip-path:inset(-.3em -.3em 100% -.3em)}to{transform:none;clip-path:inset(-.3em -.3em -.3em -.3em)}}
-  @keyframes lg-wipe{from{transform:translateX(.5em);clip-path:inset(-.3em -.3em -.3em 100%)}to{transform:none;clip-path:inset(-.3em -.3em -.3em -.3em)}}
-  @keyframes lg-pop{from{transform:scale(0)}to{transform:scale(1)}}
-  @keyframes lg-line{
-    0%{transform:scaleX(0);animation-timing-function:cubic-bezier(.34,1.5,.64,1)}
-    35%{transform:scaleX(1)}
-    70%{transform:scaleX(1);animation-timing-function:cubic-bezier(.6,0,.4,1)}
-    100%{transform:scaleX(0)}}
+  @media(prefers-reduced-motion:reduce){.feiern .tags.in .tg,.cta.fx-pop{animation:none}#hours .today-pill{transition:none}}
+  @keyframes fx-up{from{transform:translateY(112%)}to{transform:none}}
+  @keyframes fx-pop{from{transform:scale(0)}to{transform:scale(1)}}
+  @keyframes fx-wipe{from{clip-path:inset(0 50% 0 50%)}to{clip-path:inset(0 0 0 0)}}
+  @keyframes fx-btn{0%{transform:scale(1)}35%{transform:scale(1.12)}100%{transform:scale(1)}}
 </style>
+<script>try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!sessionStorage.getItem("introSeen"))document.documentElement.classList.add("intro")}catch(e){}</script>
 </head>
 <body>
+
+<div id="intro" aria-hidden="true">
+  <div class="in-logo">
+    <div class="in-rp"><span>Ristorante Pizzeria</span></div>
+    <div class="in-row"><span class="in-st"><i>★</i><i>★</i><i>★</i></span><span class="in-it"><span>Italia</span></span><span class="in-st"><i>★</i><i>★</i><i>★</i></span></div>
+    <div class="in-tag">Cucina Italiana · Bruchhausen-Vilsen</div>
+  </div>
+</div>
 
 <header id="hdr">
   <div class="wrap nav">
@@ -229,7 +265,7 @@
 <section class="feiern pad" id="feiern">
   <div class="wrap">
     <h2 class="reveal">Mit uns feiern Sie <em>richtig</em>.</h2>
-    <div class="tags reveal d1">Hochzeit · Geburtstag · Firmenfeier · Jubiläum · Catering</div>
+    <div class="tags reveal d1"><span class="tg">Hochzeit</span><span>·</span><span class="tg">Geburtstag</span><span>·</span><span class="tg">Firmenfeier</span><span>·</span><span class="tg">Jubiläum</span><span>·</span><span class="tg">Catering</span></div>
     <p class="lead2 reveal d1">…oder andere Festlichkeiten — mit uns wird Ihr Event zu einem kulinarischen Erlebnis.</p>
     <a class="cta light reveal d2" href="mailto:kontakt@ristorante-pizzeria-italia.com">Anfrage senden →</a>
   </div>
@@ -241,7 +277,7 @@
     <div class="sec-eyebrow reveal">Besuchen Sie uns</div>
     <h2 class="title reveal">Öffnungszeiten &amp; <em>Kontakt</em></h2>
     <div class="info">
-      <div class="infocard reveal d1">
+      <div class="infocard reveal d1" id="hours">
         <h3>Öffnungszeiten</h3>
         <div class="r"><b>Montag</b><span>11:30–14:30 · 17:30–22:30</span></div>
         <div class="r"><b>Dienstag</b><span class="closed">Ruhetag</span></div>
@@ -284,7 +320,54 @@ const hdr=document.getElementById('hdr');
 const onScroll=()=>hdr.classList.toggle('solid',window.scrollY>20);
 onScroll();window.addEventListener('scroll',onScroll,{passive:true});
 const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.14});
-document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+const startReveal=()=>document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ── Effekt 1: Intro – terracotta Bühne schrumpft in den Reservieren-Button ──
+(function(){
+  const root=document.documentElement,intro=document.getElementById('intro');
+  if(!root.classList.contains('intro')||!intro){startReveal();return;}
+  let done=false;
+  const finish=()=>{if(done)return;done=true;root.classList.remove('intro');intro.remove();
+    try{sessionStorage.setItem('introSeen','1')}catch(e){}
+    startReveal();const b=document.querySelector('.hero-cta .cta.primary');if(b)b.classList.add('fx-pop');};
+  const collapse=()=>{if(intro.classList.contains('out'))return;
+    const vw=innerWidth,vh=innerHeight,cta=document.querySelector('.hero-cta');
+    if(cta){cta.style.transition='none';cta.classList.add('in');}
+    let t=document.querySelector('.hero-cta .cta.primary'),r=t&&t.getBoundingClientRect(),rad='999px';
+    if(!r||r.bottom>vh-8||r.top<0){t=document.querySelector('.brand b');r=t.getBoundingClientRect();rad='10px';}
+    intro.classList.add('out');
+    intro.style.transition='clip-path .8s cubic-bezier(.7,0,.2,1.08)';
+    intro.style.clipPath=`inset(${r.top}px ${vw-r.right}px ${vh-r.bottom}px ${r.left}px round ${rad})`;
+    setTimeout(()=>{if(cta)cta.style.transition='';finish();},820);};
+  setTimeout(collapse,2000);
+  intro.addEventListener('click',collapse);addEventListener('keydown',collapse,{once:true});
+  setTimeout(finish,4500); // Sicherheitsnetz
+})();
+
+// ── Effekt 2: Balken auf dem heutigen Tag (Öffnungszeiten) ──
+(function(){
+  const card=document.getElementById('hours');if(!card)return;
+  const rows=card.querySelectorAll('.r'),d=new Date().getDay();
+  const idx={1:0,2:1,3:2,4:3,5:3,6:3,0:4}[d];const today=rows[idx];if(!today)return;
+  const pill=document.createElement('div');pill.className='today-pill';card.insertBefore(pill,rows[0]);
+  const place=r=>{pill.style.top=(r.offsetTop-2)+'px';pill.style.height=(r.offsetHeight+4)+'px';};
+  place(calm?today:rows[0]);
+  const go=()=>{pill.classList.add('on');setTimeout(()=>{place(today);setTimeout(()=>today.classList.add('today'),calm?0:380);},calm?0:420);};
+  new IntersectionObserver((es,o)=>{if(es[0].isIntersecting){o.disconnect();setTimeout(go,calm?0:500);}},{threshold:.6}).observe(card);
+  addEventListener('resize',()=>{if(pill.classList.contains('on'))place(today);});
+})();
+
+// ── Effekt 3: Feiern-Fläche wächst beim Scrollen auf volle Breite ──
+(function(){
+  const f=document.getElementById('feiern');if(!f||calm)return;
+  let raf=0;const upd=()=>{raf=0;const r=f.getBoundingClientRect(),vh=innerHeight;
+    let p=(vh-r.top)/(vh*.7);p=Math.min(1,Math.max(0,p));const e=1-Math.pow(1-p,3),k=1-e;
+    f.style.setProperty('--fx',(k*Math.min(innerWidth*.3,420)).toFixed(1)+'px');
+    f.style.setProperty('--fy',(k*60).toFixed(1)+'px');
+    f.style.setProperty('--fr',(k*240).toFixed(1)+'px');};
+  addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(upd)},{passive:true});addEventListener('resize',upd);upd();
+})();
 
 // Öffnungsstatus nach Wochentag + Uhrzeit
 (function(){
