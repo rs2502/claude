@@ -15,6 +15,10 @@ Approved reel scripts are kept in `.claude/instagram/reels/`.
 
 ## Arbeitsweise mit dem Nutzer
 
+- IMMER komplette, fertige Dateien liefern, die der Nutzer nur hochladen bzw.
+  ersetzen muss. NIE Code-Schnipsel zum Selbst-Einfügen oder Zusammenkopieren.
+  Fehlt die aktuelle Originaldatei, die Live-Seite abrufen und daraus die
+  komplette Datei bauen.
 - Immer komplette, vollständige Angaben machen: volle Download-Links (direkt
   ladbar, z. B. `https://github.com/rs2502/claude/raw/<branch>/<pfad>`, vorher
   prüfen, dass sie funktionieren) und genaue Schritt-für-Schritt-Anleitungen:
