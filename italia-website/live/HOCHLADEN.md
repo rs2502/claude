@@ -12,7 +12,7 @@ Per FTP in den Ordner `/start/` des Webspace laden:
 ## Was sich an der Startseite geändert hat
 
 1. Im `<head>`: eine Zeile, die `pizza-effekt.css` lädt.
-2. Der Bilder-Streifen (Marquee) zwischen „Qualität, Kreativität & herzlicher Service“ und „Mit uns feiern Sie richtig“ ist durch den Pizza-Abschnitt ersetzt.
+2. Zwischen „Qualität, Kreativität & herzlicher Service“ und dem Bilder-Streifen steht der neue Pizza-Abschnitt. Der Bilder-Streifen bleibt erhalten.
 3. Vor `</body>`: eine Zeile, die `pizza-effekt.js` lädt.
 
 Alles andere (Intro, Öffnungszeiten-Balken, Feiern-Effekt, Öffnungsstatus) ist unverändert.
