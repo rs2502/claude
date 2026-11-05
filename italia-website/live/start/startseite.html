@@ -21,7 +21,7 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html{scroll-behavior:smooth}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:18px;line-height:1.6;overflow-x:hidden}
+  body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:18px;line-height:1.6;overflow-x:hidden;overflow-x:clip}
   img{display:block;max-width:100%}
   a{color:inherit;text-decoration:none}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 30px}
@@ -202,7 +202,7 @@
   @keyframes fx-wipe{from{clip-path:inset(0 50% 0 50%)}to{clip-path:inset(0 0 0 0)}}
   @keyframes fx-btn{0%{transform:scale(1)}35%{transform:scale(1.12)}100%{transform:scale(1)}}
 </style>
-<link rel="stylesheet" href="/start/pizza-effekt/pizza-effekt.css?v=3">
+<link rel="stylesheet" href="/start/pizza-effekt/pizza-effekt.css?v=4">
 <script>try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!sessionStorage.getItem("introSeen"))document.documentElement.classList.add("intro")}catch(e){}</script>
 </head>
 <body>
@@ -445,6 +445,6 @@ const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
   for(let i=1;i<=7;i++){const dd=(day+i)%7,rs=sched[dd];if(rs.length){set('Geschlossen','Öffnet '+(i===1?'morgen ':wk[dd]+' ')+fmt(rs[0][0]),false);return;}}
 })();
 </script>
-<script src="/start/pizza-effekt/pizza-effekt.js?v=3" defer></script>
+<script src="/start/pizza-effekt/pizza-effekt.js?v=4" defer></script>
 </body>
 </html>

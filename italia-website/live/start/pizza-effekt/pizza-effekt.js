@@ -27,8 +27,8 @@
     { p: 0.30, y: -0.02, rx: 56, s: 0.92, st: 1, land: 0 },
     { p: 0.50, y: 0,     rx: 34, s: 0.98, st: 2, land: 0 },
     { p: 0.70, y: 0,     rx: 14, s: 1.04, st: 3, land: 0 },
-    { p: 0.88, y: 0.02,  rx: 0,  s: 0.86, st: 3, land: 1 },
-    { p: 1.00, y: 0.02,  rx: 0,  s: 0.86, st: 3, land: 1 }
+    { p: 0.88, y: 0,     rx: 0,  s: 0.74, st: 3, land: 1 },
+    { p: 1.00, y: 0,     rx: 0,  s: 0.74, st: 3, land: 1 }
   ];
   // Welcher Text wann sichtbar ist (Mitte jedes Schritts)
   var STEP_AT = [0.05, 0.30, 0.50, 0.70, 0.94];
@@ -37,6 +37,24 @@
   function lerp(a, b, t) { return a + (b - a) * t; }
   function ease(t) { return t * t * (3 - 2 * t); }
   function isPhone() { return innerWidth <= 760; }
+
+  // Hält die Bühne selbst fest, falls sticky im Browser nicht greift (iPhone-Safari mit overflow-x:hidden am body)
+  var fallback = false;
+  function pin() {
+    var r = track.getBoundingClientRect();
+    var top = parseFloat(getComputedStyle(root).getPropertyValue("--pzfx-top")) || 0;
+    var h = stage.clientHeight;
+    if (!fallback) {
+      // Mitten in der Strecke müsste die Bühne oben anliegen; sonst klappt sticky nicht
+      if (r.top < top - 40 && r.bottom > top + h + 40 && Math.abs(stage.getBoundingClientRect().top - top) > 2) {
+        fallback = true;
+        root.classList.add("is-fallback");
+      } else return;
+    }
+    var fixed = r.top <= top && r.bottom >= top + h;
+    root.classList.toggle("is-fixed", fixed);
+    root.classList.toggle("is-end", !fixed && r.bottom < top + h);
+  }
 
   function progress() {
     var r = track.getBoundingClientRect();
@@ -70,6 +88,7 @@
     var dt = Math.min(0.05, (now - last) / 1000); last = now;
     if (!visible) return;
 
+    pin();
     var p = progress();
     var T = target(p);
     if (!cur) cur = T;
@@ -98,7 +117,7 @@
     shadow.style.opacity = ((1 - cur.arc * 0.6) * (1 - cur.land * 0.8)).toFixed(3);
 
     plate.style.opacity = clamp(cur.land * 1.4, 0, 1).toFixed(3);
-    plate.style.transform = "translate(" + baseX.toFixed(1) + "px," + (baseY + 0.02 * stageH).toFixed(1) + "px) scale(" + lerp(0.8, 1, cur.land).toFixed(3) + ")";
+    plate.style.transform = "translate(" + baseX.toFixed(1) + "px," + baseY.toFixed(1) + "px) scale(" + lerp(0.8, 1, cur.land).toFixed(3) + ")";
 
     for (var i = 0; i < layers.length; i++) {
       layers[i].style.opacity = i === 0 ? 1 : clamp(cur.st - (i - 1), 0, 1).toFixed(3);

@@ -19,6 +19,12 @@
 
 /* Die Scroll-Strecke: je höher, desto langsamer läuft der Effekt */
 .pzfx-track { position: relative; height: 420vh; }
+/* Luft zum nächsten Abschnitt */
+.pzfx { padding-bottom: 56px; }
+/* Ersatz, falls ein Browser das Festhalten (sticky) nicht kann, z. B. Safari mit overflow-x:hidden am body */
+.pzfx.is-fallback .pzfx-stage { position: absolute; left: 0; right: 0; top: 0; }
+.pzfx.is-fallback.is-fixed .pzfx-stage { position: fixed; top: var(--pzfx-top); }
+.pzfx.is-fallback.is-end .pzfx-stage { top: auto; bottom: 0; }
 
 /* Die Bühne bleibt stehen, während man durch die Strecke scrollt */
 .pzfx-stage {
@@ -62,8 +68,8 @@
 }
 .pzfx-plate {
   position: absolute; left: 50%; top: 50%;
-  width: calc(var(--pzfx-size, 60vmin) * 1.32); height: calc(var(--pzfx-size, 60vmin) * 1.32);
-  margin: calc(var(--pzfx-size, 60vmin) * -0.66) 0 0 calc(var(--pzfx-size, 60vmin) * -0.66);
+  width: calc(var(--pzfx-size, 60vmin) * 1.12); height: calc(var(--pzfx-size, 60vmin) * 1.12);
+  margin: calc(var(--pzfx-size, 60vmin) * -0.56) 0 0 calc(var(--pzfx-size, 60vmin) * -0.56);
   opacity: 0;
   filter: drop-shadow(0 18px 24px rgba(60, 30, 15, 0.18));
   will-change: transform, opacity;
