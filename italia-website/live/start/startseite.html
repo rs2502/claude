@@ -199,8 +199,7 @@
   @keyframes fx-wipe{from{clip-path:inset(0 50% 0 50%)}to{clip-path:inset(0 0 0 0)}}
   @keyframes fx-btn{0%{transform:scale(1)}35%{transform:scale(1.12)}100%{transform:scale(1)}}
 </style>
-<link rel="stylesheet" href="/start/pizza-effekt/pizza-effekt.css?v=2">
-<script>document.documentElement.classList.add("hfx-wait");setTimeout(function(){var h=document.documentElement;h.classList.remove("hfx-wait");h.classList.add("hfx-go")},8000);</script>
+<link rel="stylesheet" href="/start/pizza-effekt/pizza-effekt.css?v=3">
 <script>try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!sessionStorage.getItem("introSeen"))document.documentElement.classList.add("intro")}catch(e){}</script>
 </head>
 <body>
@@ -236,16 +235,11 @@
       </div>
     </div>
     <div class="hero-media reveal d1">
-      <img class="hero-photo" src="assets/dining.jpg?v=1" alt="Italienisch essen im Ristorante Italia">
-      <!-- START-EFFEKT: Pizza fliegt ein (Stil + Skript in /start/pizza-effekt/) -->
-      <div class="hfx" aria-hidden="true">
-        <div class="hfx-item hfx-tom1"><div class="hfx-pop"><div class="hfx-float"><img src="/start/pizza-effekt/img/tomate.webp" alt=""></div></div></div>
-        <div class="hfx-item hfx-basil2"><div class="hfx-pop"><div class="hfx-float"><img src="/start/pizza-effekt/img/basilikum.webp" alt=""></div></div></div>
-        <div class="hfx-item hfx-pizza"><div class="hfx-spin"><div class="hfx-drop"><div class="hfx-dust"></div><img src="/start/pizza-effekt/img/pizza-4-margherita.webp" alt=""></div></div></div>
-        <div class="hfx-item hfx-basil1"><div class="hfx-pop"><div class="hfx-float"><img src="/start/pizza-effekt/img/basilikum.webp" alt=""></div></div></div>
-        <div class="hfx-item hfx-tom2"><div class="hfx-pop"><div class="hfx-float"><img src="/start/pizza-effekt/img/tomate.webp" alt=""></div></div></div>
-        <div class="hfx-item hfx-basil3"><div class="hfx-pop"><div class="hfx-float"><img src="/start/pizza-effekt/img/basilikum.webp" alt=""></div></div></div>
-      </div>
+      <!-- HERO-VIDEO: läuft endlos und stumm; Standbild als Vorschau und für "Bewegung reduzieren" -->
+      <video class="hero-photo" id="heroVideo" style="display:block" autoplay muted loop playsinline preload="auto" poster="assets/hero-pizza.jpg?v=1" aria-label="Pizza Margherita vor dem Holzofen">
+        <source src="assets/hero-pizza.mp4?v=1" type="video/mp4">
+        <source src="assets/hero-pizza.webm?v=1" type="video/webm">
+      </video>
     </div>
   </div>
 </section>
@@ -421,6 +415,11 @@ const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
   addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(upd)},{passive:true});addEventListener('resize',upd);upd();
 })();
 
+// Hero-Video: bei "Bewegung reduzieren" nur das Standbild zeigen
+(function(){const v=document.getElementById('heroVideo');if(!v)return;
+  if(calm){v.removeAttribute('autoplay');v.pause();return;}
+  const p=v.play();if(p&&p.catch)p.catch(()=>{});})();
+
 // Öffnungsstatus nach Wochentag + Uhrzeit
 (function(){
   const wk=['So','Mo','Di','Mi','Do','Fr','Sa'];
@@ -452,6 +451,6 @@ const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
   for(let i=1;i<=7;i++){const dd=(day+i)%7,rs=sched[dd];if(rs.length){set('Geschlossen','Öffnet '+(i===1?'morgen ':wk[dd]+' ')+fmt(rs[0][0]),false);return;}}
 })();
 </script>
-<script src="/start/pizza-effekt/pizza-effekt.js?v=2" defer></script>
+<script src="/start/pizza-effekt/pizza-effekt.js?v=3" defer></script>
 </body>
 </html>
