@@ -409,51 +409,87 @@ const key = new THREE.DirectionalLight(0xfff1dc, 2.2); key.position.set(4, 5, 6)
 const rim = new THREE.DirectionalLight(0xffc9a0, 1.6); rim.position.set(-5, 2, -3); scene.add(rim);
 scene.add(new THREE.AmbientLight(0xffffff, 0.35));
 
-/* ---- Flasche (Lathe-Profil, Mittelpunkt im Ursprung) ---- */
-const prof = [[0,-1.6],[0.44,-1.6],[0.53,-1.57],[0.56,-1.48],[0.56,0.3]];
-for (let i = 1; i <= 14; i++) {           // Schulter
-  const t = i / 14, y = 0.3 + t * 0.85;
-  prof.push([0.165 + (0.56 - 0.165) * Math.pow(Math.cos(t * Math.PI / 2), 1.6), y]);
+/* ---- Bordeauxflasche 0,75 l: Maße in mm, 300 mm hoch, Ø 75 mm ---- */
+const MM = 3.6 / 300, Y0 = -150;              // Mittelpunkt der Flasche im Ursprung
+const v = (r, y) => new THREE.Vector2(r * MM, (y + Y0) * MM);
+const prof = [
+  // Boden mit Stich (Punt)
+  v(0, 24), v(7, 22.5), v(15, 17), v(23, 9), v(29, 3), v(33, 0.4), v(35.8, 0.6), v(37.2, 3), v(37.5, 7),
+  v(37.5, 190),                                // gerader Körper
+];
+// hohe, runde Schulter als kubische Kurve bis zum senkrechten Hals
+const P = [[37.5, 190], [37.5, 213], [14.6, 212], [14.6, 236]];
+for (let i = 1; i <= 24; i++) {
+  const t = i / 24, u = 1 - t;
+  const r = u*u*u*P[0][0] + 3*u*u*t*P[1][0] + 3*u*t*t*P[2][0] + t*t*t*P[3][0];
+  const y = u*u*u*P[0][1] + 3*u*u*t*P[1][1] + 3*u*t*t*P[2][1] + t*t*t*P[3][1];
+  prof.push(v(r, y));
 }
-prof.push([0.15,1.5],[0.175,1.52],[0.18,1.6],[0,1.6]);
-const bottleGeo = new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y)), 96);
-const glass = new THREE.MeshPhysicalMaterial({ color: 0x2c0b0e, roughness: 0.1, clearcoat: 1, clearcoatRoughness: 0.04, metalness: 0.05, envMapIntensity: 1.4 });
+prof.push(v(14, 284), v(15.6, 286), v(16.1, 291), v(15.6, 297), v(14, 300), v(0, 300)); // Hals + Mündungsring
+const glass = new THREE.MeshPhysicalMaterial({
+  color: 0x0c1610, roughness: 0.07, metalness: 0.0, clearcoat: 1, clearcoatRoughness: 0.03,
+  envMapIntensity: 1.8, sheen: 0.3, sheenColor: new THREE.Color(0x1d3a26),
+});
 const bottle = new THREE.Group();
-bottle.add(new THREE.Mesh(bottleGeo, glass));
+bottle.add(new THREE.Mesh(new THREE.LatheGeometry(prof, 128), glass));
 
-// Kapsel
-const foil = new THREE.Mesh(
-  new THREE.CylinderGeometry(0.188, 0.172, 0.5, 64),
-  new THREE.MeshStandardMaterial({ color: 0xa8432a, metalness: 0.75, roughness: 0.32 })
-);
-foil.position.y = 1.36; bottle.add(foil);
+// Kapsel: obere 55 mm, matt-metallisches Bordeaux
+const foilMat = new THREE.MeshStandardMaterial({ color: 0x4a1016, metalness: 0.6, roughness: 0.38 });
+const foil = new THREE.Mesh(new THREE.CylinderGeometry(16.6 * MM, 15.0 * MM, 56 * MM, 96), foilMat);
+foil.position.y = (273 + Y0) * MM; bottle.add(foil);
+const ring = new THREE.Mesh(new THREE.CylinderGeometry(15.1 * MM, 15.1 * MM, 2.4 * MM, 96),
+  new THREE.MeshStandardMaterial({ color: 0xc9a24a, metalness: 0.9, roughness: 0.25 }));
+ring.position.y = (247 + Y0) * MM; bottle.add(ring);
 
-// Etikett (Canvas-Textur)
+// Etikett: 95 × 110 mm, nur auf der Vorderseite (fiktives Weingut)
+const LABEL_W = 95, LABEL_H = 110, LABEL_R = 37.7;
 function labelTexture() {
-  const c = document.createElement("canvas"); c.width = 2048; c.height = 640;
+  const W = 1100, H = Math.round(W * LABEL_H / LABEL_W);
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
   const g = c.getContext("2d");
-  g.fillStyle = "#f3e9d8"; g.fillRect(0, 0, c.width, c.height);
-  const cx = c.width / 2;            // Mitte der Textur zeigt zur Kamera
-  g.strokeStyle = "#6e1a1f"; g.lineWidth = 6; g.strokeRect(cx - 470, 40, 940, 560);
-  g.lineWidth = 2; g.strokeRect(cx - 450, 60, 900, 520);
-  g.fillStyle = "#c9a24a"; g.textAlign = "center";
-  g.font = "600 46px Fraunces, Georgia, serif"; g.fillText("★  ★  ★", cx, 140);
-  g.fillStyle = "#6e1a1f"; g.font = "180px Anton, Impact, sans-serif"; g.fillText("ITALIA", cx, 340);
-  g.fillStyle = "#b5502c"; g.font = "italic 600 72px Fraunces, Georgia, serif"; g.fillText("Rosso della Casa", cx, 440);
-  g.fillStyle = "#241a14"; g.font = "700 34px Karla, Arial, sans-serif";
-  g.fillText("RISTORANTE PIZZERIA · BRUCHHAUSEN-VILSEN", cx, 530);
+  g.fillStyle = "#efe5d1"; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 9000; i++) {                 // Papierstruktur
+    g.fillStyle = `rgba(90,70,40,${Math.random() * 0.05})`;
+    g.fillRect(Math.random() * W, Math.random() * H, 2, 2);
+  }
+  const ink = "#1d1712", gold = "#a8823a", wine = "#5a1418";
+  g.strokeStyle = ink; g.lineWidth = 5; g.strokeRect(46, 46, W - 92, H - 92);
+  g.lineWidth = 1.5; g.strokeRect(62, 62, W - 124, H - 124);
+  const cx = W / 2;
+  // Vignette: Sonne über drei Hügeln
+  g.strokeStyle = gold; g.lineWidth = 4;
+  g.beginPath(); g.arc(cx, 250, 46, 0, Math.PI * 2); g.stroke();
+  g.strokeStyle = ink; g.lineWidth = 3.5;
+  [[0, 330, 120], [-150, 352, 150], [150, 352, 150]].forEach(([dx, y, w]) => {
+    g.beginPath(); g.moveTo(cx + dx - w, y + 40); g.quadraticCurveTo(cx + dx, y - 70, cx + dx + w, y + 40); g.stroke();
+  });
+  g.fillStyle = ink; g.textAlign = "center";
+  const spaced = (txt, font, y, sp) => { g.font = font; g.letterSpacing = sp + "px"; g.fillText(txt, cx + sp / 2, y); g.letterSpacing = "0px"; };
+  spaced("COLLINA", "600 128px Fraunces, Georgia, serif", 540, 14);
+  spaced("NERA", "600 128px Fraunces, Georgia, serif", 670, 14);
+  g.fillStyle = gold; g.fillRect(cx - 160, 720, 320, 3);
+  g.fillStyle = wine; spaced("VINO ROSSO", "700 40px Karla, Arial, sans-serif", 800, 12);
+  g.fillStyle = ink; g.font = "italic 500 58px Fraunces, Georgia, serif"; g.fillText("Annata 2021", cx, 890);
+  g.font = "700 30px Karla, Arial, sans-serif"; g.letterSpacing = "4px";
+  g.textAlign = "left"; g.fillText("750 ml", 110, H - 110);
+  g.textAlign = "right"; g.fillText("13,5 % vol", W - 106, H - 110);
+  g.letterSpacing = "0px";
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
   return t;
 }
-const labelMat = new THREE.MeshStandardMaterial({ roughness: 0.85, metalness: 0 });
-const label = new THREE.Mesh(new THREE.CylinderGeometry(0.566, 0.566, 1.25, 96, 1, true, Math.PI, Math.PI * 2), labelMat);
-label.position.y = -0.62; bottle.add(label);
+const labelMat = new THREE.MeshStandardMaterial({ roughness: 0.9, metalness: 0 });
+const arc = LABEL_W / LABEL_R;                       // Bogenmaß der Etikettbreite
+const label = new THREE.Mesh(
+  new THREE.CylinderGeometry(LABEL_R * MM, LABEL_R * MM, LABEL_H * MM, 96, 1, true, -arc / 2, arc),
+  labelMat
+);
+label.position.y = (92 + Y0) * MM; bottle.add(label);
 const applyLabel = () => { labelMat.map = labelTexture(); labelMat.needsUpdate = true; };
 applyLabel();
 document.fonts && document.fonts.ready.then(applyLabel);
 
 scene.add(bottle);
-const BOTTLE_H = 3.2;
+const BOTTLE_H = 3.6;
 
 /* ---- Posen je Szene: Scroll „posiert“ die Flasche, statt sie zu bewegen ---- */
 const isPhone = () => innerWidth <= 820;
@@ -531,14 +567,16 @@ function frame(now) {
   const damp = first ? 1 : 1 - Math.pow(0.0008, dt);   // weiches Nachziehen
   for (const k in cur) cur[k] = lerp(cur[k], t[k], damp);
   // beim Andocken direkt auf dem Slot halten, damit die Flasche mit der Karte scrollt
-  if (t.dock > 0.999) { cur.x = t.x; cur.y = t.y; cur.s = t.s; }
+  if (t.dock > 0.999) { cur.x = t.x; cur.y = t.y; cur.s = t.s; cur.dock = 1; }
   first = false;
   if (!reduce) idle += dt * 0.25;
 
-  const spin = (scrollY * 0.0042 + idle) * (1 - cur.dock);
+  // Drehung auf den kürzesten Weg nach vorn zurückführen, damit das Etikett im Slot zur Kamera zeigt
+  const raw = (scrollY * 0.0042 + idle) % (Math.PI * 2);
+  const spin = (raw > Math.PI ? raw - Math.PI * 2 : raw) * (1 - cur.dock);
   bottle.position.set(cur.x, cur.y, 0);
   bottle.scale.setScalar(cur.s);
-  bottle.rotation.set(cur.rx * (1 - cur.dock), spin % (Math.PI * 2), cur.rz);
+  bottle.rotation.set(cur.rx * (1 - cur.dock), spin, cur.rz);
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
 }
