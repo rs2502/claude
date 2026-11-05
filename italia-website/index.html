@@ -3,8 +3,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,500;1,9..144,700&family=Karla:wght@400;600;700&display=swap">
 <style>
-/* Layout: eine echte Flasche bleibt fix in der Bildmitte, die Seite zieht an ihr vorbei.
-   Scroll dreht und neigt die Flasche; am Ende dockt sie in den Reservierungs-Slot. */
+/* Layout: eine Pizza bleibt fix in der Bildmitte, die Seite zieht an ihr vorbei.
+   Scroll wirft und dreht sie, jeder Abschnitt belegt sie weiter; am Ende landet sie auf dem Teller. */
 :root {
   --cream: #f6efe4;      /* Grund der Website */
   --paper: #fffaf2;
@@ -30,11 +30,24 @@ body {
 a { color: inherit; }
 :focus-visible { outline: 3px solid var(--terra); outline-offset: 3px; border-radius: 4px; }
 
-/* fixe 3D-Bühne */
-#stage {
-  position: fixed; inset: 0; width: 100%; height: 100%;
+/* fixe Pizza-Bühne */
+#pz {
+  position: fixed; left: 50%; top: 50%;
+  width: var(--pz, 44vmin); height: var(--pz, 44vmin);
+  margin: calc(var(--pz, 44vmin) / -2) 0 0 calc(var(--pz, 44vmin) / -2);
   z-index: 1; pointer-events: none;
+  perspective: 1400px;
+  will-change: transform;
 }
+#pz .disc { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform; }
+#pz .disc img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; }
+#pz .shadow {
+  position: absolute; left: 8%; right: 8%; top: 8%; bottom: 8%;
+  border-radius: 50%; background: rgba(60, 30, 15, .32); filter: blur(28px);
+  will-change: transform, opacity;
+}
+.fly { position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none; opacity: 0; will-change: transform, opacity; }
+.fly img { width: 100%; height: auto; display: block; }
 
 .scene {
   position: relative;
@@ -49,13 +62,13 @@ a { color: inherit; }
   row-gap: 40vh;
   overflow-x: clip;
 }
-/* Text oben links und unten rechts, die Mitte gehört Flasche und Riesentypo */
+/* Text oben links und unten rechts, die Mitte gehört Pizza und Riesentypo */
 .scene > .left { grid-column: 1; grid-row: 1; justify-self: start; max-width: 30rem; }
 .scene > .right { grid-column: 2; grid-row: 2; justify-self: end; max-width: 30rem; }
 #s-hero { min-height: 100vh; padding-block: 9vh 7vh; row-gap: 20px; }
 .left, .right, .wide { position: relative; z-index: 2; min-width: 0; }
 
-/* Riesentypo hinter der Flasche */
+/* Riesentypo hinter der Pizza */
 .giant {
   position: absolute; z-index: 0;
   left: 50%; top: 50%;
@@ -138,20 +151,16 @@ p { margin: 0; color: var(--muted); }
 /* Kontakt + Dock-Slot */
 .scene.final { gap: 40px; align-items: start; align-content: start; min-height: 100vh; }
 .scene.final > .left { grid-row: 1; justify-self: end; width: 100%; max-width: 34rem; }
-/* unter der 3D-Ebene, damit die Flasche sichtbar im Slot steht */
+/* unter der Pizza-Ebene, damit die Pizza sichtbar auf dem Teller landet */
 .scene.final > .right { grid-row: 1; justify-self: start; width: 100%; max-width: 34rem; z-index: 0; }
 .card { background: var(--paper); border-radius: 18px; padding: 28px; box-shadow: 0 24px 50px rgba(36,26,20,.08); }
 .hours { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .hours th, .hours td { text-align: left; padding: 11px 0; border-bottom: 1px dashed rgba(36,26,20,.18); font-size: 0.98rem; }
 .hours td { text-align: right; }
 .hours .off { color: var(--muted); }
-.dock { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 24px; align-items: center; }
-.slot {
-  height: 260px; border-radius: 60px 60px 14px 14px;
-  background: radial-gradient(ellipse at 50% 92%, rgba(36,26,20,.18), transparent 60%), var(--cream);
-  border: 2px dashed rgba(110,26,31,.35);
-}
-.no-gl .slot { border-style: solid; }
+.dock { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 28px; align-items: center; }
+.slot { position: relative; aspect-ratio: 1; width: 100%; max-width: 100%; }
+.slot img { width: 100%; height: 100%; display: block; filter: drop-shadow(0 14px 18px rgba(60,30,15,.18)); }
 
 footer {
   position: relative; z-index: 2;
@@ -165,7 +174,7 @@ footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 2
 footer a { text-decoration: none; }
 footer a:hover { color: var(--gold); }
 
-/* Telefon: Text oben und unten, Flasche in der Mitte frei */
+/* Telefon: Text oben und unten, Pizza in der Mitte frei */
 @media (max-width: 820px) {
   .scene { grid-template-columns: minmax(0, 1fr); row-gap: 46vh; }
   .scene > .left, .scene > .right { grid-column: 1; justify-self: stretch; max-width: none; }
@@ -179,13 +188,28 @@ footer a:hover { color: var(--gold); }
   .scene.final { grid-template-columns: minmax(0, 1fr); row-gap: 24px; min-height: auto; }
   .scene.final > .left, .scene.final > .right { grid-column: 1; background: none; padding: 0; backdrop-filter: none; -webkit-backdrop-filter: none; }
   .scene.final > .right { grid-row: 2; }
-  .dock { grid-template-columns: 86px minmax(0, 1fr); gap: 16px; padding: 20px; }
-  .slot { height: 220px; }
+  .dock { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 20px; justify-items: center; text-align: center; }
+  .dock .spec { text-align: left; }
+  .dock .btns { justify-content: center; }
+  .slot { width: 220px; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 </style>
 
-<canvas id="stage" aria-hidden="true"></canvas>
+<div id="pz" aria-hidden="true">
+  <div class="shadow"></div>
+  <div class="disc">
+    <img src="img/pizza-1-teig.webp" alt="" data-stage="0">
+    <img src="img/pizza-2-sugo.webp" alt="" data-stage="1">
+    <img src="img/pizza-3-mozzarella.webp" alt="" data-stage="2">
+    <img src="img/pizza-4-margherita.webp" alt="" data-stage="3">
+  </div>
+</div>
+<div class="fly" data-fly="tomato" data-from="-0.9,-0.6" data-stage="1"><img src="img/tomate.webp" alt=""></div>
+<div class="fly" data-fly="tomato" data-from="0.95,-0.15" data-stage="1"><img src="img/tomate.webp" alt=""></div>
+<div class="fly" data-fly="basil" data-from="-0.8,0.7" data-stage="3"><img src="img/basilikum.webp" alt=""></div>
+<div class="fly" data-fly="basil" data-from="0.85,-0.75" data-stage="3"><img src="img/basilikum.webp" alt=""></div>
+<div class="fly" data-fly="basil" data-from="0.6,0.85" data-stage="3"><img src="img/basilikum.webp" alt=""></div>
 
 <main>
   <!-- 1 · Hero -->
@@ -284,7 +308,7 @@ footer a:hover { color: var(--gold); }
     </div>
   </section>
 
-  <!-- 6 · Kontakt, hier dockt die Flasche -->
+  <!-- 6 · Kontakt, hier landet die Pizza -->
   <section class="scene final" id="s-contatto" data-pose="dock">
     <div class="left stack">
       <div class="kicker">Besuchen Sie uns</div>
@@ -301,7 +325,7 @@ footer a:hover { color: var(--gold); }
     </div>
     <div class="right stack">
       <div class="card dock">
-        <div class="slot" id="slot" aria-hidden="true"></div>
+        <div class="slot" id="slot" aria-hidden="true"><img src="img/teller.webp" alt=""></div>
         <div class="stack">
           <h3>Ihr Tisch wartet.</h3>
           <dl class="spec">
@@ -377,208 +401,114 @@ footer a:hover { color: var(--gold); }
 })();
 </script>
 
-<script type="importmap">
-{ "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-} }
-</script>
-<script type="module">
-import * as THREE from "three";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+<script>
+/* Pizza-Wurf: Scroll wirft, dreht und belegt die Pizza, am Ende landet sie auf dem Teller */
+(function () {
+  const pz = document.getElementById("pz");
+  const disc = pz.querySelector(".disc");
+  const shadow = pz.querySelector(".shadow");
+  const layers = [...disc.querySelectorAll("img")];
+  const flies = [...document.querySelectorAll(".fly")];
+  const slot = document.getElementById("slot");
+  const sections = [...document.querySelectorAll("[data-pose]")];
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const canvas = document.getElementById("stage");
-let renderer;
-try {
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-} catch (e) {
-  document.documentElement.classList.add("no-gl");
-  canvas.remove();
-  throw e;
-}
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-
-const scene = new THREE.Scene();
-scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
-const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
-camera.position.set(0, 0, 11);
-
-const key = new THREE.DirectionalLight(0xfff1dc, 2.2); key.position.set(4, 5, 6); scene.add(key);
-const rim = new THREE.DirectionalLight(0xffc9a0, 1.6); rim.position.set(-5, 2, -3); scene.add(rim);
-scene.add(new THREE.AmbientLight(0xffffff, 0.35));
-
-/* ---- Bordeauxflasche 0,75 l: Maße in mm, 300 mm hoch, Ø 75 mm ---- */
-const MM = 3.6 / 300, Y0 = -150;              // Mittelpunkt der Flasche im Ursprung
-const v = (r, y) => new THREE.Vector2(r * MM, (y + Y0) * MM);
-const prof = [
-  // Boden mit Stich (Punt)
-  v(0, 24), v(7, 22.5), v(15, 17), v(23, 9), v(29, 3), v(33, 0.4), v(35.8, 0.6), v(37.2, 3), v(37.5, 7),
-  v(37.5, 190),                                // gerader Körper
-];
-// hohe, runde Schulter als kubische Kurve bis zum senkrechten Hals
-const P = [[37.5, 190], [37.5, 213], [14.6, 212], [14.6, 236]];
-for (let i = 1; i <= 24; i++) {
-  const t = i / 24, u = 1 - t;
-  const r = u*u*u*P[0][0] + 3*u*u*t*P[1][0] + 3*u*t*t*P[2][0] + t*t*t*P[3][0];
-  const y = u*u*u*P[0][1] + 3*u*u*t*P[1][1] + 3*u*t*t*P[2][1] + t*t*t*P[3][1];
-  prof.push(v(r, y));
-}
-prof.push(v(14, 284), v(15.6, 286), v(16.1, 291), v(15.6, 297), v(14, 300), v(0, 300)); // Hals + Mündungsring
-const glass = new THREE.MeshPhysicalMaterial({
-  color: 0x0c1610, roughness: 0.07, metalness: 0.0, clearcoat: 1, clearcoatRoughness: 0.03,
-  envMapIntensity: 1.8, sheen: 0.3, sheenColor: new THREE.Color(0x1d3a26),
-});
-const bottle = new THREE.Group();
-bottle.add(new THREE.Mesh(new THREE.LatheGeometry(prof, 128), glass));
-
-// Kapsel: obere 55 mm, matt-metallisches Bordeaux
-const foilMat = new THREE.MeshStandardMaterial({ color: 0x4a1016, metalness: 0.6, roughness: 0.38 });
-const foil = new THREE.Mesh(new THREE.CylinderGeometry(16.6 * MM, 15.0 * MM, 56 * MM, 96), foilMat);
-foil.position.y = (273 + Y0) * MM; bottle.add(foil);
-const ring = new THREE.Mesh(new THREE.CylinderGeometry(15.1 * MM, 15.1 * MM, 2.4 * MM, 96),
-  new THREE.MeshStandardMaterial({ color: 0xc9a24a, metalness: 0.9, roughness: 0.25 }));
-ring.position.y = (247 + Y0) * MM; bottle.add(ring);
-
-// Etikett: 95 × 110 mm, nur auf der Vorderseite (fiktives Weingut)
-const LABEL_W = 95, LABEL_H = 110, LABEL_R = 37.7;
-function labelTexture() {
-  const W = 1100, H = Math.round(W * LABEL_H / LABEL_W);
-  const c = document.createElement("canvas"); c.width = W; c.height = H;
-  const g = c.getContext("2d");
-  g.fillStyle = "#efe5d1"; g.fillRect(0, 0, W, H);
-  for (let i = 0; i < 9000; i++) {                 // Papierstruktur
-    g.fillStyle = `rgba(90,70,40,${Math.random() * 0.05})`;
-    g.fillRect(Math.random() * W, Math.random() * H, 2, 2);
-  }
-  const ink = "#1d1712", gold = "#a8823a", wine = "#5a1418";
-  g.strokeStyle = ink; g.lineWidth = 5; g.strokeRect(46, 46, W - 92, H - 92);
-  g.lineWidth = 1.5; g.strokeRect(62, 62, W - 124, H - 124);
-  const cx = W / 2;
-  // Vignette: Sonne über drei Hügeln
-  g.strokeStyle = gold; g.lineWidth = 4;
-  g.beginPath(); g.arc(cx, 250, 46, 0, Math.PI * 2); g.stroke();
-  g.strokeStyle = ink; g.lineWidth = 3.5;
-  [[0, 330, 120], [-150, 352, 150], [150, 352, 150]].forEach(([dx, y, w]) => {
-    g.beginPath(); g.moveTo(cx + dx - w, y + 40); g.quadraticCurveTo(cx + dx, y - 70, cx + dx + w, y + 40); g.stroke();
-  });
-  g.fillStyle = ink; g.textAlign = "center";
-  const spaced = (txt, font, y, sp) => { g.font = font; g.letterSpacing = sp + "px"; g.fillText(txt, cx + sp / 2, y); g.letterSpacing = "0px"; };
-  spaced("COLLINA", "600 128px Fraunces, Georgia, serif", 540, 14);
-  spaced("NERA", "600 128px Fraunces, Georgia, serif", 670, 14);
-  g.fillStyle = gold; g.fillRect(cx - 160, 720, 320, 3);
-  g.fillStyle = wine; spaced("VINO ROSSO", "700 40px Karla, Arial, sans-serif", 800, 12);
-  g.fillStyle = ink; g.font = "italic 500 58px Fraunces, Georgia, serif"; g.fillText("Annata 2021", cx, 890);
-  g.font = "700 30px Karla, Arial, sans-serif"; g.letterSpacing = "4px";
-  g.textAlign = "left"; g.fillText("750 ml", 110, H - 110);
-  g.textAlign = "right"; g.fillText("13,5 % vol", W - 106, H - 110);
-  g.letterSpacing = "0px";
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
-  return t;
-}
-const labelMat = new THREE.MeshStandardMaterial({ roughness: 0.9, metalness: 0 });
-const arc = LABEL_W / LABEL_R;                       // Bogenmaß der Etikettbreite
-const label = new THREE.Mesh(
-  new THREE.CylinderGeometry(LABEL_R * MM, LABEL_R * MM, LABEL_H * MM, 96, 1, true, -arc / 2, arc),
-  labelMat
-);
-label.position.y = (92 + Y0) * MM; bottle.add(label);
-const applyLabel = () => { labelMat.map = labelTexture(); labelMat.needsUpdate = true; };
-applyLabel();
-document.fonts && document.fonts.ready.then(applyLabel);
-
-scene.add(bottle);
-const BOTTLE_H = 3.6;
-
-/* ---- Posen je Szene: Scroll „posiert“ die Flasche, statt sie zu bewegen ---- */
-const isPhone = () => innerWidth <= 820;
-const POSES = {
-  hero:    { x: 0, y: 0,    rz: 0,     rx: 0.08, s: 1.0 },
-  qualita: { x: 0, y: 0.1,  rz: -0.22, rx: 0.18, s: 0.95 },
-  carta:   { x: 0, y: 0,    rz: 1.08,  rx: 0.1,  s: 1.08 },
-  autunno: { x: 0, y: -0.1, rz: -0.42, rx: -0.1, s: 0.92 },
-  festa:   { x: 0, y: 0,    rz: 0.18,  rx: 0.25, s: 1.02 },
-};
-const sections = [...document.querySelectorAll("[data-pose]")];
-const slot = document.getElementById("slot");
-
-function worldPerPx() {
-  const h = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
-  return h / innerHeight;
-}
-function dockPose() {
-  const r = slot.getBoundingClientRect(), k = worldPerPx();
-  return {
-    x: (r.left + r.width / 2 - innerWidth / 2) * k,
-    y: -(r.top + r.height / 2 - innerHeight / 2) * k,
-    rz: 0, rx: 0,
-    s: (r.height * 0.86 * k) / BOTTLE_H,
-    dock: 1,
+  // y in Anteilen der Bildschirmhöhe, rx = Neigung (Grad), s = Größe, st = Belag-Stufe
+  const POSES = {
+    hero:    { x: 0, y: 0,     rx: 0,  s: 1.0,  st: 0 },
+    qualita: { x: 0, y: -0.02, rx: 58, s: 0.92, st: 1 },
+    carta:   { x: 0, y: 0,     rx: 34, s: 1.0,  st: 2 },
+    autunno: { x: 0, y: 0,     rx: 12, s: 1.06, st: 3 },
+    festa:   { x: 0, y: 0,     rx: 62, s: 0.96, st: 3 },
   };
-}
-function poseFor(el) {
-  if (el.dataset.pose === "dock") return dockPose();
-  const p = { ...POSES[el.dataset.pose], dock: 0 };
-  if (isPhone()) p.s *= 0.78;
-  return p;
-}
-function anchor(el) {
-  const top = el.getBoundingClientRect().top + scrollY;
-  const max = document.documentElement.scrollHeight - innerHeight;
-  if (el.dataset.pose === "dock") return Math.min(max, top - innerHeight * 0.12);
-  if (el.dataset.pose === "hero") return 0;
-  return Math.min(max, top + el.offsetHeight / 2 - innerHeight / 2);
-}
-const ease = (t) => t * t * (3 - 2 * t);
-const lerp = (a, b, t) => a + (b - a) * t;
+  const isPhone = () => innerWidth <= 820;
+  const base = () => (isPhone() ? Math.min(innerWidth * 0.8, innerHeight * 0.42) : Math.min(innerWidth * 0.42, innerHeight * 0.62));
 
-function targetPose() {
-  const y = scrollY;
-  const keys = sections.map((el) => ({ a: anchor(el), p: poseFor(el) }));
-  if (y <= keys[0].a) return keys[0].p;
-  for (let i = 0; i < keys.length - 1; i++) {
-    const A = keys[i], B = keys[i + 1];
-    if (y <= B.a) {
-      const t = ease((y - A.a) / Math.max(1, B.a - A.a));
-      const o = {};
-      for (const k of ["x", "y", "rz", "rx", "s", "dock"]) o[k] = lerp(A.p[k], B.p[k], t);
-      return o;
-    }
+  function poseFor(el) {
+    if (el.dataset.pose !== "dock") return { ...POSES[el.dataset.pose], dock: 0 };
+    const r = slot.getBoundingClientRect();
+    return {
+      x: (r.left + r.width / 2 - innerWidth / 2) / innerHeight,
+      y: (r.top + r.height / 2 - innerHeight / 2) / innerHeight,
+      rx: 0, s: (r.width * 0.74) / base(), st: 3, dock: 1,
+    };
   }
-  return keys[keys.length - 1].p;
-}
+  function anchor(el) {
+    const top = el.getBoundingClientRect().top + scrollY;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    if (el.dataset.pose === "hero") return 0;
+    if (el.dataset.pose === "dock") return Math.min(max, top - innerHeight * 0.12);
+    return Math.min(max, top + el.offsetHeight / 2 - innerHeight / 2);
+  }
+  const ease = (t) => t * t * (3 - 2 * t);
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
-const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const cur = { x: 0, y: 0, rz: 0, rx: 0, s: 1, dock: 0 };
-let first = true, last = performance.now(), idle = 0;
+  // Zielpose plus Wurfbogen zwischen zwei Szenen
+  function target() {
+    const y = scrollY;
+    const keys = sections.map((el) => ({ a: anchor(el), p: poseFor(el) }));
+    if (y <= keys[0].a) return { ...keys[0].p, arc: 0, seg: 0, t: 0 };
+    for (let i = 0; i < keys.length - 1; i++) {
+      const A = keys[i], B = keys[i + 1];
+      if (y <= B.a) {
+        const raw = clamp((y - A.a) / Math.max(1, B.a - A.a), 0, 1), t = ease(raw);
+        const o = {};
+        for (const k of ["x", "y", "rx", "s", "st", "dock"]) o[k] = lerp(A.p[k], B.p[k], t);
+        o.arc = B.p.dock ? 0 : Math.sin(Math.PI * raw);   // hochwerfen, nicht beim Landen
+        o.seg = i; o.t = raw;
+        return o;
+      }
+    }
+    return { ...keys[keys.length - 1].p, arc: 0, seg: keys.length - 1, t: 1 };
+  }
 
-function resize() {
-  renderer.setSize(innerWidth, innerHeight, false);
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-}
-addEventListener("resize", resize);
-resize();
+  const cur = { x: 0, y: 0, rx: 0, s: 1, st: 0, dock: 0, arc: 0 };
+  let first = true, last = performance.now(), idle = 0;
 
-function frame(now) {
-  const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  const t = targetPose();
-  const damp = first ? 1 : 1 - Math.pow(0.0008, dt);   // weiches Nachziehen
-  for (const k in cur) cur[k] = lerp(cur[k], t[k], damp);
-  // beim Andocken direkt auf dem Slot halten, damit die Flasche mit der Karte scrollt
-  if (t.dock > 0.999) { cur.x = t.x; cur.y = t.y; cur.s = t.s; cur.dock = 1; }
-  first = false;
-  if (!reduce) idle += dt * 0.25;
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    const T = target();
+    const k = first ? 1 : 1 - Math.pow(0.0006, dt);
+    for (const key in cur) cur[key] = lerp(cur[key], T[key], k);
+    if (T.dock > 0.999) { cur.x = T.x; cur.y = T.y; cur.s = T.s; cur.dock = 1; cur.arc = 0; }
+    first = false;
+    if (!reduce) idle += dt * 6;
 
-  // Drehung auf den kürzesten Weg nach vorn zurückführen, damit das Etikett im Slot zur Kamera zeigt
-  const raw = (scrollY * 0.0042 + idle) % (Math.PI * 2);
-  const spin = (raw > Math.PI ? raw - Math.PI * 2 : raw) * (1 - cur.dock);
-  bottle.position.set(cur.x, cur.y, 0);
-  bottle.scale.setScalar(cur.s);
-  bottle.rotation.set(cur.rx * (1 - cur.dock), spin, cur.rz);
-  renderer.render(scene, camera);
+    const size = base();
+    pz.style.setProperty("--pz", size + "px");
+    // Drehung um die eigene Achse: Scroll + leichtes Kreisen, beim Landen auf den kürzesten Weg nach 0
+    let spin = (scrollY * 0.09 + idle) % 360;
+    if (spin > 180) spin -= 360;
+    spin *= 1 - cur.dock;
+    const lift = cur.arc * innerHeight * (isPhone() ? 0.1 : 0.16);
+    const tx = cur.x * innerHeight, ty = cur.y * innerHeight - lift;
+    pz.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px)`;
+    disc.style.transform = `rotateX(${cur.rx.toFixed(2)}deg) rotateZ(${spin.toFixed(2)}deg) scale(${cur.s.toFixed(4)})`;
+    // Schatten: kleiner und blasser, je höher die Pizza fliegt
+    const flat = Math.cos((cur.rx * Math.PI) / 180);
+    shadow.style.transform = `translateY(${(lift * 0.9 + size * 0.06 * cur.s).toFixed(1)}px) scale(${(cur.s * (1 - cur.arc * 0.25)).toFixed(3)}, ${(cur.s * flat * (1 - cur.arc * 0.25)).toFixed(3)})`;
+    shadow.style.opacity = ((1 - cur.arc * 0.6) * (1 - cur.dock * 0.7)).toFixed(3);
+    // Belag-Stufen überblenden (alle Bilder haben denselben Umriss)
+    layers.forEach((img, i) => { img.style.opacity = i === 0 ? 1 : clamp(cur.st - (i - 1), 0, 1).toFixed(3); });
+
+    // Zutaten fliegen auf die Pizza, kurz bevor ihre Stufe erscheint
+    flies.forEach((f, i) => {
+      const st = +f.dataset.stage;
+      const p = clamp((cur.st - (st - 1)) * 1.15, 0, 1);       // 0 = weg, 1 = gelandet
+      const vis = p > 0 && p < 1 ? Math.sin(Math.PI * p) * 1.4 : 0;
+      const [fx, fy] = f.dataset.from.split(",").map(Number);
+      const w = size * (f.dataset.fly === "basil" ? 0.22 : 0.26);
+      const cx = innerWidth / 2 + tx, cy = innerHeight / 2 + ty;
+      const sx = cx + fx * innerWidth * 0.55, sy = cy + fy * innerHeight * 0.55;
+      const e = ease(p);
+      const px = lerp(sx, cx + fx * size * 0.12, e) - w / 2, py = lerp(sy, cy + fy * size * 0.12, e) - w / 2;
+      f.style.width = w + "px";
+      f.style.opacity = clamp(vis, 0, 1).toFixed(3);
+      f.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) rotate(${(fx * 220 * (1 - e) + i * 40).toFixed(1)}deg) scale(${lerp(1.1, 0.5, e).toFixed(3)})`;
+    });
+    requestAnimationFrame(frame);
+  }
   requestAnimationFrame(frame);
-}
-requestAnimationFrame(frame);
+})();
 </script>
