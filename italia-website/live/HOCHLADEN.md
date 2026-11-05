@@ -15,6 +15,8 @@ Per FTP in den Ordner `/start/` des Webspace laden:
 2. Zwischen „Qualität, Kreativität & herzlicher Service“ und dem Bilder-Streifen steht der neue Pizza-Abschnitt. Der Bilder-Streifen bleibt erhalten.
 3. Vor `</body>`: eine Zeile, die `pizza-effekt.js` lädt.
 
+4. Im Hero-Bild: Start-Effekt. Nach dem Intro fliegt die Pizza ein und landet auf der Fotoecke (Stil und Skript stecken in denselben Dateien `pizza-effekt.css` und `pizza-effekt.js`).
+
 Alles andere (Intro, Öffnungszeiten-Balken, Feiern-Effekt, Öffnungsstatus) ist unverändert.
 
 Nach dem Hochladen die Seite einmal mit Strg+F5 (Handy: Seite neu laden) aufrufen und durch den Pizza-Abschnitt scrollen.

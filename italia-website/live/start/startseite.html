@@ -199,7 +199,8 @@
   @keyframes fx-wipe{from{clip-path:inset(0 50% 0 50%)}to{clip-path:inset(0 0 0 0)}}
   @keyframes fx-btn{0%{transform:scale(1)}35%{transform:scale(1.12)}100%{transform:scale(1)}}
 </style>
-<link rel="stylesheet" href="/start/pizza-effekt/pizza-effekt.css?v=1">
+<link rel="stylesheet" href="/start/pizza-effekt/pizza-effekt.css?v=2">
+<script>document.documentElement.classList.add("hfx-wait");setTimeout(function(){var h=document.documentElement;h.classList.remove("hfx-wait");h.classList.add("hfx-go")},8000);</script>
 <script>try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!sessionStorage.getItem("introSeen"))document.documentElement.classList.add("intro")}catch(e){}</script>
 </head>
 <body>
@@ -236,6 +237,15 @@
     </div>
     <div class="hero-media reveal d1">
       <img class="hero-photo" src="assets/dining.jpg?v=1" alt="Italienisch essen im Ristorante Italia">
+      <!-- START-EFFEKT: Pizza fliegt ein (Stil + Skript in /start/pizza-effekt/) -->
+      <div class="hfx" aria-hidden="true">
+        <div class="hfx-item hfx-tom1"><div class="hfx-pop"><div class="hfx-float"><img src="/start/pizza-effekt/img/tomate.webp" alt=""></div></div></div>
+        <div class="hfx-item hfx-basil2"><div class="hfx-pop"><div class="hfx-float"><img src="/start/pizza-effekt/img/basilikum.webp" alt=""></div></div></div>
+        <div class="hfx-item hfx-pizza"><div class="hfx-spin"><div class="hfx-drop"><div class="hfx-dust"></div><img src="/start/pizza-effekt/img/pizza-4-margherita.webp" alt=""></div></div></div>
+        <div class="hfx-item hfx-basil1"><div class="hfx-pop"><div class="hfx-float"><img src="/start/pizza-effekt/img/basilikum.webp" alt=""></div></div></div>
+        <div class="hfx-item hfx-tom2"><div class="hfx-pop"><div class="hfx-float"><img src="/start/pizza-effekt/img/tomate.webp" alt=""></div></div></div>
+        <div class="hfx-item hfx-basil3"><div class="hfx-pop"><div class="hfx-float"><img src="/start/pizza-effekt/img/basilikum.webp" alt=""></div></div></div>
+      </div>
     </div>
   </div>
 </section>
@@ -442,6 +452,6 @@ const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
   for(let i=1;i<=7;i++){const dd=(day+i)%7,rs=sched[dd];if(rs.length){set('Geschlossen','Öffnet '+(i===1?'morgen ':wk[dd]+' ')+fmt(rs[0][0]),false);return;}}
 })();
 </script>
-<script src="/start/pizza-effekt/pizza-effekt.js?v=1" defer></script>
+<script src="/start/pizza-effekt/pizza-effekt.js?v=2" defer></script>
 </body>
 </html>

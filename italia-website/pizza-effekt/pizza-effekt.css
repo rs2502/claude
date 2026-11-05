@@ -116,3 +116,64 @@
   .pzfx-step { padding: 18px 20px; }
   .pzfx-dots { right: 10px; }
 }
+
+/* ════════ Start-Effekt im Hero: Pizza fliegt ein und landet auf dem Foto ════════ */
+.hfx { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.hfx-item { position: absolute; transform: translate(calc(var(--hfx-mx, 0) * var(--d, 10px)), calc(var(--hfx-my, 0) * var(--d, 10px))); will-change: transform; }
+.hfx-item > * { display: block; width: 100%; height: auto; max-width: none; }
+/* Pizza: unten links auf der Fotoecke */
+.hfx-pizza { width: 58%; left: -14%; bottom: -12%; --d: 8px; }
+.hfx-pizza .hfx-spin { transform: rotate(var(--hfx-rot, 0deg)); }
+.hfx-pizza img { filter: drop-shadow(0 22px 26px rgba(60, 30, 15, .35)); }
+.hfx-dust { position: absolute; inset: 0; border-radius: 50%; opacity: 0;
+  background: radial-gradient(circle at 30% 60%, rgba(255,255,255,.95) 0 14%, transparent 34%),
+              radial-gradient(circle at 70% 55%, rgba(255,252,245,.9) 0 12%, transparent 30%),
+              radial-gradient(circle at 50% 75%, rgba(255,255,255,.9) 0 16%, transparent 36%),
+              radial-gradient(circle at 20% 40%, rgba(250,244,232,.8) 0 8%, transparent 22%),
+              radial-gradient(circle at 82% 38%, rgba(250,244,232,.8) 0 7%, transparent 20%); filter: blur(6px); }
+/* Zutaten rund um die Pizza */
+.hfx-basil1 { width: 15%; left: 34%; bottom: 20%; --d: 22px; }
+.hfx-basil2 { width: 12%; left: -20%; bottom: 36%; --d: 30px; }
+.hfx-basil3 { width: 11%; left: 40%; bottom: -14%; --d: 18px; }
+.hfx-tom1   { width: 13%; left: -24%; bottom: -6%; --d: 26px; }
+.hfx-tom2   { width: 11%; left: 28%; bottom: 40%; --d: 34px; }
+.hfx-float { animation: hfx-bob 4.2s ease-in-out infinite; }
+.hfx-basil2 .hfx-float, .hfx-tom2 .hfx-float { animation-duration: 5s; animation-delay: -1.3s; }
+.hfx-basil3 .hfx-float, .hfx-tom1 .hfx-float { animation-duration: 3.6s; animation-delay: -2.1s; }
+
+/* Ablauf, sobald <html> die Klasse hfx-go bekommt */
+html.hfx-wait .hfx-pizza .hfx-drop, html.hfx-wait .hfx-pop { opacity: 0; }
+html.hfx-go .hfx-pizza .hfx-drop { animation: hfx-drop 1.35s cubic-bezier(.2,.75,.25,1) both; }
+html.hfx-go .hfx-dust { animation: hfx-dust 1.1s ease-out .95s backwards; }
+html.hfx-go .hfx-pop { animation: hfx-pop .7s cubic-bezier(.34,1.7,.64,1) both; }
+html.hfx-go .hfx-basil1 .hfx-pop { animation-delay: 1.05s; }
+html.hfx-go .hfx-tom2 .hfx-pop   { animation-delay: 1.15s; }
+html.hfx-go .hfx-basil2 .hfx-pop { animation-delay: 1.25s; }
+html.hfx-go .hfx-tom1 .hfx-pop   { animation-delay: 1.35s; }
+html.hfx-go .hfx-basil3 .hfx-pop { animation-delay: 1.45s; }
+@keyframes hfx-drop {
+  0%   { transform: translate(60%, -150vh) rotate(-620deg) scale(1.35); opacity: 0; }
+  12%  { opacity: 1; }
+  70%  { transform: translate(0, 0) rotate(0deg) scale(1); }
+  80%  { transform: translate(0, 0) scale(1.07, .93); }
+  90%  { transform: translate(0, -3%) scale(.98, 1.02); }
+  100% { transform: none; opacity: 1; }
+}
+@keyframes hfx-dust { 0% { opacity: 0; transform: scale(.6); } 25% { opacity: .9; } 100% { opacity: 0; transform: scale(2.2); } }
+@keyframes hfx-pop  { 0% { opacity: 0; transform: translate(var(--fx0, 60%), var(--fy0, -40%)) scale(0) rotate(-120deg); } 100% { opacity: 1; transform: none; } }
+@keyframes hfx-bob  { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-9px) rotate(6deg); } }
+.hfx-basil2 .hfx-pop, .hfx-tom1 .hfx-pop { --fx0: 160%; }
+.hfx-basil3 .hfx-pop { --fy0: -120%; }
+
+@media (max-width: 919px) {
+  .hfx-pizza { width: 46%; left: auto; right: -2%; bottom: -10%; }
+  .hfx-basil1 { left: auto; right: 38%; bottom: 14%; }
+  .hfx-basil2 { left: auto; right: 2%; bottom: 34%; }
+  .hfx-basil3 { left: auto; right: 22%; bottom: -12%; }
+  .hfx-tom1   { left: auto; right: 44%; bottom: -8%; }
+  .hfx-tom2   { left: auto; right: 4%; bottom: 24%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.hfx-go .hfx-pizza .hfx-drop, html.hfx-go .hfx-dust, html.hfx-go .hfx-pop, .hfx-float { animation: none; }
+  html.hfx-wait .hfx-pizza .hfx-drop, html.hfx-wait .hfx-pop { opacity: 1; }
+}
