@@ -235,11 +235,7 @@
       </div>
     </div>
     <div class="hero-media reveal d1">
-      <!-- HERO-VIDEO: läuft endlos und stumm; Standbild als Vorschau und für "Bewegung reduzieren" -->
-      <video class="hero-photo" id="heroVideo" style="display:block" autoplay muted loop playsinline preload="auto" poster="assets/hero-pizza.jpg?v=1" aria-label="Pizza Margherita vor dem Holzofen">
-        <source src="assets/hero-pizza.mp4?v=1" type="video/mp4">
-        <source src="assets/hero-pizza.webm?v=1" type="video/webm">
-      </video>
+      <img class="hero-photo" src="assets/dining.jpg?v=1" alt="Italienisch essen im Ristorante Italia">
     </div>
   </div>
 </section>
@@ -414,11 +410,6 @@ const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
     f.style.setProperty('--fr',(k*240).toFixed(1)+'px');};
   addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(upd)},{passive:true});addEventListener('resize',upd);upd();
 })();
-
-// Hero-Video: bei "Bewegung reduzieren" nur das Standbild zeigen
-(function(){const v=document.getElementById('heroVideo');if(!v)return;
-  if(calm){v.removeAttribute('autoplay');v.pause();return;}
-  const p=v.play();if(p&&p.catch)p.catch(()=>{});})();
 
 // Öffnungsstatus nach Wochentag + Uhrzeit
 (function(){
