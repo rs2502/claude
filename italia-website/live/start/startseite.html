@@ -124,6 +124,9 @@
 
   /* Feiern (terracotta) */
   .feiern{background:var(--accent);color:#fff;text-align:center}
+  /* Festsaal-Foto hinter „Mit uns feiern“; der Terrakotta-Verlauf hält die Schrift lesbar */
+  .feiern{background:linear-gradient(180deg,rgba(120,45,20,.42),rgba(85,28,10,.72)),url('assets/festsaal.jpg?v=1') center/cover no-repeat,var(--accent)}
+  .feiern h2,.feiern .tags,.feiern .lead2{text-shadow:0 2px 14px rgba(40,15,5,.35)}
   .feiern h2{font-family:"Playfair Display","Didot",Georgia,"Times New Roman",serif;font-weight:600;font-size:clamp(30px,5vw,46px);color:#fff}
   .feiern .tags{display:flex;flex-wrap:wrap;gap:10px 14px;justify-content:center;margin:24px 0 12px;font-size:16px}
   .feiern .lead2{color:#ffe9df;max-width:660px;margin:0 auto 30px;font-size:clamp(16px,2.2vw,19px)}
