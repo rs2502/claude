@@ -117,7 +117,8 @@ All commands in `~/claude-video-effects`. Effects live in `src/effects/effects.t
    word. Done only when no text sits on the face, no person shows twice and there is no halo around the
    cut-out.
 
-10. **Render:** `npx remotion render src/index.ts EffectsVideo out/<name>-effects.mp4`.
+10. **Render:** `npx remotion render src/index.ts EffectsVideo out/<name>-effects.mp4 --concurrency=2 --timeout=120000`
+    (on a machine with few cores the default parallel render times out on "Loading fonts").
 
 11. **P pass (only if the plan has P effects):** run the quick route steps 1, 3 to 5 in `~/claude-effects-py`
     with `~/claude-video-effects/out/<name>-effects.mp4` as input and the same times (R does not change the
@@ -136,6 +137,10 @@ watch it before posting. For fine-tuning R effects mention `npm run studio`.
   `spotlight`, `slow-push` before overlays). Zoom never past 2x.
 - **One frame offset between video and cut-out** gives two heads: almost always the concat demuxer
   (`-f concat`). Use only the concat filter, and compute the cut-out from exactly the file in `video`.
+- **Text baked into the footage** (titles, cover lines, big lettering behind the person) gets kept by the
+  cut-out as part of the person and shows up as remnants on the plain backgrounds of `greenscreen`,
+  `magazine`, `curve`, `paper`, `studio`. With such footage prefer effects that keep the camera frame
+  (P effects, `glass`, `frame`, `snap`, `liquid`, `checks`, `viewfinder`), or try `resnet50` for the cut-out.
 - **Behind a cut-out that moves a lot, show the empty room** (`plate`).
 - **Do not clip a rectangle around the head**; clean the matte itself (`scripts/make-cutout.sh`).
 - **Landscape footage**: set `crop=1080:1920:<x>:0` when preparing if the person is not centred.

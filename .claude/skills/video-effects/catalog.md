@@ -87,7 +87,7 @@ standing-in-front trick.
 | `portal` | Zoom portal | circle with the live frame top left, the camera flies into it | | `at` on the word |
 | `broll` | B-roll overlay | an editing program slides up, a clip drops onto the track | | `at` on "B-roll" |
 | `text` | Text behind me | a giant word behind you, you in front of it | Cut-out, `plate` | `word` |
-| `viewfinder` | Digital zoom | viewfinder with REC, timecode, zoom 1.0x → 2.0x | `face` | `at` on the word |
+| `viewfinder` | Digital zoom | viewfinder with REC, timecode, zoom 1.0x → 2.0x | `face` | `at` on the word; window at least `at` + 1.6 s, the zoom starts 0.96 s after `at` |
 | `frame` | Frame escape | the frame becomes a tilted card, your head climbs over its edge | Cut-out, `face` | |
 | `zoomcut` | Zoom cut | blurred zoom in, flash, back out | `face` | |
 | `checks` | Check pop | up to four pills with check marks above the head | | `lines` |
