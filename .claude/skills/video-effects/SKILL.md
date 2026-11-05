@@ -1,6 +1,6 @@
 ---
 name: video-effects
-description: Edits a vertical talking-head video - cuts the pauses, captions every word and adds any of 67 video effects (green screen, magazine cover, glass break, orbit, dolly zoom, text behind me, frame escape, spotlight, glass widgets, timeline, checklist, headline wall, comment box, phone fan, liquid glass graph, match-cut, iPhone toggles, LED sign, iMessage pop-ups and more) exactly where the person mentions them. Effects track the face and can sit behind the head. Use for "edit my video", "add the effects", "video effects", /effects, "text behind me", "green screen", "cut-out", when someone names one of the effects, or hands over a raw video with spoken effect cues.
+description: Edits a vertical talking-head video - cuts the pauses, captions every word and adds any of 68 video effects (green screen, magazine cover, glass break, orbit, dolly zoom, text behind me, frame escape, spotlight, glass widgets, timeline, editor, checklist, headline wall, comment box, phone fan, liquid glass graph, match-cut, iPhone toggles, LED sign, iMessage pop-ups and more) exactly where the person mentions them. Effects track the face and can sit behind the head. Use for "edit my video", "add the effects", "video effects", /effects, "text behind me", "green screen", "cut-out", when someone names one of the effects, or hands over a raw video with spoken effect cues.
 ---
 
 # Video effects (two engines, one skill)
@@ -11,7 +11,7 @@ column **Engine** says which pack renders it.
 | Engine | Where | What it brings |
 |---|---|---|
 | **R** = Remotion | `~/claude-video-effects` (KenoMedien/claude-video-effects) | full edit: cut, captions, header row, 21 effects with a high-quality cut-out ([matting.md](matting.md)) |
-| **P** = Python | `~/claude-effects-py` (Vibha-Ramprakash/claude-video-effects) | 46 more effects, quick, no cut-out step needed (face tracking and segmentation built in) |
+| **P** = Python | `~/claude-effects-py` (Vibha-Ramprakash/claude-video-effects) | 47 more effects (46 + our own `editor` in `engine-p/fx_private.py`), quick, no cut-out step needed (face tracking and segmentation built in) |
 
 Both folders are installed by the repo's SessionStart hook (`.claude/hooks/video-effects.sh`). If one is
 missing, run that hook script.
@@ -32,6 +32,9 @@ All commands in `~/claude-effects-py`.
 
 1. **Set up once:** `bash scripts/setup.sh` prints `READY` (1 to 3 minutes the first time). `NEED_FFMPEG`
    or `NEED_PYTHON`: tell the user how to get it and install only after they say yes.
+   Linux error `libEGL.so.1` → `apt-get install -y libegl1 libgles2`. A `TypeError ... NoneType` from
+   mediapipe at exit is harmless. If `scripts/fx_private.py` is missing (no `editor`), copy
+   `engine-p/fx_private.py` from this skill folder there.
 2. **Timing:** "on the word X" → `.venv/bin/python scripts/words.py <video>` gives word times. No timing
    given → whole clip or ask once. Short windows look best: 1.5 to 4 s per effect.
 3. **Plan** next to the video as `<name>_effects.json`:

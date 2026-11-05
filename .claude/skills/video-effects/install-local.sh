@@ -57,15 +57,18 @@ fetch_pinned "$R_URL" "$R_SHA" "$R_DIR"
 
 say "Engine P (Python): $P_DIR"
 fetch_pinned "$P_URL" "$P_SHA" "$P_DIR"
+cp "$SKILL_SRC/engine-p/fx_private.py" "$P_DIR/scripts/fx_private.py"   # extra effects, e.g. editor
 if ! bash "$P_DIR/scripts/setup.sh"; then
   echo "Python setup did not finish. Install Python 3.10 or newer (Mac: brew install python@3.12),"
   echo "then run: bash $P_DIR/scripts/setup.sh"
+  echo "(Linux: if it complains about libEGL.so.1, run: sudo apt install libegl1 libgles2)"
 fi
 
 say "Skill: $TARGET"
 mkdir -p "$TARGET"
 cp "$SKILL_SRC"/SKILL.md "$SKILL_SRC"/catalog.md "$SKILL_SRC"/matting.md "$TARGET/"
-echo "Copied SKILL.md, catalog.md, matting.md."
+mkdir -p "$TARGET/engine-p" && cp "$SKILL_SRC"/engine-p/fx_private.py "$TARGET/engine-p/"
+echo "Copied SKILL.md, catalog.md, matting.md, engine-p/fx_private.py."
 
 # The two old single skills would compete with the merged one.
 if [ -e "$HOME/.claude/skills/effects" ]; then

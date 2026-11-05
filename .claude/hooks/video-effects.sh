@@ -2,6 +2,7 @@
 # Installs both engines of the merged video-effects skill (.claude/skills/video-effects) into a fresh container.
 # Called from session-start.sh; safe to run again, and it never touches an existing checkout's files.
 set -euo pipefail
+SKILL_DIR="$(cd "$(dirname "$0")/../skills/video-effects" && pwd)"
 
 REPO_URL="https://github.com/KenoMedien/claude-video-effects.git"
 # Reviewed commit. Bump only after reading the upstream diff: skill/*.md become Claude's instructions.
@@ -43,5 +44,7 @@ if [ ! -d "$PY_DIR/.git" ]; then
   git -C "$PY_DIR" fetch --quiet --depth 1 "$PY_URL" "$PY_SHA"
   git -C "$PY_DIR" checkout --quiet FETCH_HEAD
 fi
+# Our own extra P effects (e.g. editor); fx.py loads scripts/fx_private.py by itself.
+cp "$SKILL_DIR/engine-p/fx_private.py" "$PY_DIR/scripts/fx_private.py"
 # Its own SKILL.md must not be loaded as a separate skill; only the merged one counts.
 rm -rf "$HOME/.claude/skills/effects"

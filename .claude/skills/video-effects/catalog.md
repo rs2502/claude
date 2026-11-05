@@ -1,7 +1,7 @@
 # Effect catalog (both engines, duplicates removed)
 
-21 effects from engine **R** (Remotion, `~/claude-video-effects`) + 46 from engine **P** (Python,
-`~/claude-effects-py`) = **67 effects**. The frame is always 1080 × 1920; times are seconds in the
+21 effects from engine **R** (Remotion, `~/claude-video-effects`) + 47 from engine **P** (Python,
+`~/claude-effects-py`, 46 from the pack + our own `editor`) = **68 effects**. The frame is always 1080 × 1920; times are seconds in the
 finished, cut video.
 
 ## Duplicates: one entry each
@@ -30,7 +30,7 @@ Pick by the look the user describes.
 | `portal` (camera flies into a circle) | `rabbit-hole` | P: frame tunnels into itself, spinning |
 | `viewfinder` (REC, zoom 1x → 2x) | `locked-on` | P: corner brackets lock onto the face, camera follows |
 | `zoomcut` (blur zoom, flash) | `slow-push` | P: slow cinematic push with background blur |
-| `broll` (editing program slides up) | `timeline`, `broll-split` | P: film grade with timeline and REC / B-roll on top, you below |
+| `broll` (editing program slides up) | `timeline`, `broll-split`, `editor` | P: film grade with timeline and REC / B-roll on top, you below |
 | `studio` (lamps flicker on) | `spotlight`, `led-sign` | P: lights go out, you stay lit / LED sign types itself |
 
 ## Engine R: the 21 effects (+ intro)
@@ -97,7 +97,7 @@ standing-in-front trick.
 `src/effects/theme.tsx`). Font Montserrat is included; another via `theme.font` and a `FontFace` in
 `src/fonts.ts`. `liquid` uses `public/lens-map.png` (ships ready-made).
 
-## Engine P: the 46 effects
+## Engine P: the 47 effects
 
 Plan entry `{"fx": "<name>", "start": s, "end": s, "text": "...", ...}`; options go into the same object
 (or `--opt key=value` for a single effect). Lists are joined with `|`. All options are optional.
@@ -150,6 +150,7 @@ Plan entry `{"fx": "<name>", "start": s, "end": s, "text": "...", ...}`; options
 | `huge-strike` | huge serif word wipes in behind your head, a red line crosses it out | `text`, `at` (0.6) |
 | `crayon-write` | red crayon writes your word behind your head, underlines it | `text` |
 | `fan-build` | your reel covers deal into a fan behind your head | `images`, `count` (13) |
+| `editor` | **own effect** (`engine-p/fx_private.py`): an editor window pops up above your head, behind it. `look=code` (default): files slide in, code types itself with colours, the cursor clicks Run, "Build succeeded". `look=video`: media bin, live preview, timeline; the cursor drags a clip onto the track and clicks Export | `text` (code lines, or the name of the dragged clip with `look=video`), `title`, `files`, `run` (button), `status` (green chip), `color`, `pos=below` (under the chin) |
 
 P aliases also work: `bill`, `to-do`, `follow`, `stamp`, `countdown`, `rain`, `pause` (and `cover` =
 `cover-star`, the P twin of `magazine`).
