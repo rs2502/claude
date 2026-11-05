@@ -1,0 +1,546 @@
+<title>Ristorante Pizzeria Italia</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,500;1,9..144,700&family=Karla:wght@400;600;700&display=swap">
+<style>
+/* Layout: eine echte Flasche bleibt fix in der Bildmitte, die Seite zieht an ihr vorbei.
+   Scroll dreht und neigt die Flasche; am Ende dockt sie in den Reservierungs-Slot. */
+:root {
+  --cream: #f6efe4;      /* Grund der Website */
+  --paper: #fffaf2;
+  --terra: #b5502c;      /* Akzent der Website */
+  --oxblood: #6e1a1f;    /* Riesentypo */
+  --ink: #241a14;
+  --muted: #76675b;
+  --night: #1c1210;
+  --gold: #c9a24a;
+  --display: "Anton", "Impact", "Arial Narrow", sans-serif;
+  --serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --body: "Karla", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font: 400 17px/1.6 var(--body);
+  overflow-x: hidden;
+}
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--terra); outline-offset: 3px; border-radius: 4px; }
+
+/* fixe 3D-Bühne */
+#stage {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 1; pointer-events: none;
+}
+
+.scene {
+  position: relative;
+  min-height: 150vh;
+  padding-block: 12vh;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-content: space-between;
+  column-gap: 30vw;
+  row-gap: 40vh;
+  overflow-x: clip;
+}
+/* Text oben links und unten rechts, die Mitte gehört Flasche und Riesentypo */
+.scene > .left { grid-column: 1; grid-row: 1; justify-self: start; max-width: 30rem; }
+.scene > .right { grid-column: 2; grid-row: 2; justify-self: end; max-width: 30rem; }
+#s-hero { min-height: 100vh; padding-block: 9vh 7vh; row-gap: 20px; }
+.left, .right, .wide { position: relative; z-index: 2; min-width: 0; }
+
+/* Riesentypo hinter der Flasche */
+.giant {
+  position: absolute; z-index: 0;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%) translateY(calc(var(--drift, 0) * 1px));
+  font-family: var(--display);
+  font-size: clamp(5rem, 19vw, 22rem);
+  line-height: 0.86;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--oxblood);
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+.giant.two { font-size: clamp(4rem, 15vw, 17rem); }
+.giant small { display: block; font-size: 0.42em; letter-spacing: 0.04em; }
+
+.splash { position: absolute; z-index: 0; pointer-events: none; color: var(--oxblood); opacity: 0.9; }
+.splash svg { width: 100%; height: 100%; display: block; transform: scale(var(--p, 1)); transform-origin: center; }
+
+.kicker {
+  font: 700 0.78rem/1 var(--body);
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--terra);
+  display: flex; align-items: center; gap: 12px;
+}
+.kicker::before { content: ""; width: 36px; height: 2px; background: currentColor; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.2rem, 4.2vw, 3.6rem); line-height: 1.05; }
+h2 { font-size: clamp(1.9rem, 3.3vw, 2.8rem); line-height: 1.08; }
+h3 { font-size: 1.35rem; line-height: 1.2; }
+em { font-style: italic; color: var(--terra); }
+p { margin: 0; color: var(--muted); }
+.stack { display: flex; flex-direction: column; gap: 18px; }
+
+.btns { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 24px; border-radius: 999px;
+  font: 700 0.95rem/1 var(--body); text-decoration: none;
+  border: 2px solid var(--ink); color: var(--ink); background: transparent;
+  transition: background .2s, color .2s;
+}
+.btn.solid { background: var(--terra); border-color: var(--terra); color: var(--paper); }
+.btn:hover { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+
+/* Spec-Blöcke wie auf einem Weinetikett */
+.spec { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; font-size: 0.95rem; }
+.spec dt { font: 700 0.72rem/1.9 var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--terra); }
+.spec dd { margin: 0; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.pillar { border-top: 2px solid var(--ink); padding-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+
+.cats { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 28px; }
+.cats li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px dashed rgba(36,26,20,.22); break-inside: avoid; font-variant-numeric: tabular-nums; }
+.cats b { font-family: var(--serif); font-weight: 600; }
+.cats span { color: var(--muted); }
+.big-num { font: 400 clamp(4rem, 8vw, 7rem)/0.9 var(--display); color: var(--terra); }
+
+.plates { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.plates figure { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.plates img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 50%; background: var(--paper); }
+.plates figcaption { font: 600 0.85rem/1.2 var(--serif); text-align: center; }
+
+/* dunkle Herbst-Szene */
+.scene.dark { background: var(--night); color: var(--paper); }
+.scene.dark .giant { color: #3a1a17; }
+.scene.dark p { color: #d9c9b6; }
+.scene.dark em { color: var(--gold); }
+.scene.dark .kicker { color: var(--gold); }
+.special-img { width: 100%; border-radius: 6px; display: block; box-shadow: 0 30px 60px rgba(0,0,0,.45); }
+
+.events { display: flex; flex-wrap: wrap; gap: 10px; }
+.events span { font: 600 1rem/1 var(--serif); padding: 12px 18px; border: 2px solid var(--oxblood); color: var(--oxblood); border-radius: 999px; background: var(--cream); }
+.copy-line { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.copy-line code { font: 600 1rem/1.4 var(--body); user-select: all; color: var(--ink); }
+.mini { font: 700 0.8rem/1 var(--body); padding: 8px 12px; border-radius: 999px; border: 1.5px solid var(--ink); background: transparent; cursor: pointer; color: var(--ink); }
+
+/* Kontakt + Dock-Slot */
+.scene.final { gap: 40px; align-items: start; align-content: start; min-height: 100vh; }
+.scene.final > .left { grid-row: 1; justify-self: end; width: 100%; max-width: 34rem; }
+/* unter der 3D-Ebene, damit die Flasche sichtbar im Slot steht */
+.scene.final > .right { grid-row: 1; justify-self: start; width: 100%; max-width: 34rem; z-index: 0; }
+.card { background: var(--paper); border-radius: 18px; padding: 28px; box-shadow: 0 24px 50px rgba(36,26,20,.08); }
+.hours { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.hours th, .hours td { text-align: left; padding: 11px 0; border-bottom: 1px dashed rgba(36,26,20,.18); font-size: 0.98rem; }
+.hours td { text-align: right; }
+.hours .off { color: var(--muted); }
+.dock { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 24px; align-items: center; }
+.slot {
+  height: 260px; border-radius: 60px 60px 14px 14px;
+  background: radial-gradient(ellipse at 50% 92%, rgba(36,26,20,.18), transparent 60%), var(--cream);
+  border: 2px dashed rgba(110,26,31,.35);
+}
+.no-gl .slot { border-style: solid; }
+
+footer {
+  position: relative; z-index: 2;
+  background: var(--night); color: #d9c9b6;
+  padding-block: 40px calc(40px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  text-align: center; font-size: 0.9rem;
+}
+footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; margin-bottom: 14px; }
+footer a { text-decoration: none; }
+footer a:hover { color: var(--gold); }
+
+/* Telefon: Text oben und unten, Flasche in der Mitte frei */
+@media (max-width: 820px) {
+  .scene { grid-template-columns: minmax(0, 1fr); row-gap: 46vh; }
+  .scene > .left, .scene > .right { grid-column: 1; justify-self: stretch; max-width: none; }
+  .scene > .right { grid-row: 2; }
+  #s-hero { row-gap: 52vh; padding-block: 4vh; }
+  .scene > .left, .scene > .right { background: rgba(255,250,242,.88); padding: 20px; border-radius: 14px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .scene.dark > .left, .scene.dark > .right { background: rgba(28,18,16,.85); }
+  .giant { font-size: 27vw; }
+  .giant.two { font-size: 21vw; }
+  .cats { columns: 1; }
+  .scene.final { grid-template-columns: minmax(0, 1fr); row-gap: 24px; min-height: auto; }
+  .scene.final > .left, .scene.final > .right { grid-column: 1; background: none; padding: 0; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .scene.final > .right { grid-row: 2; }
+  .dock { grid-template-columns: 86px minmax(0, 1fr); gap: 16px; padding: 20px; }
+  .slot { height: 220px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+
+<canvas id="stage" aria-hidden="true"></canvas>
+
+<main>
+  <!-- 1 · Hero -->
+  <section class="scene" id="s-hero" data-pose="hero">
+    <div class="giant" aria-hidden="true">Italia</div>
+    <div class="splash" data-splash="7" style="right:8%;top:14%;width:180px;height:180px"></div>
+    <div class="left stack">
+      <div class="kicker">Cucina Italiana · Bruchhausen-Vilsen</div>
+      <h1>Echte italienische <em>Lebensfreude</em>.</h1>
+      <p>Frisch gekocht, herzlich serviert und immer mit dem Geschmack Italiens.</p>
+    </div>
+    <div class="right stack">
+      <dl class="spec">
+        <dt>Adresse</dt><dd>Engelbergplatz 4</dd>
+        <dt>Telefon</dt><dd>04252 4597</dd>
+        <dt>Heute</dt><dd id="today">Öffnungszeiten unten</dd>
+      </dl>
+      <div class="btns">
+        <a class="btn solid" href="https://www.ristorante-pizzeria-italia.com/reservierungsportal/" target="_blank" rel="noopener">Tisch reservieren</a>
+        <a class="btn" href="https://www.ristorante-pizzeria-italia.com/app/" target="_blank" rel="noopener">Speisekarte</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · Qualität -->
+  <section class="scene" id="s-qualita" data-pose="qualita">
+    <div class="giant two" aria-hidden="true">Qualità<small>Fantasia · Cuore</small></div>
+    <div class="left stack">
+      <div class="kicker">Willkommen</div>
+      <h2>Qualität, Kreativität &amp; <em>herzlicher Service</em></h2>
+      <p>Lassen Sie sich verwöhnen mit raffinierten Nudelgerichten, knusprigen Pizzen, gegrilltem Fleisch und frischem Fisch.</p>
+    </div>
+    <div class="right stack">
+      <div class="pillar"><h3>Frische Qualität</h3><p>Täglich frische, sorgfältig ausgewählte Zutaten als Basis jeder guten italienischen Küche.</p></div>
+      <div class="pillar"><h3>Kreative Küche</h3><p>Pizzen aus dem Ofen, gegrilltes Fleisch und frischer Fisch.</p></div>
+      <div class="pillar"><h3>Herzlicher Service</h3><p>Aufmerksam und persönlich, damit Sie sich vom ersten Moment an wohlfühlen.</p></div>
+    </div>
+  </section>
+
+  <!-- 3 · Speisekarte -->
+  <section class="scene" id="s-carta" data-pose="carta">
+    <div class="giant two" aria-hidden="true">La Carta<small>126 Gerichte</small></div>
+    <div class="left stack">
+      <div class="kicker">Die Speisekarte</div>
+      <div class="big-num">126</div>
+      <h2>Gerichte in <em>14 Kategorien</em></h2>
+      <ul class="cats">
+        <li><b>Pizza</b><span>21</span></li>
+        <li><b>Pasta</b><span>20</span></li>
+        <li><b>Menue Speciale</b><span>16</span></li>
+        <li><b>Carne</b><span>15</span></li>
+        <li><b>Pesce</b><span>8</span></li>
+        <li><b>Insalate</b><span>8</span></li>
+        <li><b>Vorspeisen</b><span>6</span></li>
+        <li><b>Dolci</b><span>6</span></li>
+      </ul>
+    </div>
+    <div class="right stack">
+      <div class="plates">
+        <figure><img src="img/pizza.png" alt="Pizza mit Büffelmozzarella und Basilikum"><figcaption>Pizza</figcaption></figure>
+        <figure><img src="img/pasta.png" alt="Tagliatelle mit Garnelen"><figcaption>Pasta</figcaption></figure>
+        <figure><img src="img/dolci.png" alt="Tiramisu"><figcaption>Dolci</figcaption></figure>
+      </div>
+      <p>Alle Gerichte werden frisch zubereitet, die Wartezeit liegt bei etwa 15–25 Minuten.</p>
+      <div class="btns"><a class="btn" href="https://www.ristorante-pizzeria-italia.com/app/" target="_blank" rel="noopener">Ganze Karte ansehen</a></div>
+    </div>
+  </section>
+
+  <!-- 4 · Herbst -->
+  <section class="scene dark" id="s-autunno" data-pose="autunno">
+    <div class="giant two" aria-hidden="true">Autunno<small>Menue Speciale</small></div>
+    <div class="left stack">
+      <img class="special-img" src="img/muscheln.png" alt="Frische Muscheln in Weißweinsoße und Tomatensoße">
+    </div>
+    <div class="right stack">
+      <div class="kicker">Menue Speciale</div>
+      <h2>Herbst-<em>Spezialitäten</em></h2>
+      <p>Frische Muscheln in Weißweinsoße oder Tomatensoße, dazu 16 Gerichte auf der aktuellen Herbstkarte.</p>
+    </div>
+  </section>
+
+  <!-- 5 · Feiern -->
+  <section class="scene" id="s-festa" data-pose="festa">
+    <div class="giant" aria-hidden="true">Festa</div>
+    <div class="splash" data-splash="3" style="left:10%;top:18%;width:240px;height:240px"></div>
+    <div class="splash" data-splash="11" style="right:12%;bottom:16%;width:150px;height:150px"></div>
+    <div class="left stack">
+      <div class="kicker">Feiern &amp; Catering</div>
+      <h2>Mit uns feiern Sie <em>richtig</em>.</h2>
+      <p>Mit uns wird Ihr Event zu einem kulinarischen Erlebnis.</p>
+    </div>
+    <div class="right stack">
+      <div class="events"><span>Hochzeit</span><span>Geburtstag</span><span>Firmenfeier</span><span>Jubiläum</span><span>Catering</span></div>
+      <p>Anfragen per E-Mail:</p>
+      <div class="copy-line"><code id="mail">kontakt@ristorante-pizzeria-italia.com</code><button class="mini" id="copy-mail" type="button">Kopieren</button></div>
+    </div>
+  </section>
+
+  <!-- 6 · Kontakt, hier dockt die Flasche -->
+  <section class="scene final" id="s-contatto" data-pose="dock">
+    <div class="left stack">
+      <div class="kicker">Besuchen Sie uns</div>
+      <h2>Öffnungszeiten &amp; <em>Kontakt</em></h2>
+      <div class="card">
+        <table class="hours">
+          <tr><th>Montag</th><td>11:30–14:30 · 17:30–22:30</td></tr>
+          <tr><th>Dienstag</th><td class="off">Ruhetag</td></tr>
+          <tr><th>Mittwoch</th><td class="off">Ruhetag</td></tr>
+          <tr><th>Do – Sa</th><td>11:30–14:30 · 17:30–22:30</td></tr>
+          <tr><th>Sonntag</th><td>11:30–14:00 · 17:00–22:00</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="right stack">
+      <div class="card dock">
+        <div class="slot" id="slot" aria-hidden="true"></div>
+        <div class="stack">
+          <h3>Ihr Tisch wartet.</h3>
+          <dl class="spec">
+            <dt>Adresse</dt><dd>Engelbergplatz 4, 27305 Bruchhausen-Vilsen</dd>
+            <dt>Telefon</dt><dd>04252 4597</dd>
+          </dl>
+          <div class="btns">
+            <a class="btn solid" href="https://www.ristorante-pizzeria-italia.com/reservierungsportal/" target="_blank" rel="noopener">Reservieren</a>
+            <a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Engelbergplatz+4+27305+Bruchhausen-Vilsen" target="_blank" rel="noopener">Route</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <nav>
+    <a href="https://www.ristorante-pizzeria-italia.com/app/" target="_blank" rel="noopener">Speisekarte</a>
+    <a href="https://www.ristorante-pizzeria-italia.com/reservierungsportal/" target="_blank" rel="noopener">Reservierung</a>
+    <a href="https://www.ristorante-pizzeria-italia.com/Impressionen/" target="_blank" rel="noopener">Impressionen</a>
+    <a href="https://www.ristorante-pizzeria-italia.com/Impressum/impressum.html" target="_blank" rel="noopener">Impressum</a>
+    <a href="https://www.ristorante-pizzeria-italia.com/Datenschutz/datenschutz.html" target="_blank" rel="noopener">Datenschutz</a>
+  </nav>
+  © Ristorante Pizzeria Italia · Engelbergplatz 4 · 27305 Bruchhausen-Vilsen
+</footer>
+
+<script>
+/* Weinflecken: prozedural erzeugt, damit jeder Fleck anders aussieht */
+(function () {
+  function rng(seed) { return function () { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+  document.querySelectorAll("[data-splash]").forEach(function (el) {
+    var r = rng(+el.dataset.splash * 977 + 13), n = 46, pts = [], i;
+    for (i = 0; i < n; i++) {
+      var a = (i / n) * Math.PI * 2, spike = r() < 0.22 ? 1.25 + r() * 0.55 : 0.82 + r() * 0.16;
+      pts.push([50 + Math.cos(a) * 28 * spike, 50 + Math.sin(a) * 28 * spike]);
+    }
+    var d = "M" + pts.map(function (p) { return p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" L") + "Z";
+    var drops = "";
+    for (i = 0; i < 9; i++) {
+      var a2 = r() * Math.PI * 2, dist = 36 + r() * 12;
+      drops += '<circle cx="' + (50 + Math.cos(a2) * dist).toFixed(1) + '" cy="' + (50 + Math.sin(a2) * dist).toFixed(1) + '" r="' + (0.8 + r() * 2.4).toFixed(1) + '"/>';
+    }
+    el.innerHTML = '<svg viewBox="0 0 100 100" fill="currentColor"><path d="' + d + '" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>' + drops + "</svg>";
+  });
+
+  // heute geöffnet?
+  var hours = { 1: "11:30–14:30 · 17:30–22:30", 2: "Ruhetag", 3: "Ruhetag", 4: "11:30–14:30 · 17:30–22:30", 5: "11:30–14:30 · 17:30–22:30", 6: "11:30–14:30 · 17:30–22:30", 0: "11:30–14:00 · 17:00–22:00" };
+  document.getElementById("today").textContent = hours[new Date().getDay()];
+
+  document.getElementById("copy-mail").addEventListener("click", function () {
+    var btn = this, txt = document.getElementById("mail").textContent;
+    function sel() { var s = getSelection(), rg = document.createRange(); rg.selectNodeContents(document.getElementById("mail")); s.removeAllRanges(); s.addRange(rg); btn.textContent = "Markiert"; }
+    try { navigator.clipboard.writeText(txt).then(function () { btn.textContent = "Kopiert"; }, sel); } catch (e) { sel(); }
+  });
+
+  // Riesentypo und Flecken leicht mit dem Scroll bewegen
+  var giants = document.querySelectorAll(".giant"), splashes = document.querySelectorAll(".splash");
+  function drift() {
+    var vh = innerHeight;
+    giants.forEach(function (g) {
+      var r = g.parentElement.getBoundingClientRect();
+      g.style.setProperty("--drift", ((r.top + r.height / 2 - vh / 2) * -0.25).toFixed(1));
+    });
+    splashes.forEach(function (s) {
+      var r = s.getBoundingClientRect(), t = 1 - Math.min(1, Math.abs(r.top + r.height / 2 - vh / 2) / vh);
+      s.style.setProperty("--p", (0.55 + t * 0.55).toFixed(3));
+    });
+  }
+  addEventListener("scroll", drift, { passive: true });
+  addEventListener("resize", drift);
+  drift();
+})();
+</script>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+const canvas = document.getElementById("stage");
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+} catch (e) {
+  document.documentElement.classList.add("no-gl");
+  canvas.remove();
+  throw e;
+}
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+camera.position.set(0, 0, 11);
+
+const key = new THREE.DirectionalLight(0xfff1dc, 2.2); key.position.set(4, 5, 6); scene.add(key);
+const rim = new THREE.DirectionalLight(0xffc9a0, 1.6); rim.position.set(-5, 2, -3); scene.add(rim);
+scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+
+/* ---- Flasche (Lathe-Profil, Mittelpunkt im Ursprung) ---- */
+const prof = [[0,-1.6],[0.44,-1.6],[0.53,-1.57],[0.56,-1.48],[0.56,0.3]];
+for (let i = 1; i <= 14; i++) {           // Schulter
+  const t = i / 14, y = 0.3 + t * 0.85;
+  prof.push([0.165 + (0.56 - 0.165) * Math.pow(Math.cos(t * Math.PI / 2), 1.6), y]);
+}
+prof.push([0.15,1.5],[0.175,1.52],[0.18,1.6],[0,1.6]);
+const bottleGeo = new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y)), 96);
+const glass = new THREE.MeshPhysicalMaterial({ color: 0x2c0b0e, roughness: 0.1, clearcoat: 1, clearcoatRoughness: 0.04, metalness: 0.05, envMapIntensity: 1.4 });
+const bottle = new THREE.Group();
+bottle.add(new THREE.Mesh(bottleGeo, glass));
+
+// Kapsel
+const foil = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.188, 0.172, 0.5, 64),
+  new THREE.MeshStandardMaterial({ color: 0xa8432a, metalness: 0.75, roughness: 0.32 })
+);
+foil.position.y = 1.36; bottle.add(foil);
+
+// Etikett (Canvas-Textur)
+function labelTexture() {
+  const c = document.createElement("canvas"); c.width = 2048; c.height = 640;
+  const g = c.getContext("2d");
+  g.fillStyle = "#f3e9d8"; g.fillRect(0, 0, c.width, c.height);
+  const cx = c.width / 2;            // Mitte der Textur zeigt zur Kamera
+  g.strokeStyle = "#6e1a1f"; g.lineWidth = 6; g.strokeRect(cx - 470, 40, 940, 560);
+  g.lineWidth = 2; g.strokeRect(cx - 450, 60, 900, 520);
+  g.fillStyle = "#c9a24a"; g.textAlign = "center";
+  g.font = "600 46px Fraunces, Georgia, serif"; g.fillText("★  ★  ★", cx, 140);
+  g.fillStyle = "#6e1a1f"; g.font = "180px Anton, Impact, sans-serif"; g.fillText("ITALIA", cx, 340);
+  g.fillStyle = "#b5502c"; g.font = "italic 600 72px Fraunces, Georgia, serif"; g.fillText("Rosso della Casa", cx, 440);
+  g.fillStyle = "#241a14"; g.font = "700 34px Karla, Arial, sans-serif";
+  g.fillText("RISTORANTE PIZZERIA · BRUCHHAUSEN-VILSEN", cx, 530);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  return t;
+}
+const labelMat = new THREE.MeshStandardMaterial({ roughness: 0.85, metalness: 0 });
+const label = new THREE.Mesh(new THREE.CylinderGeometry(0.566, 0.566, 1.25, 96, 1, true, Math.PI, Math.PI * 2), labelMat);
+label.position.y = -0.62; bottle.add(label);
+const applyLabel = () => { labelMat.map = labelTexture(); labelMat.needsUpdate = true; };
+applyLabel();
+document.fonts && document.fonts.ready.then(applyLabel);
+
+scene.add(bottle);
+const BOTTLE_H = 3.2;
+
+/* ---- Posen je Szene: Scroll „posiert“ die Flasche, statt sie zu bewegen ---- */
+const isPhone = () => innerWidth <= 820;
+const POSES = {
+  hero:    { x: 0, y: 0,    rz: 0,     rx: 0.08, s: 1.0 },
+  qualita: { x: 0, y: 0.1,  rz: -0.22, rx: 0.18, s: 0.95 },
+  carta:   { x: 0, y: 0,    rz: 1.08,  rx: 0.1,  s: 1.08 },
+  autunno: { x: 0, y: -0.1, rz: -0.42, rx: -0.1, s: 0.92 },
+  festa:   { x: 0, y: 0,    rz: 0.18,  rx: 0.25, s: 1.02 },
+};
+const sections = [...document.querySelectorAll("[data-pose]")];
+const slot = document.getElementById("slot");
+
+function worldPerPx() {
+  const h = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
+  return h / innerHeight;
+}
+function dockPose() {
+  const r = slot.getBoundingClientRect(), k = worldPerPx();
+  return {
+    x: (r.left + r.width / 2 - innerWidth / 2) * k,
+    y: -(r.top + r.height / 2 - innerHeight / 2) * k,
+    rz: 0, rx: 0,
+    s: (r.height * 0.86 * k) / BOTTLE_H,
+    dock: 1,
+  };
+}
+function poseFor(el) {
+  if (el.dataset.pose === "dock") return dockPose();
+  const p = { ...POSES[el.dataset.pose], dock: 0 };
+  if (isPhone()) p.s *= 0.78;
+  return p;
+}
+function anchor(el) {
+  const top = el.getBoundingClientRect().top + scrollY;
+  const max = document.documentElement.scrollHeight - innerHeight;
+  if (el.dataset.pose === "dock") return Math.min(max, top - innerHeight * 0.12);
+  if (el.dataset.pose === "hero") return 0;
+  return Math.min(max, top + el.offsetHeight / 2 - innerHeight / 2);
+}
+const ease = (t) => t * t * (3 - 2 * t);
+const lerp = (a, b, t) => a + (b - a) * t;
+
+function targetPose() {
+  const y = scrollY;
+  const keys = sections.map((el) => ({ a: anchor(el), p: poseFor(el) }));
+  if (y <= keys[0].a) return keys[0].p;
+  for (let i = 0; i < keys.length - 1; i++) {
+    const A = keys[i], B = keys[i + 1];
+    if (y <= B.a) {
+      const t = ease((y - A.a) / Math.max(1, B.a - A.a));
+      const o = {};
+      for (const k of ["x", "y", "rz", "rx", "s", "dock"]) o[k] = lerp(A.p[k], B.p[k], t);
+      return o;
+    }
+  }
+  return keys[keys.length - 1].p;
+}
+
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cur = { x: 0, y: 0, rz: 0, rx: 0, s: 1, dock: 0 };
+let first = true, last = performance.now(), idle = 0;
+
+function resize() {
+  renderer.setSize(innerWidth, innerHeight, false);
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+}
+addEventListener("resize", resize);
+resize();
+
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  const t = targetPose();
+  const damp = first ? 1 : 1 - Math.pow(0.0008, dt);   // weiches Nachziehen
+  for (const k in cur) cur[k] = lerp(cur[k], t[k], damp);
+  // beim Andocken direkt auf dem Slot halten, damit die Flasche mit der Karte scrollt
+  if (t.dock > 0.999) { cur.x = t.x; cur.y = t.y; cur.s = t.s; }
+  first = false;
+  if (!reduce) idle += dt * 0.25;
+
+  const spin = (scrollY * 0.0042 + idle) * (1 - cur.dock);
+  bottle.position.set(cur.x, cur.y, 0);
+  bottle.scale.setScalar(cur.s);
+  bottle.rotation.set(cur.rx * (1 - cur.dock), spin % (Math.PI * 2), cur.rz);
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
