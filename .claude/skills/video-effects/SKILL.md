@@ -13,8 +13,16 @@ column **Engine** says which pack renders it.
 | **R** = Remotion | `~/claude-video-effects` (KenoMedien/claude-video-effects) | full edit: cut, captions, header row, 21 effects with a high-quality cut-out ([matting.md](matting.md)) |
 | **P** = Python | `~/claude-effects-py` (Vibha-Ramprakash/claude-video-effects) | 47 more effects (46 + our own `editor` in `engine-p/fx_private.py`), quick, no cut-out step needed (face tracking and segmentation built in) |
 
-Both folders are installed by the repo's SessionStart hook (`.claude/hooks/video-effects.sh`). If one is
-missing, run that hook script.
+## Step 0: set up (every time, before anything else)
+
+Run `bash <this skill's folder>/bootstrap.sh` (the folder this SKILL.md is in; use its absolute path). It
+downloads both engines at reviewed commits, installs their packages and prints `READY`. Once set up it
+returns in a second; the first time takes a few minutes (tell the user). It works in cloud sessions, on a
+Mac, on Linux and in WSL. If it stops with a `NEED_...` line, tell the user what is missing in one plain
+sentence with the install command for their system, and install it only after they say yes.
+`NEED_EGL` (Linux): `sudo apt install libegl1 libgles2`.
+
+On claude.ai chat or anywhere without a shell, ffmpeg and Node, this skill cannot run: say so plainly.
 
 Talk to the user simply and without jargon, in their language. They do not need to know any editing
 software and never have to run commands themselves.
@@ -30,11 +38,7 @@ software and never have to run commands themselves.
 
 All commands in `~/claude-effects-py`.
 
-1. **Set up once:** `bash scripts/setup.sh` prints `READY` (1 to 3 minutes the first time). `NEED_FFMPEG`
-   or `NEED_PYTHON`: tell the user how to get it and install only after they say yes.
-   Linux error `libEGL.so.1` → `apt-get install -y libegl1 libgles2`. A `TypeError ... NoneType` from
-   mediapipe at exit is harmless. If `scripts/fx_private.py` is missing (no `editor`), copy
-   `engine-p/fx_private.py` from this skill folder there.
+1. **Set up:** step 0 did it. A `TypeError ... NoneType` from mediapipe when fx.py exits is harmless.
 2. **Timing:** "on the word X" → `.venv/bin/python scripts/words.py <video>` gives word times. No timing
    given → whole clip or ask once. Short windows look best: 1.5 to 4 s per effect.
 3. **Plan** next to the video as `<name>_effects.json`:
@@ -56,9 +60,7 @@ All commands in `~/claude-effects-py`.
 All commands in `~/claude-video-effects`. Effects live in `src/effects/effects.tsx`; per video only
 `src/project.ts` changes.
 
-1. **Check the tools.** `node -v` (18 or later), `ffmpeg -version`, `ffprobe -version`. If `node_modules`
-   is missing, run `npm install`. If ffmpeg is missing, tell the user how to get it (Mac:
-   `brew install ffmpeg`, Windows: `winget install ffmpeg`) and install only after they say yes.
+1. **Set up:** step 0 did it (Node, ffmpeg, `node_modules`, Chrome for rendering).
 
 2. **Prepare the video.** Copy it into `public/` and convert to vertical 1080 × 1920 with a constant frame
    rate (phone videos often have a variable one, which shifts the effects):
