@@ -139,5 +139,13 @@ watch it before posting. For fine-tuning R effects mention `npm run studio`.
 - **Behind a cut-out that moves a lot, show the empty room** (`plate`).
 - **Do not clip a rectangle around the head**; clean the matte itself (`scripts/make-cutout.sh`).
 - **Landscape footage**: set `crop=1080:1920:<x>:0` when preparing if the person is not centred.
+- **Always set the texts of P effects.** Their defaults are the pack author's own ("22 effects", "Claude edits
+  my reels", "@vibha.in.progress", English headlines). Every P effect that shows text gets `text`, `title`,
+  `name`, `handle`, `lines` etc. in the user's language and about their topic; never ship a default.
+- **Head high in the frame** (face centre in the top third, little room above the hair): effects that draw
+  above or behind the head (`crayon-write`, `the-bill`, `wave-trim`, `countdown-flip`, `lineup`,
+  `apple-toggles`, `select-resize`) end up hidden behind it. Pick effects that use the sides or the lower
+  half, or `pos=below` where an effect has it.
+- **No emoji in P texts**: the bundled fonts have none, they render as empty boxes.
 - **No sound effects.** Captions only through engine R. The P effects are starter versions; be honest about
   that if the user compares them to a reel they saw.

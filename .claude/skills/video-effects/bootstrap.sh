@@ -35,7 +35,8 @@ fetch_pinned() { # url sha dir
 
 # ---- engine R: Remotion ----
 fetch_pinned "$R_URL" "$R_SHA" "$R_DIR"
-if [ ! -d "$R_DIR/node_modules" ]; then
+# npm ls fails when any dependency is missing, not only when node_modules is absent.
+if ! (cd "$R_DIR" && npm ls --depth=0 >/dev/null 2>&1); then
   say "installing Remotion (npm)"
   (cd "$R_DIR" && npm install --no-audit --no-fund --loglevel=error)
 fi
