@@ -6,7 +6,6 @@ Per FTP in den Ordner `/start/` des Webspace laden:
 |---|---|
 | `start/startseite.html` | `/start/startseite.html` (ersetzt die alte Datei) |
 | `start/pizza-effekt/` (ganzer Ordner) | `/start/pizza-effekt/` |
-| `start/assets/dining-motion.mp4` und `.webm` | `/start/assets/` (neben dein `dining.jpg`) |
 
 `start/startseite.original.html` ist die bisherige Startseite als Sicherung. Die muss nicht hochgeladen werden. Falls etwas nicht passt, einfach diese Datei wieder als `startseite.html` hochladen.
 
@@ -16,7 +15,6 @@ Per FTP in den Ordner `/start/` des Webspace laden:
 2. Zwischen „Qualität, Kreativität & herzlicher Service“ und dem Bilder-Streifen steht der neue Pizza-Abschnitt. Der Bilder-Streifen bleibt erhalten.
 3. Vor `</body>`: eine Zeile, die `pizza-effekt.js` lädt.
 
-4. Im Hero: Dein Foto `dining.jpg` ist jetzt dezent bewegt (Video `dining-motion`). Das Foto selbst bleibt als Vorschaubild und für „Bewegung reduzieren“.
 
 Alles andere (Intro, Öffnungszeiten-Balken, Feiern-Effekt, Öffnungsstatus) ist unverändert.
 
