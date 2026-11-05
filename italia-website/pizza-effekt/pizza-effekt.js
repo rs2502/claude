@@ -7,6 +7,7 @@
   if (!root) return;
 
   var track = root.querySelector(".pzfx-track");
+  var stage = root.querySelector(".pzfx-stage");
   var pizza = root.querySelector(".pzfx-pizza");
   var disc = root.querySelector(".pzfx-disc");
   var shadow = root.querySelector(".pzfx-shadow");
@@ -39,7 +40,7 @@
 
   function progress() {
     var r = track.getBoundingClientRect();
-    var h = r.height - innerHeight;
+    var h = r.height - stage.clientHeight;
     return h > 0 ? clamp(-r.top / h, 0, 1) : 0;
   }
 
@@ -76,7 +77,7 @@
     for (var key in T) cur[key] = lerp(cur[key], T[key], k);
     if (!reduce) idle += dt * 6;
 
-    var stageH = innerHeight;
+    var stageH = stage.clientHeight;
     var size = isPhone() ? Math.min(innerWidth * 0.78, stageH * 0.42) : Math.min(innerWidth * 0.4, stageH * 0.6);
     root.style.setProperty("--pzfx-size", size.toFixed(1) + "px");
 
@@ -104,7 +105,7 @@
     }
 
     // Zutaten fliegen kurz vor ihrer Stufe auf die Pizza
-    var cx = innerWidth / 2 + baseX, cy = stageH / 2 + ty;
+    var cx = stage.clientWidth / 2 + baseX, cy = stageH / 2 + ty;
     for (var f = 0; f < flies.length; f++) {
       var el = flies[f], st = +el.getAttribute("data-stage");
       var from = el.getAttribute("data-from").split(",");

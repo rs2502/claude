@@ -2,12 +2,14 @@
    Eigenständiger Abschnitt: alle Klassen beginnen mit "pzfx", nichts außerhalb wird verändert.
    Farben bei Bedarf hier anpassen. */
 .pzfx {
-  --pzfx-bg: #f7f1e8;       /* Creme der Website */
-  --pzfx-ink: #2a211b;
-  --pzfx-muted: #7a6d63;
-  --pzfx-accent: #bb5631;   /* Terrakotta der Website */
+  /* übernimmt die Farben der Website (--bg, --ink …), sonst diese Werte */
+  --pzfx-bg: var(--bg, #f7f1e8);
+  --pzfx-ink: var(--ink, #2f2922);
+  --pzfx-muted: var(--muted, #857c6e);
+  --pzfx-accent: var(--accent, #b8542e);
+  --pzfx-top: 0px;          /* Höhe eines festen Headers, damit nichts darunter verschwindet */
   --pzfx-word: rgba(187, 86, 49, 0.12);
-  --pzfx-card: #fffdf9;
+  --pzfx-card: var(--card, #ffffff);
   position: relative;
   background: var(--pzfx-bg);
   color: var(--pzfx-ink);
@@ -20,8 +22,9 @@
 
 /* Die Bühne bleibt stehen, während man durch die Strecke scrollt */
 .pzfx-stage {
-  position: sticky; top: 0;
-  height: 100vh; height: 100svh;
+  position: sticky;
+  top: var(--pzfx-top);
+  height: calc(100vh - var(--pzfx-top)); height: calc(100svh - var(--pzfx-top));
   overflow: hidden;
   display: grid; place-items: center;
 }
@@ -35,7 +38,8 @@
 .pzfx-word span {
   grid-area: 1 / 1;
   font-size: clamp(4rem, 17vw, 16rem);
-  font-weight: 800; line-height: 1; letter-spacing: -0.02em;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif; font-style: italic;
+  font-weight: 700; line-height: 1; letter-spacing: -0.02em;
   text-transform: uppercase; white-space: nowrap;
   color: var(--pzfx-word);
   opacity: 0;
@@ -89,7 +93,7 @@
   font-size: 0.75rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--pzfx-accent);
 }
-.pzfx-step h3 { margin: 0 0 8px; font-size: clamp(1.5rem, 2.4vw, 2.1rem); line-height: 1.1; color: var(--pzfx-ink); }
+.pzfx-step h3 { font-family: "Playfair Display", Georgia, "Times New Roman", serif; font-weight: 600; margin: 0 0 8px; font-size: clamp(1.5rem, 2.4vw, 2.1rem); line-height: 1.1; color: var(--pzfx-ink); }
 .pzfx-step p { margin: 0; color: var(--pzfx-muted); line-height: 1.55; }
 .pzfx-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
 .pzfx-btn {

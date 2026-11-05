@@ -1,0 +1,118 @@
+/* Pizza-Effekt · Ristorante Pizzeria Italia
+   Eigenständiger Abschnitt: alle Klassen beginnen mit "pzfx", nichts außerhalb wird verändert.
+   Farben bei Bedarf hier anpassen. */
+.pzfx {
+  /* übernimmt die Farben der Website (--bg, --ink …), sonst diese Werte */
+  --pzfx-bg: var(--bg, #f7f1e8);
+  --pzfx-ink: var(--ink, #2f2922);
+  --pzfx-muted: var(--muted, #857c6e);
+  --pzfx-accent: var(--accent, #b8542e);
+  --pzfx-top: 0px;          /* Höhe eines festen Headers, damit nichts darunter verschwindet */
+  --pzfx-word: rgba(187, 86, 49, 0.12);
+  --pzfx-card: var(--card, #ffffff);
+  position: relative;
+  background: var(--pzfx-bg);
+  color: var(--pzfx-ink);
+  font-family: inherit;
+}
+.pzfx *, .pzfx *::before, .pzfx *::after { box-sizing: border-box; }
+
+/* Die Scroll-Strecke: je höher, desto langsamer läuft der Effekt */
+.pzfx-track { position: relative; height: 420vh; }
+
+/* Die Bühne bleibt stehen, während man durch die Strecke scrollt */
+.pzfx-stage {
+  position: sticky;
+  top: var(--pzfx-top);
+  height: calc(100vh - var(--pzfx-top)); height: calc(100svh - var(--pzfx-top));
+  overflow: hidden;
+  display: grid; place-items: center;
+}
+
+/* großes Wort im Hintergrund */
+.pzfx-word {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  pointer-events: none; user-select: none;
+}
+.pzfx-word span {
+  grid-area: 1 / 1;
+  font-size: clamp(4rem, 17vw, 16rem);
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif; font-style: italic;
+  font-weight: 700; line-height: 1; letter-spacing: -0.02em;
+  text-transform: uppercase; white-space: nowrap;
+  color: var(--pzfx-word);
+  opacity: 0;
+}
+
+/* Pizza */
+.pzfx-pizza {
+  position: absolute; left: 50%; top: 50%;
+  width: var(--pzfx-size, 60vmin); height: var(--pzfx-size, 60vmin);
+  margin: calc(var(--pzfx-size, 60vmin) / -2) 0 0 calc(var(--pzfx-size, 60vmin) / -2);
+  perspective: 1400px;
+  will-change: transform;
+}
+.pzfx-disc { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform; }
+.pzfx-disc img, .pzfx-plate img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; display: block; }
+.pzfx-shadow {
+  position: absolute; inset: 8%;
+  border-radius: 50%; background: rgba(60, 30, 15, 0.3); filter: blur(28px);
+  will-change: transform, opacity;
+}
+.pzfx-plate {
+  position: absolute; left: 50%; top: 50%;
+  width: calc(var(--pzfx-size, 60vmin) * 1.32); height: calc(var(--pzfx-size, 60vmin) * 1.32);
+  margin: calc(var(--pzfx-size, 60vmin) * -0.66) 0 0 calc(var(--pzfx-size, 60vmin) * -0.66);
+  opacity: 0;
+  filter: drop-shadow(0 18px 24px rgba(60, 30, 15, 0.18));
+  will-change: transform, opacity;
+}
+
+/* fliegende Zutaten */
+.pzfx-fly { position: absolute; left: 0; top: 0; opacity: 0; pointer-events: none; will-change: transform, opacity; }
+.pzfx-fly img { width: 100%; height: auto; display: block; }
+
+/* Text zu jedem Schritt */
+.pzfx-steps {
+  position: absolute; left: max(16px, 5vw); top: 50%;
+  width: min(25rem, 32vw);
+  transform: translateY(-50%);
+  display: grid;
+}
+.pzfx-step {
+  grid-area: 1 / 1;
+  opacity: 0;
+  background: var(--pzfx-card);
+  border-radius: 16px;
+  padding: 22px 24px;
+  box-shadow: 0 20px 44px rgba(42, 33, 27, 0.08);
+}
+.pzfx-step small {
+  display: block; margin-bottom: 8px;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--pzfx-accent);
+}
+.pzfx-step h3 { font-family: "Playfair Display", Georgia, "Times New Roman", serif; font-weight: 600; margin: 0 0 8px; font-size: clamp(1.5rem, 2.4vw, 2.1rem); line-height: 1.1; color: var(--pzfx-ink); }
+.pzfx-step p { margin: 0; color: var(--pzfx-muted); line-height: 1.55; }
+.pzfx-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.pzfx-btn {
+  display: inline-block; padding: 12px 20px; border-radius: 999px;
+  font-weight: 700; font-size: 0.95rem; text-decoration: none;
+  border: 2px solid var(--pzfx-accent); color: var(--pzfx-accent);
+}
+.pzfx-btn.is-solid { background: var(--pzfx-accent); color: #fff; }
+.pzfx-btn:focus-visible { outline: 3px solid var(--pzfx-ink); outline-offset: 3px; }
+
+/* Fortschritt */
+.pzfx-dots { position: absolute; right: max(16px, 4vw); top: 50%; transform: translateY(-50%); display: grid; gap: 10px; }
+.pzfx-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--pzfx-ink); opacity: 0.18; }
+.pzfx-dots i.is-on { background: var(--pzfx-accent); opacity: 1; }
+
+/* Handy: Pizza oben, Text unten */
+@media (max-width: 760px) {
+  .pzfx-track { height: 380vh; }
+  .pzfx-steps { left: 16px; right: 16px; width: auto; top: auto; bottom: max(16px, 3vh); transform: none; }
+  .pzfx-step { padding: 18px 20px; }
+  .pzfx-dots { right: 10px; }
+}
