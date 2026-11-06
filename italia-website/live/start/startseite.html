@@ -197,6 +197,23 @@
     .cta.cta.cta:active,.feiern .cta.light:active{transform:scale(.94);transition-duration:.08s}
   }
   @media(prefers-reduced-motion:reduce){.feiern .tags.in .tg,.cta.fx-pop{animation:none}#hours .today-pill{transition:none}}
+  /* 4 · Hero: Wörter gleiten einzeln aus einer Kante nach oben, Linie zieht sich auf */
+  .hero h1.wsplit.reveal,.hero .eyebrow.reveal{opacity:1;transform:none}
+  .hero h1 .w{display:inline-block;overflow:hidden;vertical-align:top;padding:0 .08em .12em 0;margin:0 -.08em -.12em 0}
+  .hero h1 .w>span{display:inline-block;transform:translateY(115%)}
+  .hero h1.wsplit.in .w>span{animation:fx-up .85s cubic-bezier(.34,1.35,.64,1) both;animation-delay:calc(var(--i)*75ms + .05s)}
+  .hero .eyebrow.reveal::before{transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.22,1,.36,1)}
+  .hero .eyebrow.reveal.in::before{transform:none}
+  .hero .eyebrow .et{display:inline-block;clip-path:inset(0 100% 0 0);transition:clip-path .7s cubic-bezier(.22,1,.36,1) .25s}
+  .hero .eyebrow.in .et{clip-path:inset(0 0 0 0)}
+
+  /* 5 · Karten: Terrakotta-Balken springt zur Karte, auf die man zeigt */
+  .pillars{position:relative}
+  .pillar{position:relative}
+  .pill-bar{position:absolute;z-index:2;left:0;top:0;width:42px;height:5px;border-radius:3px;background:var(--accent);pointer-events:none;
+    transform:scaleX(0);transform-origin:left;transition:left .55s cubic-bezier(.34,1.45,.64,1),top .55s cubic-bezier(.34,1.45,.64,1),transform .45s cubic-bezier(.22,1,.36,1)}
+  .pill-bar.on{transform:none}
+  @media(prefers-reduced-motion:reduce){.hero h1 .w>span{transform:none!important;animation:none!important}.hero .eyebrow .et{clip-path:none;transition:none}.hero .eyebrow.reveal::before{transform:none;transition:none}.pill-bar{transition:none}}
   @keyframes fx-up{from{transform:translateY(112%)}to{transform:none}}
   @keyframes fx-pop{from{transform:scale(0)}to{transform:scale(1)}}
   @keyframes fx-wipe{from{clip-path:inset(0 50% 0 50%)}to{clip-path:inset(0 0 0 0)}}
@@ -367,6 +384,35 @@ onScroll();window.addEventListener('scroll',onScroll,{passive:true});
 const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.14});
 const startReveal=()=>document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ── Effekt 4: Hero-Überschrift Wort für Wort, Eyebrow-Linie ──
+(function(){
+  const h=document.querySelector('.hero h1');if(!h)return;
+  let i=0;
+  const walk=n=>{[...n.childNodes].forEach(c=>{
+    if(c.nodeType===3){const parts=c.textContent.split(/( )/);const f=document.createDocumentFragment();
+      parts.forEach(t=>{if(t===' '||t===''){f.appendChild(document.createTextNode(t));return;}
+        const w=document.createElement('span');w.className='w';const inner=document.createElement('span');inner.textContent=t;inner.style.setProperty('--i',i++);w.appendChild(inner);f.appendChild(w);});
+      c.replaceWith(f);}
+    else if(c.nodeType===1)walk(c);});};
+  walk(h);h.classList.add('wsplit');
+  const eb=document.querySelector('.hero .eyebrow');
+  if(eb){const t=document.createElement('span');t.className='et';while(eb.firstChild)t.appendChild(eb.firstChild);eb.appendChild(t);}
+})();
+
+// ── Effekt 5: Balken springt zur Karte unter Maus/Finger ──
+(function(){
+  const wrap=document.querySelector('.pillars');if(!wrap)return;
+  const cards=[...wrap.querySelectorAll('.pillar')];if(!cards.length)return;
+  const bar=document.createElement('div');bar.className='pill-bar';bar.setAttribute('aria-hidden','true');wrap.appendChild(bar);
+  let cur=cards[0];
+  const place=(c,lift)=>{cur=c;bar.style.left=(c.offsetLeft+26)+'px';bar.style.top=(c.offsetTop+16-(lift?8:0))+'px';};
+  place(cur);
+  cards.forEach(c=>{c.addEventListener('mouseenter',()=>place(c,true));c.addEventListener('touchstart',()=>place(c),{passive:true});});
+  wrap.addEventListener('mouseleave',()=>place(cards[0]));
+  addEventListener('resize',()=>place(cur));
+  new IntersectionObserver((es,o)=>{if(es[0].isIntersecting){o.disconnect();setTimeout(()=>{place(cards[0]);bar.classList.add('on');},calm?0:900);}},{threshold:.4}).observe(wrap);
+})();
 
 // ── Effekt 1: Intro – terracotta Bühne schrumpft in den Reservieren-Button ──
 (function(){

@@ -17,6 +17,7 @@ Per FTP in den Ordner `/start/` des Webspace laden:
 3. Vor `</body>`: eine Zeile, die `pizza-effekt.js` lädt.
 
 4. „Mit uns feiern Sie richtig“ hat das Festsaal-Foto als Hintergrund (`assets/festsaal.jpg`) mit leichtem Terrakotta-Schleier.
+5. Showreel-Effekte: Die Hero-Überschrift gleitet Wort für Wort hoch, die Eyebrow-Linie zieht sich auf, und bei den drei Karten springt ein Terrakotta-Balken zur Karte unter Maus oder Finger.
 
 Alles andere (Intro, Öffnungszeiten-Balken, Feiern-Effekt, Öffnungsstatus) ist unverändert.
 
