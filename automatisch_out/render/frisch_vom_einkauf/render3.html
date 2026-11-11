@@ -157,7 +157,7 @@ function drawSubs(t){
  x.restore();}
 function arrowDown(cx,cy,s,col){x.save();x.translate(cx,cy);x.scale(s,s);x.beginPath();x.moveTo(-14,-30);x.lineTo(14,-30);x.lineTo(14,2);x.lineTo(32,2);x.lineTo(0,36);x.lineTo(-32,2);x.lineTo(-14,2);x.closePath();x.fillStyle=col;x.fill();x.restore();}
 function drawComment(t){const a=lin(t,10.3,10.75),o=eio(lin(t,12.5,12.72));if(a<=0||o>=1)return;
- const yb=-500+(905+500)*back(a)-o*0;const rot=(1-eo(a))*-10+Math.sin((t-10.75)*10)*Math.exp(-Math.max(0,t-10.75)*4)*3;
+ const yb=-500+(1010+500)*back(a);const rot=(1-eo(a))*-10+Math.sin((t-10.75)*10)*Math.exp(-Math.max(0,t-10.75)*4)*3;
  x.save();x.globalAlpha=1-o;x.translate(520,yb);x.rotate(rot*Math.PI/180);x.scale(1-o*.3,1-o*.3);
  const w=860,h=180;x.shadowColor='rgba(0,0,0,.5)';x.shadowBlur=30;x.shadowOffsetY=12;rrect(-w/2,-h/2,w,h,32);x.fillStyle='#fff';x.fill();x.shadowColor='transparent';
  // avatar
@@ -171,7 +171,7 @@ function drawComment(t){const a=lin(t,10.3,10.75),o=eio(lin(t,12.5,12.72));if(a<
  x.save();x.translate(w/2-55,-10);x.scale(1.1,1.1);x.beginPath();x.moveTo(0,16);x.bezierCurveTo(-30,-4,-16,-26,0,-10);x.bezierCurveTo(16,-26,30,-4,0,16);x.lineWidth=4;x.strokeStyle='#999';x.stroke();x.restore();
  x.restore();
  // label + arrow
- const s=back(lin(t,11.84,12.1));if(s>0){x.save();x.globalAlpha=1-o;x.translate(540,760);x.rotate(-3*Math.PI/180);x.scale(s,s);x.font='64px Anton';const lw=x.measureText('IM 1. KOMMENTAR').width+130;
+ const s=back(lin(t,11.84,12.1));if(s>0){x.save();x.globalAlpha=1-o;x.translate(540,1188);x.rotate(-3*Math.PI/180);x.scale(s,s);x.font='64px Anton';const lw=x.measureText('IM 1. KOMMENTAR').width+130;
   x.shadowColor='rgba(0,0,0,.45)';x.shadowBlur=16;x.shadowOffsetY=8;rrect(-lw/2,-50,lw,100,22);x.fillStyle=RED;x.fill();x.shadowColor='transparent';x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.fillText('IM 1. KOMMENTAR',-30,4);
   arrowDown(lw/2-50,0+Math.abs(Math.sin(t*9))*10-4,1.0,'#fff');x.restore();}}
 function drawEnd(t){
