@@ -53,6 +53,7 @@ function xf(t){
  if(t<C4){const k=Math.pow(lin(t,9.02,C4),2.2);return [BASE*(1+2.2*k),540+(510-540)*k,700+(450-700)*k,k>0.05?0.25*k:0];}
  if(t<C5){const a=eo(lin(t,C4,C4+.28));let z=BASE*(2.2-1.2*a);let cx=565,cy=880;
   const s=eo(lin(t,9.42,9.52))*(1-eio(lin(t,10.2,10.4)));const ov=t>9.52?Math.sin((t-9.52)*16)*Math.exp(-(t-9.52)*7)*.08:0;z*=1+(0.45+ov)*s;return [z,cx,cy,(a<1?0.15*(1-a):0)+((t>9.42&&t<9.52)?0.1:0)];}
+ if(t>=14.0){return [BASE*(1+0.18*eio(lin(t,14.0,15.07))),540,900,0];}
  const z=BASE*(1+0.08*eo(lin(t,C5,C5+.1))*(1-eio(lin(t,C5+.2,C5+.7))));return [z,540,760,0];}
 function w2s(t,px,py){const [z,cx,cy]=xf(t);return [cx+(px-cx)*z,cy+(py-cy)*z,z];}
 // ----- shot1 text
@@ -94,12 +95,12 @@ function bonDraw(cx,cy,sc,rot,len,nr,alpha,st){const w=262;
 // bon state: world phase (behind head) then pinned screen phase
 const BONS=[{nr:1,t0:5.5,shotEnd:C2,pinA:6.02,head:[367,560],world:[600,650],wsc:.8,rot:-6,pin:[205,1115],psc:.62,prot:-7},
             {nr:2,t0:6.28,shotEnd:C3,pinA:6.92,head:[740,550],world:[505,585],wsc:.62,rot:6,pin:[875,1115],psc:.62,prot:7}];
-const BOUT=[9.08,9.28];
-function bonState(b,t){if(t<b.t0||t>BOUT[1])return null;const p=lin(t,b.t0,b.t0+.5),e=eo(p);const len=480*clamp(p*1.15);
+const BOUT=[6.95,7.12],BIN=[9.28,9.5],BEND=[10.3,10.5];
+function bonState(b,t){if(t<b.t0||t>BEND[1])return null;if(t>BOUT[1]&&t<BIN[0])return null;const p=lin(t,b.t0,b.t0+.5),e=eo(p);const len=480*clamp(p*1.15);
  const wx=b.head[0]+(b.world[0]-b.head[0])*e,wy=b.head[1]+(b.world[1]-b.head[1])*e;const ls=t-(b.t0+.5);const sw=ls>0?Math.sin(ls*11)*Math.exp(-ls*3.2)*7:0;
  const st=lin(t,b.t0+.62,b.t0+.74);const k=eio(lin(t,b.pinA,b.pinA+.28));
  let [sx,sy,z]=w2s(Math.min(t,b.pinA),wx,wy);const sc0=b.wsc*z*(.55+.45*e)/BASE;
- const o=eio(lin(t,BOUT[0],BOUT[1]));
+ const o=t<BIN[0]?eio(lin(t,BOUT[0],BOUT[1])):Math.max(1-eio(lin(t,BIN[0],BIN[1])),eio(lin(t,BEND[0],BEND[1])));
  return {x:sx+(b.pin[0]-sx)*k+(b.nr==1?-1:1)*o*300,y:sy+(b.pin[1]-sy)*k+o*400,sc:sc0+(b.psc-sc0)*k,rot:(b.rot*e+sw)*(1-k)+b.prot*k,len,a:1-o,st,pinned:k>0};}
 function drawBon(b,t){const s=bonState(b,t);if(!s)return;bonDraw(s.x,s.y,s.sc,s.rot,s.len,b.nr,s.a,s.st);}
 // ----- cutout
