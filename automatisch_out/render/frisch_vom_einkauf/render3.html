@@ -63,7 +63,7 @@ function confetti(t){const k=t-0.8;if(k<0||k>0.9)return;const cols=[GREEN,'#fff'
   x.save();x.globalAlpha=1-lin(k,.5,.9);x.translate(px,py);x.rotate(k*12*(rnd(i+3)-.5)+i);x.fillStyle=cols[i%4];x.fillRect(-9,-5,18,10);x.restore();}}
 // ---------- shot 2 helpers
 function pz(t){return BASE*(1+0.05*eio(lin(t,3.1,7.4))+0.09*eo(lin(t,6.06,6.16))*(1-eio(lin(t,6.35,6.8))));}
-function snap(t){const segs=[[7.58,8.42,8.62,420,600,1.42],[8.76,9.86,10.06,735,590,1.38]];
+function snap(t){const segs=[[7.58,8.42,8.62,390,600,1.42],[8.76,9.86,10.06,735,590,1.38]];
  for(const [t0,r0,r1,X,Y,ZZ] of segs){if(t<t0||t>=r1)continue;const kin=lin(t,t0,t0+.1),kout=eio(lin(t,r0,r1));
   const ov=t>t0+.1?Math.sin((t-t0-.1)*16)*Math.exp(-(t-t0-.1)*7)*.09:0;const drift=0.03*lin(t,t0+.1,r0);
   const b=pz(t)/BASE;const zt=ZZ+ov+drift;const k=eo(kin)*(1-kout);const z=BASE*(b+(zt-b)*k);
@@ -89,18 +89,20 @@ function bon(t,t0,t1,sx,sy,ex,ey,rot,nr){
  x.fillStyle='#1d1d1d';x.textAlign='center';x.textBaseline='middle';let y=top+34;
  const L=(txt,f,dy)=>{x.font=f;x.fillText(txt,0,y);y+=dy;};const dash=()=>{x.font='bold 20px DejaVu Sans Mono';x.fillText('- - - - - - - - - -',0,y);y+=30;};
  L('RISTORANTE','bold 24px DejaVu Sans Mono',28);L('PIZZERIA ITALIA','bold 24px DejaVu Sans Mono',32);dash();
- L('EXTRA-KARTE','bold 28px DejaVu Sans Mono',34);
- x.save();x.font='38px Anton';const lab='NEUE IDEE #'+nr;const lw=x.measureText(lab).width+28;x.fillStyle=RED;x.fillRect(-lw/2,y-24,lw,50);x.fillStyle='#fff';x.fillText(lab,0,y+2);x.restore();y+=50;dash();
- x.textAlign='left';x.font='bold 30px DejaVu Sans Mono';x.fillText('1x',-w/2+22,y);x.font='54px Anton';x.fillStyle=RED;x.fillText('? ? ?',-w/2+80,y+2);x.fillStyle='#1d1d1d';y+=40;
- x.font='bold 22px DejaVu Sans Mono';x.fillText('Überraschung',-w/2+80,y);y+=34;x.textAlign='center';dash();
- L('BALD BEI UNS','bold 26px DejaVu Sans Mono',30);
- for(let i=0;i<34;i++){const bw=rnd(i+nr*40)>.5?4:2;x.fillRect(-w/2+30+i*6,y,bw,34);}
+ const DISH=nr==1?{cat:'ANTIPASTI',lines:['Bruschetta mit','Burrata, Tomaten','und Basilikum'],price:'15,00 €'}:{cat:'PRIMI PIATTI',lines:['Agnolotti mit','Mortadella und','Ricotta'],price:'19,50 €'};
+ L('EXTRA-KARTE','bold 26px DejaVu Sans Mono',32);
+ x.save();x.font='36px Anton';const lab='NEUE IDEE #'+nr;const lw=x.measureText(lab).width+28;x.fillStyle=RED;x.fillRect(-lw/2,y-23,lw,46);x.fillStyle='#fff';x.fillText(lab,0,y+2);x.restore();y+=46;dash();
+ x.fillStyle='#777';L(DISH.cat,'bold 19px DejaVu Sans Mono',30);x.fillStyle='#1d1d1d';
+ x.textAlign='left';x.font='bold 20px DejaVu Sans Mono';x.fillText('1x',-w/2+14,y);
+ DISH.lines.forEach((ln,i)=>{x.fillText(ln,-w/2+50,y);y+=27;});y+=12;
+ x.textAlign='center';x.font='50px Anton';x.fillStyle=RED;x.fillText(DISH.price,0,y);x.fillStyle='#1d1d1d';y+=38;dash();
+ for(let i=0;i<34;i++){const bw=rnd(i+nr*40)>.5?4:2;x.fillRect(-w/2+30+i*6,y-8,bw,30);}
  x.restore();
  if(st>0){x.save();x.globalAlpha=1-out;x.translate(cx+(nr==1?-85:85),cy-190+bump);x.rotate((nr==1?-14:14)*Math.PI/180);const ss=1+1.6*(1-eo(st));x.scale(ss*.75,ss*.75);x.globalAlpha*=Math.min(1,st*3)*.92;
   x.strokeStyle=RED;x.lineWidth=7;x.beginPath();x.arc(0,0,58,0,7);x.stroke();x.lineWidth=3;x.beginPath();x.arc(0,0,47,0,7);x.stroke();
   x.fillStyle=RED;x.font='44px Anton';x.textAlign='center';x.textBaseline='middle';x.fillText('NEU!',0,2);x.restore();}}
 function hpos(fi){const h=HEAD[fi]||[560,450];return [h[0],h[1]+130];}
-function drawBons(t){const a=hpos(230),b=hpos(265);bon(t,7.64,8.55,a[0],a[1],385,600,-6,1);bon(t,8.82,10.02,b[0],b[1],752,580,6,2);}
+function drawBons(t){const a=hpos(230),b=hpos(265);bon(t,7.64,8.55,a[0],a[1],318,595,-5,1);bon(t,8.82,10.02,b[0],b[1],752,580,6,2);}
 function frontMask(t,fi){const hd=HEAD[fi];mx.clearRect(0,0,W,H);
  if(hd){mx.save();mx.translate(hd[0],hd[1]+150);mx.scale(1,1.4);const g=mx.createRadialGradient(0,0,105,0,0,150);g.addColorStop(0,'#000');g.addColorStop(1,'rgba(0,0,0,0)');mx.fillStyle=g;mx.fillRect(-300,-300,600,600);mx.restore();}
  mx.fillStyle='#000';if(t<8.7)mx.fillRect(0,0,520,840);else mx.fillRect(705,0,W,900);}
