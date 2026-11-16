@@ -41,7 +41,7 @@ index b435770..9fe4181 100644
  
  `theme` in `project.ts` overrides individual colours, for example
 diff --git a/src/effects/effects.tsx b/src/effects/effects.tsx
-index d20f5c9..3c6aac0 100644
+index d20f5c9..f50bdf0 100644
 --- a/src/effects/effects.tsx
 +++ b/src/effects/effects.tsx
 @@ -1,6 +1,7 @@
@@ -71,7 +71,16 @@ index d20f5c9..3c6aac0 100644
    lines?: string[];
    /** `chat`: the message in the bubble. */
    prompt?: string;
-@@ -1325,6 +1327,7 @@ const RENDERERS: Record<EffectKind, React.FC<Ctx>> = {
+@@ -61,6 +63,8 @@ export type EffectCue = {
+   avatar?: string;
+   /** `phone`: account name next to the profile picture. */
+   handle?: string;
++  /** `thrown`: side of the head the item lands on (default right). */
++  side?: "left" | "right";
+ };
+ 
+ export type EffectsSpec = {
+@@ -1325,6 +1329,7 @@ const RENDERERS: Record<EffectKind, React.FC<Ctx>> = {
    zoomcut: ZoomCut,
    checks: Checks,
    checklist: Checklist,
@@ -81,10 +90,10 @@ index d20f5c9..3c6aac0 100644
  export const EffectLayer: React.FC<{ spec: EffectsSpec; seconds: number; source: string; cutout?: string }> = ({ spec, seconds, source, cutout }) => {
 diff --git a/src/effects/extra.tsx b/src/effects/extra.tsx
 new file mode 100644
-index 0000000..b229a41
+index 0000000..82ba2ab
 --- /dev/null
 +++ b/src/effects/extra.tsx
-@@ -0,0 +1,888 @@
+@@ -0,0 +1,924 @@
 +import type { CSSProperties, ReactNode } from "react";
 +import { AbsoluteFill, Freeze, Img, OffthreadVideo, interpolate, staticFile, useCurrentFrame } from "remotion";
 +import { Backdrop } from "./Backdrop";
@@ -153,7 +162,12 @@ index 0000000..b229a41
 +};
 +
 +/** Top edge for a block of the given height that ends just above the head, below the header row. */
-+const aboveHead = (cue: EffectCue, height: number) => Math.max(345, faceOf(cue).y - 400 - height);
++const aboveHead = (cue: EffectCue, height: number) => {
++  const face = faceOf(cue);
++  const top = face.y - 400 - height;
++  // Full-body framing leaves no room above the head: then the block goes below the chin instead.
++  return top >= 345 ? top : face.y + 230;
++};
 +
 +/* ------------------------------------------------------------------------------------------ */
 +/* Graph split: the frame splits, a bar chart grows on the left, you stay on the right          */
@@ -360,9 +374,13 @@ index 0000000..b229a41
 +      >
 +        <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 28, fontWeight: 600, color: rgba(theme.ink, 0.6) }}>
 +          <Avatar cue={cue} size={56} />
-+          <span>
-+            Reply to <b style={{ color: theme.ink }}>{cue.handle ?? "yourname"}</b>'s comment
-+          </span>
++          {cue.badge ? (
++            <span>{cue.badge}</span>
++          ) : (
++            <span>
++              Reply to <b style={{ color: theme.ink }}>{cue.handle ?? "yourname"}</b>'s comment
++            </span>
++          )}
 +        </div>
 +        <div style={{ marginTop: 14, fontSize: 44, fontWeight: 800, lineHeight: 1.18, letterSpacing: "-0.01em" }}>{text}</div>
 +        <div style={{ position: "absolute", left: "50%", bottom: -16, width: 32, height: 32, marginLeft: -16, background: "#fff", rotate: "45deg", borderRadius: 4 }} />
@@ -822,14 +840,16 @@ index 0000000..b229a41
 +  const theme = useTheme();
 +  const at = cue.at ?? 0.3;
 +  const face = faceOf(cue);
-+  const land = { x: Math.min(820, face.x + 220), y: Math.max(560, face.y - 280) };
++  // Beside the head, on the side given by `side` (default right), never on the face.
++  const dir = cue.side === "left" ? -1 : 1;
++  const land = { x: Math.max(200, Math.min(WIDTH - 200, face.x + dir * 330)), y: Math.max(560, face.y - 280) };
 +  const flyTime = 0.32;
 +  const f = ramp(t, at - flyTime, at, 0, 1, (x) => x);
-+  // Thrown from the bottom left on a parabola, spinning, and landing right on the trigger word.
-+  const start = { x: -300, y: 1500 };
++  // Thrown from the opposite bottom corner on a parabola, spinning, and landing right on the trigger word.
++  const start = { x: dir > 0 ? -300 : WIDTH + 300, y: 1500 };
 +  const x = start.x + (land.x - start.x) * f;
 +  const y = start.y + (land.y - start.y) * f - Math.sin(f * Math.PI) * 380;
-+  const spin = (1 - f) * -540 + 8;
++  const spin = dir * ((1 - f) * -540 + 8);
 +  const after = Math.max(0, t - at);
 +  const squash = t >= at ? 1 + 0.18 * Math.exp(-after * 14) * Math.cos(after * 40) : 1;
 +  const shake = t >= at ? 22 * Math.exp(-after * 12) * Math.sin(after * 70) : 0;
@@ -865,8 +885,33 @@ index 0000000..b229a41
 +          }}
 +        >
 +          {cue.src ? (
-+            <div style={{ background: "#fff", padding: "16px 16px 60px", borderRadius: 8 }}>
-+              <Img src={staticFile(cue.src)} style={{ width: 320, height: 320, objectFit: "cover", display: "block" }} />
++            <div style={{ position: "relative", background: "#fff", padding: "14px 14px 0", borderRadius: 8, width: 368, boxSizing: "border-box" }}>
++              <Img src={staticFile(cue.src)} style={{ width: 340, height: 340, objectFit: "cover", display: "block" }} />
++              <div style={{ height: 74, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", fontFamily: theme.font, fontWeight: 800, fontSize: 30, lineHeight: 1.05, color: theme.ink }}>
++                {cue.word ?? ""}
++              </div>
++              {cue.badge ? (
++                <div
++                  style={{
++                    position: "absolute",
++                    right: 26,
++                    top: 26,
++                    padding: "12px 20px",
++                    borderRadius: 999,
++                    background: theme.gold,
++                    color: theme.ink,
++                    fontFamily: theme.font,
++                    fontWeight: 900,
++                    fontSize: 34,
++                    whiteSpace: "nowrap",
++                    rotate: "10deg",
++                    boxShadow: "0 8px 18px rgba(10,10,12,0.35)",
++                    scale: `${ramp(t, at + 0.1, at + 0.35, 0, 1, EASE_SLAM)}`,
++                  }}
++                >
++                  {cue.badge}
++                </div>
++              ) : null}
 +            </div>
 +          ) : (
 +            <div style={{ padding: "22px 40px", borderRadius: 28, background: theme.gold, color: theme.ink, fontFamily: theme.font, fontWeight: 900, fontSize: 72, whiteSpace: "nowrap", border: "6px solid #fff" }}>
