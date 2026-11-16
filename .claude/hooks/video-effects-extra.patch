@@ -41,7 +41,7 @@ index b435770..9fe4181 100644
  
  `theme` in `project.ts` overrides individual colours, for example
 diff --git a/src/effects/effects.tsx b/src/effects/effects.tsx
-index d20f5c9..f50bdf0 100644
+index d20f5c9..4ee765f 100644
 --- a/src/effects/effects.tsx
 +++ b/src/effects/effects.tsx
 @@ -1,6 +1,7 @@
@@ -71,16 +71,18 @@ index d20f5c9..f50bdf0 100644
    lines?: string[];
    /** `chat`: the message in the bubble. */
    prompt?: string;
-@@ -61,6 +63,8 @@ export type EffectCue = {
+@@ -61,6 +63,10 @@ export type EffectCue = {
    avatar?: string;
    /** `phone`: account name next to the profile picture. */
    handle?: string;
 +  /** `thrown`: side of the head the item lands on (default right). */
 +  side?: "left" | "right";
++  /** `graphsplit`: photo slides instead of the bar chart, each from `at` seconds after `from`. */
++  slides?: { at: number; title: string; src?: string; label?: string; note?: string }[];
  };
  
  export type EffectsSpec = {
-@@ -1325,6 +1329,7 @@ const RENDERERS: Record<EffectKind, React.FC<Ctx>> = {
+@@ -1325,6 +1331,7 @@ const RENDERERS: Record<EffectKind, React.FC<Ctx>> = {
    zoomcut: ZoomCut,
    checks: Checks,
    checklist: Checklist,
@@ -90,10 +92,10 @@ index d20f5c9..f50bdf0 100644
  export const EffectLayer: React.FC<{ spec: EffectsSpec; seconds: number; source: string; cutout?: string }> = ({ spec, seconds, source, cutout }) => {
 diff --git a/src/effects/extra.tsx b/src/effects/extra.tsx
 new file mode 100644
-index 0000000..82ba2ab
+index 0000000..c5bdc9a
 --- /dev/null
 +++ b/src/effects/extra.tsx
-@@ -0,0 +1,924 @@
+@@ -0,0 +1,960 @@
 +import type { CSSProperties, ReactNode } from "react";
 +import { AbsoluteFill, Freeze, Img, OffthreadVideo, interpolate, staticFile, useCurrentFrame } from "remotion";
 +import { Backdrop } from "./Backdrop";
@@ -174,6 +176,41 @@ index 0000000..82ba2ab
 +/* ------------------------------------------------------------------------------------------ */
 +
 +const BARS = [0.22, 0.34, 0.3, 0.52, 0.94];
++const SERIF = 'Georgia, Caladea, "Bitstream Charter", "Times New Roman", serif';
++
++/** Photo slides in the left half of the graph split, one after the other (menus, products). */
++const SplitSlides: React.FC<{ t: number; cue: EffectCue }> = ({ t, cue }) => {
++  const theme = useTheme();
++  const slides = cue.slides ?? [];
++  return (
++    <>
++      {slides.map((slide, i) => {
++        const next = slides[i + 1]?.at ?? 1e6;
++        const enter = ramp(t, slide.at, slide.at + 0.3, 0, 1, EASE_OUT_POW4);
++        const leave = ramp(t, next, next + 0.25, 0, 1, EASE_IN_POW4);
++        if (enter <= 0 || leave >= 1) return null;
++        const y = (1 - enter) * 120 - leave * 120;
++        return (
++          <div key={i} style={{ position: "absolute", left: 0, top: 0, width: 540, height: HEIGHT, opacity: enter * (1 - leave), translate: `0px ${y.toFixed(1)}px`, textAlign: "center" }}>
++            <div style={{ position: "absolute", left: 40, width: 460, top: slide.src ? 430 : 640, fontFamily: SERIF, fontSize: slide.src ? 50 : 72, lineHeight: 1.05, color: theme.paper }}>{slide.title}</div>
++            {slide.note ? (
++              <div style={{ position: "absolute", left: 40, width: 460, top: slide.src ? 560 : 820, fontFamily: theme.font, fontSize: 26, fontWeight: 600, lineHeight: 1.25, color: rgba(theme.paper, 0.75) }}>{slide.note}</div>
++            ) : null}
++            {slide.src ? (
++              <Img
++                src={staticFile(slide.src)}
++                style={{ position: "absolute", left: 45, top: 650, width: 450, height: 450, objectFit: "cover", borderRadius: 28, boxShadow: "0 30px 60px rgba(0,0,0,0.6)", scale: `${1.06 - 0.06 * enter}` }}
++              />
++            ) : null}
++            {slide.label ? (
++              <div style={{ position: "absolute", left: 40, width: 460, top: slide.src ? 1140 : 940, fontFamily: SERIF, fontSize: 64, color: theme.gold }}>{slide.label}</div>
++            ) : null}
++          </div>
++        );
++      })}
++    </>
++  );
++};
 +
 +const GraphSplit: React.FC<ExtraCtx> = ({ t, d, cue, source }) => {
 +  const theme = useTheme();
@@ -193,8 +230,9 @@ index 0000000..82ba2ab
 +      <Layer transform={`translateX(${shift.toFixed(1)}px)`}>
 +        <Cam src={source} />
 +      </Layer>
-+      <div style={{ position: "absolute", left: 0, top: 0, width: panel, height: HEIGHT, overflow: "hidden", background: `color-mix(in srgb, ${theme.deep} 40%, ${theme.ink})` }}>
-+        <div style={{ position: "absolute", left: 0, top: 0, width: 540, height: HEIGHT, fontFamily: theme.font, color: theme.paper }}>
++      <div style={{ position: "absolute", left: 0, top: 0, width: panel, height: HEIGHT, overflow: "hidden", background: cue.slides ? "radial-gradient(90% 60% at 50% 45%, #1c1a17 0%, #050505 100%)" : `color-mix(in srgb, ${theme.deep} 40%, ${theme.ink})` }}>
++        {cue.slides ? <SplitSlides t={t} cue={cue} /> : null}
++        <div style={{ position: "absolute", left: 0, top: 0, width: 540, height: HEIGHT, fontFamily: theme.font, color: theme.paper, display: cue.slides ? "none" : undefined }}>
 +          <div
 +            style={{
 +              position: "absolute",
@@ -231,7 +269,7 @@ index 0000000..82ba2ab
 +          <div style={{ position: "absolute", left: chart.left, top: chart.top + chart.height, width: chart.width, height: 4, borderRadius: 2, background: rgba(theme.paper, 0.6) }} />
 +        </div>
 +      </div>
-+      <div style={{ position: "absolute", left: panel - 3, top: 0, width: 6, height: HEIGHT, background: "#fff", opacity: p > 0.01 ? 1 : 0, boxShadow: "0 0 24px rgba(10,10,12,0.5)" }} />
++      <div style={{ position: "absolute", left: panel - 3, top: 0, width: 6, height: HEIGHT, background: cue.slides ? theme.gold : "#fff", opacity: p > 0.01 ? 1 : 0, boxShadow: "0 0 24px rgba(10,10,12,0.5)" }} />
 +    </AbsoluteFill>
 +  );
 +};
