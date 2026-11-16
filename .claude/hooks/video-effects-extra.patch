@@ -1,0 +1,975 @@
+diff --git a/skill/SKILL.md b/skill/SKILL.md
+index 2dc730a..fc64f89 100644
+--- a/skill/SKILL.md
++++ b/skill/SKILL.md
+@@ -1,6 +1,6 @@
+ ---
+ name: video-effects
+-description: Edits a vertical talking-head video, captions every word and places 21 video effects (green screen, magazine cover, glass break, orbit, dolly zoom, text behind me, frame escape and more) exactly where the person mentions them in the video. Use for "edit my video", "add the effects", "video effects", "text behind me", "green screen", "cut-out", or when someone hands over a raw video with spoken effect cues.
++description: Edits a vertical talking-head video, captions every word and places 33 video effects (green screen, magazine cover, glass break, orbit, dolly zoom, text behind me, frame escape, graph split, flight map, prompt box, word funnel, follow bell and more) exactly where the person mentions them in the video. Use for "edit my video", "add the effects", "video effects", "text behind me", "green screen", "cut-out", "graph split", "flight map", "stop motion", "room swap", or when someone hands over a raw video with spoken effect cues.
+ ---
+ 
+ # Video effects
+diff --git a/skill/catalog.md b/skill/catalog.md
+index b435770..9fe4181 100644
+--- a/skill/catalog.md
++++ b/skill/catalog.md
+@@ -64,6 +64,25 @@ cut-out these effects still run, just without the trick of you standing in front
+ | `checks` | Check pop | up to four pills with check marks above the head | | `lines` |
+ | `checklist` | Checklist | all numbered effects get ticked off, a counter runs along | | `word` closing line |
+ 
++### Extra effects (`src/effects/extra.tsx`)
++
++Twelve more effects from the effect wish list. Same rules as above; texts in the language of the video.
++
++| kind | Name | What happens on screen | Ingredients | Texts |
++|---|---|---|---|---|
++| `graphsplit` | Graph split | on `at` a white line splits the frame: a bar chart grows on the left, you move to the right half | `face` | `lines` [small label, title]; no made-up numbers |
++| `flightmap` | Flight map | a map behind you, a red route draws from city A to city B, a plane flies along. Without cut-out the video shrinks into a card at the bottom | better with Cut-out | `lines` [from, to], `at` = take-off |
++| `comment` | Comment box | an Instagram "Reply to …'s comment" sticker pops up above the head | `face` | `prompt` comment text, `handle`, `avatar` |
++| `roomswap` | Room swap | on `at` a light wipe swaps the room behind you for a photo, you stay. Without cut-out: whip blur | Cut-out, photo `src`, `plate` | |
++| `notes` | Apple Notes | a notes screen slides up, the checklist ticks itself off (struck through), the last item is highlighted; your video sits on the right as an attachment | | `word` title, `lines` items (default: names of the numbered effects), `at` = first tick |
++| `stopmotion` | Stop motion | the picture runs at 7.5 frames per second, every frame jitters slightly, grain and vignette | `face` | |
++| `funnel` | Word funnel | words fly into a glass funnel above the head, the funnel folds away and one word comes out | `face` | `lines` incoming words (up to 10), `word` the result |
++| `tunnel` | Glass tunnel | frames inside frames with glass rims, the camera keeps flying through them | `face` as the tunnel centre | |
++| `prompt` | Prompt box | an input field above the head, the prompt is typed, the send button is pressed and the box flies away | `face` | `prompt`; `at` = send (default right after typing) |
++| `disappear` | Disappear | on `at` you dissolve into dust and leave the empty room. Stays empty until `to` | Cut-out, `plate`, `face` | |
++| `thrown` | Thrown in | a sticker or photo is thrown in from the bottom left, lands next to the head on `at` with a shake | `face`, optional photo `src` | `word` sticker text (without `src`) |
++| `bell` | Follow bell | profile card above the head, a cursor taps Follow on `at`, then the bell, which rings | `face` | `handle`, `avatar` |
++
+ ## Colours
+ 
+ `theme` in `project.ts` overrides individual colours, for example
+diff --git a/src/effects/effects.tsx b/src/effects/effects.tsx
+index d20f5c9..3c6aac0 100644
+--- a/src/effects/effects.tsx
++++ b/src/effects/effects.tsx
+@@ -1,6 +1,7 @@
+ import type { CSSProperties, ReactNode } from "react";
+ import { AbsoluteFill, Freeze, Img, OffthreadVideo, interpolate, staticFile, useVideoConfig } from "remotion";
+ import { Backdrop } from "./Backdrop";
++import { EXTRA_RENDERERS, type ExtraKind } from "./extra";
+ import { EASE_IN_POW4, EASE_OUT, EASE_OUT_POW4, EASE_SLAM } from "./motion";
+ import { HEIGHT, WIDTH, rgba, useTheme } from "./theme";
+ 
+@@ -31,7 +32,8 @@ export type EffectKind =
+   | "frame"
+   | "zoomcut"
+   | "checks"
+-  | "checklist";
++  | "checklist"
++  | ExtraKind;
+ 
+ export type EffectCue = {
+   kind: EffectKind;
+@@ -51,7 +53,7 @@ export type EffectCue = {
+   plate?: string;
+   /** `text`: the word behind you. `magazine`: the masthead. `checklist`: the closing line. */
+   word?: string;
+-  /** Text lines of `headlines`, `checks`, `chat` (steps), `magazine` (cover lines), `curve` (two labels). */
++  /** Text lines of `headlines`, `checks`, `chat` (steps), `magazine` (cover lines), `curve` (two labels) and the extra effects (see catalog). */
+   lines?: string[];
+   /** `chat`: the message in the bubble. */
+   prompt?: string;
+@@ -1325,6 +1327,7 @@ const RENDERERS: Record<EffectKind, React.FC<Ctx>> = {
+   zoomcut: ZoomCut,
+   checks: Checks,
+   checklist: Checklist,
++  ...EXTRA_RENDERERS,
+ };
+ 
+ export const EffectLayer: React.FC<{ spec: EffectsSpec; seconds: number; source: string; cutout?: string }> = ({ spec, seconds, source, cutout }) => {
+diff --git a/src/effects/extra.tsx b/src/effects/extra.tsx
+new file mode 100644
+index 0000000..b229a41
+--- /dev/null
++++ b/src/effects/extra.tsx
+@@ -0,0 +1,888 @@
++import type { CSSProperties, ReactNode } from "react";
++import { AbsoluteFill, Freeze, Img, OffthreadVideo, interpolate, staticFile, useCurrentFrame } from "remotion";
++import { Backdrop } from "./Backdrop";
++import type { EffectCue } from "./effects";
++import { EASE_IN_POW4, EASE_OUT, EASE_OUT_POW4, EASE_SLAM } from "./motion";
++import { HEIGHT, WIDTH, rgba, useTheme } from "./theme";
++
++/**
++ * Twelve more effects: graph split, flight map, comment box, room swap, notes, stop motion, word
++ * funnel, glass tunnel, prompt box, disappear, thrown in and follow bell. Same contract as the
++ * effects in effects.tsx: each one covers its whole window, every video element is muted.
++ * Only types are imported from effects.tsx, so there is no runtime import cycle.
++ */
++export type ExtraKind =
++  | "graphsplit"
++  | "flightmap"
++  | "comment"
++  | "roomswap"
++  | "notes"
++  | "stopmotion"
++  | "funnel"
++  | "tunnel"
++  | "prompt"
++  | "disappear"
++  | "thrown"
++  | "bell";
++
++export type ExtraCtx = { t: number; d: number; cue: EffectCue; seconds: number; source: string; cutout?: string; names: string[] };
++
++const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
++const ramp = (t: number, a: number, b: number, from = 0, to = 1, easing = EASE_OUT) => interpolate(t, [a, b], [from, to], { ...clamp, easing });
++const FULL: CSSProperties = { position: "absolute", left: 0, top: 0, width: WIDTH, height: HEIGHT };
++const faceOf = (cue: EffectCue) => cue.face ?? { x: 540, y: 820 };
++const line = (cue: EffectCue, index: number, fallback: string) => cue.lines?.[index] ?? fallback;
++
++const Cam: React.FC<{ src: string; style?: CSSProperties; transparent?: boolean }> = ({ src, style, transparent }) => (
++  <OffthreadVideo src={staticFile(src)} muted transparent={transparent} style={{ ...FULL, objectFit: "cover", ...style }} />
++);
++
++const Picture: React.FC<{ src: string; style?: CSSProperties }> = ({ src, style }) => <Img src={staticFile(src)} style={{ ...FULL, objectFit: "cover", ...style }} />;
++
++const Layer: React.FC<{ transform?: string; origin?: { x: number; y: number }; children: ReactNode; style?: CSSProperties }> = ({ transform, origin, children, style }) => (
++  <div style={{ ...FULL, transform, transformOrigin: origin ? `${origin.x}px ${origin.y}px` : undefined, ...style }}>{children}</div>
++);
++
++const random = (seed: number) => {
++  let a = seed >>> 0;
++  return () => {
++    a = (a + 0x6d2b79f5) >>> 0;
++    let x = Math.imul(a ^ (a >>> 15), 1 | a);
++    x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x;
++    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
++  };
++};
++
++const Avatar: React.FC<{ cue: EffectCue; size: number }> = ({ cue, size }) => {
++  const theme = useTheme();
++  const style: CSSProperties = { width: size, height: size, borderRadius: "50%", flexShrink: 0 };
++  if (cue.avatar) return <Img src={staticFile(cue.avatar)} style={{ ...style, objectFit: "cover" }} />;
++  const handle = cue.handle ?? "yourname";
++  return (
++    <div style={{ ...style, background: theme.accent, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: theme.font, fontWeight: 800, fontSize: size * 0.48 }}>
++      {handle.replace(/^@/, "").charAt(0).toUpperCase()}
++    </div>
++  );
++};
++
++/** Top edge for a block of the given height that ends just above the head, below the header row. */
++const aboveHead = (cue: EffectCue, height: number) => Math.max(345, faceOf(cue).y - 400 - height);
++
++/* ------------------------------------------------------------------------------------------ */
++/* Graph split: the frame splits, a bar chart grows on the left, you stay on the right          */
++/* ------------------------------------------------------------------------------------------ */
++
++const BARS = [0.22, 0.34, 0.3, 0.52, 0.94];
++
++const GraphSplit: React.FC<ExtraCtx> = ({ t, d, cue, source }) => {
++  const theme = useTheme();
++  const face = faceOf(cue);
++  const at = cue.at ?? 0.2;
++  const split = ramp(t, at, at + 0.45, 0, 1, EASE_OUT_POW4);
++  const close = ramp(t, d - 0.3, d, 0, 1, EASE_IN_POW4);
++  const p = split * (1 - close);
++  // The right half shows the camera frame with the face moved to its centre (x 810).
++  const shift = (810 - face.x) * p;
++  const panel = 540 * p;
++  const chart = { left: 70, top: 640, width: 400, height: 560 };
++  const barW = 56;
++  const gap = (chart.width - barW * BARS.length) / (BARS.length - 1);
++  return (
++    <AbsoluteFill style={{ background: theme.ink }}>
++      <Layer transform={`translateX(${shift.toFixed(1)}px)`}>
++        <Cam src={source} />
++      </Layer>
++      <div style={{ position: "absolute", left: 0, top: 0, width: panel, height: HEIGHT, overflow: "hidden", background: `color-mix(in srgb, ${theme.deep} 40%, ${theme.ink})` }}>
++        <div style={{ position: "absolute", left: 0, top: 0, width: 540, height: HEIGHT, fontFamily: theme.font, color: theme.paper }}>
++          <div
++            style={{
++              position: "absolute",
++              inset: 0,
++              background: `linear-gradient(0deg, ${rgba(theme.glow, 0.1)} 1px, transparent 1px) 0 ${chart.top % 70}px / 100% 70px`,
++            }}
++          />
++          <div style={{ position: "absolute", left: 70, top: 400, width: 420, fontSize: 26, fontWeight: 800, letterSpacing: "0.14em", color: theme.glow, opacity: ramp(t, at + 0.3, at + 0.5) }}>
++            {line(cue, 0, "GROWTH")}
++          </div>
++          <div style={{ position: "absolute", left: 70, top: 440, width: 420, fontSize: 52, fontWeight: 900, lineHeight: 1.02, letterSpacing: "-0.02em", opacity: ramp(t, at + 0.35, at + 0.55) }}>
++            {line(cue, 1, "Before vs. after")}
++          </div>
++          {BARS.map((h, i) => {
++            const grow = ramp(t, at + 0.4 + i * 0.1, at + 0.8 + i * 0.1, 0, 1, EASE_OUT_POW4);
++            const height = chart.height * h * grow;
++            const last = i === BARS.length - 1;
++            return (
++              <div
++                key={i}
++                style={{
++                  position: "absolute",
++                  left: chart.left + i * (barW + gap),
++                  top: chart.top + chart.height - height,
++                  width: barW,
++                  height,
++                  borderRadius: "14px 14px 4px 4px",
++                  background: last ? theme.glow : rgba(theme.paper, 0.28),
++                  boxShadow: last ? `0 0 40px ${rgba(theme.glow, 0.6)}` : "none",
++                }}
++              />
++            );
++          })}
++          <div style={{ position: "absolute", left: chart.left, top: chart.top + chart.height, width: chart.width, height: 4, borderRadius: 2, background: rgba(theme.paper, 0.6) }} />
++        </div>
++      </div>
++      <div style={{ position: "absolute", left: panel - 3, top: 0, width: 6, height: HEIGHT, background: "#fff", opacity: p > 0.01 ? 1 : 0, boxShadow: "0 0 24px rgba(10,10,12,0.5)" }} />
++    </AbsoluteFill>
++  );
++};
++
++/* ------------------------------------------------------------------------------------------ */
++/* Flight map: a route draws itself over a map, a plane flies along it                          */
++/* ------------------------------------------------------------------------------------------ */
++
++const LAND = [
++  "M-40 470 C60 420 170 440 250 400 C330 360 300 300 380 290 C450 280 470 350 430 420 C390 500 450 560 380 620 C300 690 160 640 80 700 C10 750 -40 720 -40 700Z",
++  "M560 250 C640 200 760 230 820 280 C880 330 980 300 1120 340 L1120 620 C1030 650 960 610 900 660 C840 710 760 690 720 620 C680 560 600 590 560 520 C520 450 600 400 560 330Z",
++  "M140 900 C220 860 330 880 380 950 C430 1020 360 1110 270 1120 C180 1130 110 1060 120 990Z",
++  "M700 980 C790 930 930 950 1000 1020 C1070 1090 1010 1200 900 1210 C800 1220 720 1150 700 1080Z",
++];
++
++const quad = (a: { x: number; y: number }, c: { x: number; y: number }, b: { x: number; y: number }, u: number) => ({
++  x: (1 - u) * (1 - u) * a.x + 2 * (1 - u) * u * c.x + u * u * b.x,
++  y: (1 - u) * (1 - u) * a.y + 2 * (1 - u) * u * c.y + u * u * b.y,
++});
++
++const FlightMap: React.FC<ExtraCtx> = ({ t, d, cue, source, cutout, seconds }) => {
++  const theme = useTheme();
++  const at = cue.at ?? 0.3;
++  const appear = ramp(t, 0, 0.3);
++  const fly = ramp(t, at, Math.min(d - 0.2, at + 1.6), 0, 1, (x) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2));
++  // With the cut-out you stand in front of the map, so the route runs above the head.
++  const a = { x: 170, y: cutout ? 700 : 620 };
++  const b = { x: 900, y: cutout ? 640 : 860 };
++  const c = { x: (a.x + b.x) / 2, y: Math.min(a.y, b.y) - 240 };
++  const route = `M${a.x} ${a.y} Q${c.x} ${c.y} ${b.x} ${b.y}`;
++  const plane = quad(a, c, b, fly);
++  const ahead = quad(a, c, b, Math.min(1, fly + 0.01));
++  const behind = quad(a, c, b, Math.max(0, fly - 0.01));
++  const angle = (Math.atan2(ahead.y - behind.y, ahead.x - behind.x) * 180) / Math.PI;
++  const land = arrival(t, at, d);
++  const pin = (p: { x: number; y: number }, label: string, show: number, hot: boolean) => (
++    <div style={{ position: "absolute", left: p.x, top: p.y, opacity: show, scale: `${0.6 + 0.4 * show}` }}>
++      <div style={{ position: "absolute", left: -16, top: -16, width: 32, height: 32, borderRadius: "50%", background: hot ? theme.accent : theme.paper, border: `5px solid ${theme.ink}` }} />
++      <div
++        style={{
++          position: "absolute",
++          left: p.x > 540 ? undefined : -20,
++          right: p.x > 540 ? -20 : undefined,
++          top: 30,
++          whiteSpace: "nowrap",
++          padding: "8px 18px",
++          borderRadius: 999,
++          background: theme.ink,
++          color: theme.paper,
++          fontFamily: theme.font,
++          fontWeight: 800,
++          fontSize: 30,
++        }}
++      >
++        {label}
++      </div>
++    </div>
++  );
++  const card = ramp(t, 0, 0.5, 0, 1, EASE_OUT_POW4);
++  const lerp = (x: number, y: number) => x + (y - x) * card;
++  return (
++    <AbsoluteFill>
++      <div style={{ ...FULL, opacity: cutout ? 1 : appear }}>
++        <Backdrop seconds={seconds} />
++        <div style={{ ...FULL, background: `radial-gradient(${rgba(theme.deep, 0.18)} 2px, transparent 2.5px) 0 0 / 34px 34px` }} />
++        <svg width={WIDTH} height={HEIGHT} style={FULL}>
++          {LAND.map((path, i) => (
++            <path key={i} d={path} fill={rgba(theme.deep, 0.16)} stroke={rgba(theme.deep, 0.35)} strokeWidth={3} />
++          ))}
++          <path d={route} fill="none" stroke={rgba(theme.ink, 0.25)} strokeWidth={6} strokeDasharray="2 18" strokeLinecap="round" />
++          <path d={route} fill="none" stroke={theme.accent} strokeWidth={8} strokeLinecap="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - fly} />
++        </svg>
++      </div>
++      {cutout ? (
++        <Cam src={cutout} transparent style={{ filter: "drop-shadow(0 20px 40px rgba(10,10,12,0.3))" }} />
++      ) : (
++        <div
++          style={{
++            position: "absolute",
++            left: lerp(0, 320),
++            top: lerp(0, 1040),
++            width: lerp(WIDTH, 440),
++            height: lerp(HEIGHT, 782),
++            borderRadius: lerp(0, 36),
++            overflow: "hidden",
++            boxShadow: card > 0.05 ? "0 30px 70px rgba(10,10,12,0.4)" : "none",
++            border: card > 0.5 ? "6px solid #fff" : "none",
++          }}
++        >
++          <Cam src={source} style={{ width: "100%", height: "100%" }} />
++        </div>
++      )}
++      {pin(a, line(cue, 0, "Berlin"), ramp(t, 0.15, 0.35), false)}
++      {pin(b, line(cue, 1, "New York"), ramp(t, at + 0.2, at + 0.4), land > 0.5)}
++      <div style={{ position: "absolute", left: plane.x - 40, top: plane.y - 40, width: 80, height: 80, rotate: `${angle.toFixed(1)}deg`, opacity: ramp(t, at - 0.1, at + 0.05) * (1 - land), filter: "drop-shadow(0 8px 10px rgba(10,10,12,0.35))" }}>
++        <svg width={80} height={80} viewBox="0 0 24 24">
++          <path d="M21.5 12c0-.8-.7-1.3-1.5-1.3h-5.2L10.5 3.5H8.3l2.2 7.2H5.6L4 8.6H2.5l1 3.4-1 3.4H4l1.6-2.1h4.9l-2.2 7.2h2.2l4.3-7.2H20c.8 0 1.5-.5 1.5-1.3z" fill={theme.ink} />
++        </svg>
++      </div>
++    </AbsoluteFill>
++  );
++};
++
++/** 0 while flying, 1 once the plane has landed. */
++const arrival = (t: number, at: number, d: number) => ramp(t, Math.min(d - 0.2, at + 1.6) - 0.05, Math.min(d - 0.2, at + 1.6) + 0.1);
++
++/* ------------------------------------------------------------------------------------------ */
++/* Comment box: an Instagram-style "reply to comment" sticker pops up above the head            */
++/* ------------------------------------------------------------------------------------------ */
++
++const CommentBox: React.FC<ExtraCtx> = ({ t, d, cue, source }) => {
++  const theme = useTheme();
++  const at = cue.at ?? 0.15;
++  const pop = ramp(t, at, at + 0.32, 0, 1, EASE_SLAM);
++  const out = ramp(t, d - 0.2, d, 1, 0);
++  const text = cue.prompt ?? "How did you make this video?";
++  const lines = Math.ceil(text.length / 24);
++  const height = 150 + lines * 56;
++  const top = aboveHead(cue, height);
++  return (
++    <AbsoluteFill>
++      <Cam src={source} />
++      <div
++        style={{
++          position: "absolute",
++          left: 140,
++          top,
++          width: 800,
++          padding: "26px 34px 30px",
++          borderRadius: 34,
++          background: "#fff",
++          boxShadow: "0 22px 50px rgba(10,10,12,0.35)",
++          fontFamily: theme.font,
++          color: theme.ink,
++          opacity: out * Math.min(1, pop * 3),
++          scale: `${0.4 + 0.6 * pop}`,
++          rotate: `${(-3 * pop).toFixed(2)}deg`,
++          transformOrigin: "50% 100%",
++        }}
++      >
++        <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 28, fontWeight: 600, color: rgba(theme.ink, 0.6) }}>
++          <Avatar cue={cue} size={56} />
++          <span>
++            Reply to <b style={{ color: theme.ink }}>{cue.handle ?? "yourname"}</b>'s comment
++          </span>
++        </div>
++        <div style={{ marginTop: 14, fontSize: 44, fontWeight: 800, lineHeight: 1.18, letterSpacing: "-0.01em" }}>{text}</div>
++        <div style={{ position: "absolute", left: "50%", bottom: -16, width: 32, height: 32, marginLeft: -16, background: "#fff", rotate: "45deg", borderRadius: 4 }} />
++      </div>
++    </AbsoluteFill>
++  );
++};
++
++/* ------------------------------------------------------------------------------------------ */
++/* Room swap: a light wipe swaps the room behind you, you stay where you are                    */
++/* ------------------------------------------------------------------------------------------ */
++
++const RoomSwap: React.FC<ExtraCtx> = ({ t, cue, source, cutout }) => {
++  const theme = useTheme();
++  const at = cue.at ?? 0.4;
++  const wipe = ramp(t, at, at + 0.38, 0, 1, EASE_OUT_POW4);
++  const edge = -120 + wipe * (WIDTH + 240);
++  const glow = interpolate(wipe, [0, 0.05, 0.95, 1], [0, 1, 1, 0], clamp);
++  const settle = interpolate(t, [at, at + 2], [1.08, 1], clamp);
++  const room = cue.src ? (
++    <Picture src={cue.src} style={{ scale: `${settle}` }} />
++  ) : (
++    <div style={{ ...FULL, background: `linear-gradient(180deg, ${theme.deep} 0%, ${theme.gold} 100%)` }} />
++  );
++  if (!cutout) {
++    // Without a cut-out the whole frame swaps behind a whip of light and comes back on the camera.
++    const whip = interpolate(t, [at, at + 0.12, at + 0.3], [0, 1, 0], clamp);
++    return (
++      <AbsoluteFill>
++        <Layer style={{ filter: whip > 0.05 ? `blur(${(30 * whip).toFixed(1)}px)` : undefined, transform: `translateX(${(-160 * whip).toFixed(1)}px)` }}>
++          <Cam src={source} />
++        </Layer>
++        <div style={{ ...FULL, background: "#fff", opacity: whip * 0.6 }} />
++      </AbsoluteFill>
++    );
++  }
++  return (
++    <AbsoluteFill>
++      {cue.plate ? <Picture src={cue.plate} /> : <Cam src={source} />}
++      <div style={{ ...FULL, clipPath: `inset(0px ${Math.max(0, WIDTH - edge).toFixed(1)}px 0px 0px)` }}>{room}</div>
++      <div style={{ position: "absolute", left: edge - 60, top: 0, width: 120, height: HEIGHT, opacity: glow, background: "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.95) 50%, rgba(255,255,255,0) 100%)", filter: "blur(6px)" }} />
++      <Cam src={cutout} transparent />
++    </AbsoluteFill>
++  );
++};
++
++/* ------------------------------------------------------------------------------------------ */
++/* Notes: a notes-app checklist ticks itself off, your video sits in it as an attachment       */
++/* ------------------------------------------------------------------------------------------ */
++
++const NOTES_GOLD = "#e2b33c";
++
++const Notes: React.FC<ExtraCtx> = ({ t, d, cue, source, names }) => {
++  const theme = useTheme();
++  const items = (cue.lines?.length ? cue.lines : names.length >= 3 ? names : ["Script", "Film", "Edit", "Post"]).slice(0, 12);
++  const rise = ramp(t, 0, 0.35, HEIGHT, 0, EASE_OUT_POW4);
++  const fall = ramp(t, d - 0.25, d, 0, HEIGHT, EASE_IN_POW4);
++  const start = cue.at ?? 0.45;
++  const step = Math.min(0.32, Math.max(0.08, (d * 0.65 - start) / Math.max(1, items.length - 1)));
++  // All but the last are ticked; the last one is the one being worked on, highlighted like in the app.
++  const current = items.length - 1;
++  const rowH = Math.min(78, Math.floor(700 / items.length));
++  const thumb = { left: 690, top: 520, width: 320, height: 569 };
++  const p = ramp(t, 0.1, 0.6, 0, 1, EASE_OUT_POW4);
++  const lerp = (a: number, b: number) => a + (b - a) * p;
++  return (
++    <AbsoluteFill>
++      <Cam src={source} />
++      <div style={{ ...FULL, translate: `0px ${(rise + fall).toFixed(1)}px`, background: "#fffdf7", fontFamily: '-apple-system, "SF Pro Display", ' + theme.font, color: "#1c1c1e" }}>
++        <div style={{ position: "absolute", left: 70, top: 345, fontSize: 40, fontWeight: 600, color: NOTES_GOLD }}>‹ Notes</div>
++        <div style={{ position: "absolute", left: 70, top: 405, fontSize: 70, fontWeight: 800, letterSpacing: "-0.02em" }}>{cue.word ?? "To do"}</div>
++        {items.map((label, i) => {
++          const tick = i < current ? ramp(t, start + i * step, start + i * step + 0.15) : 0;
++          const hot = i === current && t >= start + (current - 0.5) * step;
++          return (
++            <div
++              key={`${i}-${label}`}
++              style={{
++                position: "absolute",
++                left: 50,
++                top: 520 + i * rowH,
++                width: 600,
++                height: rowH - 8,
++                display: "flex",
++                alignItems: "center",
++                gap: 20,
++                paddingLeft: 20,
++                borderRadius: 12,
++                background: hot ? "#fcefb4" : "transparent",
++                fontSize: Math.min(44, rowH * 0.56),
++                fontWeight: 700,
++                color: tick > 0.5 ? "#a1a1a6" : "#1c1c1e",
++                textDecoration: tick > 0.5 ? "line-through" : "none",
++              }}
++            >
++              <div
++                style={{
++                  width: rowH * 0.5,
++                  height: rowH * 0.5,
++                  flexShrink: 0,
++                  borderRadius: "50%",
++                  border: `3px solid ${tick > 0.5 ? NOTES_GOLD : "#c7c7cc"}`,
++                  background: tick > 0.5 ? NOTES_GOLD : "transparent",
++                  display: "flex",
++                  alignItems: "center",
++                  justifyContent: "center",
++                  scale: `${1 + 0.2 * Math.sin(tick * Math.PI)}`,
++                }}
++              >
++                <svg width={rowH * 0.32} height={rowH * 0.32} viewBox="0 0 24 24">
++                  <path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="#fff" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - tick} />
++                </svg>
++              </div>
++              <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{label}</span>
++            </div>
++          );
++        })}
++      </div>
++      <div
++        style={{
++          position: "absolute",
++          left: lerp(0, thumb.left),
++          top: lerp(0, thumb.top) + fall,
++          width: lerp(WIDTH, thumb.width),
++          height: lerp(HEIGHT, thumb.height),
++          borderRadius: lerp(0, 22),
++          overflow: "hidden",
++          boxShadow: p > 0.05 ? "0 18px 40px rgba(10,10,12,0.25)" : "none",
++        }}
++      >
++        <Cam src={source} style={{ width: "100%", height: "100%" }} />
++      </div>
++    </AbsoluteFill>
++  );
++};
++
++/* ------------------------------------------------------------------------------------------ */
++/* Stop motion: the picture runs at a few frames per second and jitters like hand-moved frames  */
++/* ------------------------------------------------------------------------------------------ */
++
++const StopMotion: React.FC<ExtraCtx> = ({ cue, source }) => {
++  const frame = useCurrentFrame();
++  // Hold every picture for four frames: 7.5 pictures per second at 30 fps.
++  const held = Math.floor(frame / 4) * 4;
++  const rnd = random(held * 7919 + 13);
++  const dx = (rnd() - 0.5) * 16;
++  const dy = (rnd() - 0.5) * 16;
++  const rot = (rnd() - 0.5) * 1.6;
++  const exposure = 0.94 + rnd() * 0.12;
++  return (
++    <AbsoluteFill style={{ background: "#000" }}>
++      <Layer transform={`translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) rotate(${rot.toFixed(2)}deg) scale(1.04)`} origin={faceOf(cue)} style={{ filter: `brightness(${exposure.toFixed(3)}) contrast(1.06) saturate(0.92)` }}>
++        <Freeze frame={held}>
++          <Cam src={source} />
++        </Freeze>
++      </Layer>
++      <svg width={WIDTH} height={HEIGHT} style={{ ...FULL, opacity: 0.16, mixBlendMode: "overlay" }}>
++        <filter id={`stop-grain-${held}`}>
++          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed={held % 97} />
++          <feColorMatrix type="saturate" values="0" />
++        </filter>
++        <rect width={WIDTH} height={HEIGHT} filter={`url(#stop-grain-${held})`} />
++      </svg>
++      <div style={{ ...FULL, background: "radial-gradient(ellipse 80% 70% at 50% 45%, transparent 55%, rgba(10,10,12,0.45) 100%)" }} />
++    </AbsoluteFill>
++  );
++};
++
++/* ------------------------------------------------------------------------------------------ */
++/* Word funnel: words fall into a glass funnel above the head, one word comes out               */
++/* ------------------------------------------------------------------------------------------ */
++
++const FUNNEL_WORDS = ["ideas", "notes", "clips", "drafts", "voice", "links", "takes", "photos"];
++
++const WordFunnel: React.FC<ExtraCtx> = ({ t, d, cue, source }) => {
++  const theme = useTheme();
++  const words = (cue.lines?.length ? cue.lines : FUNNEL_WORDS).slice(0, 10);
++  // Between the header row (ends near y 330) and the top of the head.
++  const tip = { x: 540, y: Math.max(520, Math.min(600, faceOf(cue).y - 290)) };
++  const mouth = { y: tip.y - 140, half: 260 };
++  const middle = (mouth.y + tip.y) / 2;
++  const appear = ramp(t, 0, 0.3, 0, 1, EASE_SLAM);
++  const out = ramp(t, d - 0.2, d, 1, 0);
++  const rnd = random(4242);
++  const stagger = Math.min(0.12, Math.max(0.05, (d - 1.6) / words.length));
++  const doneAt = 0.25 + words.length * stagger + 0.55;
++  const result = ramp(t, doneAt, doneAt + 0.3, 0, 1, EASE_SLAM);
++  const swirl = interpolate(t, [0, doneAt], [0, 1], clamp);
++  // The funnel folds away and the result takes its place, so nothing sits on the head.
++  const fold = ramp(t, doneAt - 0.12, doneAt + 0.12, 1, 0, EASE_IN_POW4);
++  return (
++    <AbsoluteFill>
++      <Cam src={source} />
++      <div style={{ ...FULL, opacity: out }}>
++        <svg width={WIDTH} height={HEIGHT} style={{ ...FULL, opacity: appear * fold, scale: `${0.4 + 0.6 * fold}`, transformOrigin: `${tip.x}px ${middle}px` }}>
++          <defs>
++            <linearGradient id="funnel-glass" x1="0" x2="1">
++              <stop offset="0" stopColor="#fff" stopOpacity={0.55} />
++              <stop offset="0.5" stopColor="#fff" stopOpacity={0.18} />
++              <stop offset="1" stopColor="#fff" stopOpacity={0.5} />
++            </linearGradient>
++          </defs>
++          <path
++            d={`M${tip.x - mouth.half} ${mouth.y} Q${tip.x - 70} ${tip.y - 70} ${tip.x - 34} ${tip.y} L${tip.x + 34} ${tip.y} Q${tip.x + 70} ${tip.y - 70} ${tip.x + mouth.half} ${mouth.y}Z`}
++            fill="url(#funnel-glass)"
++            stroke="#fff"
++            strokeWidth={5}
++            style={{ filter: "drop-shadow(0 10px 24px rgba(10,10,12,0.35))" }}
++          />
++          <ellipse cx={tip.x} cy={mouth.y} rx={mouth.half} ry={34} fill={rgba(theme.ink, 0.25)} stroke="#fff" strokeWidth={5} />
++          {[0, 1, 2].map((i) => {
++            const r = ((swirl * 3 + i / 3) % 1) * (mouth.half - 40);
++            return <ellipse key={i} cx={tip.x} cy={mouth.y + 4} rx={r} ry={r * 0.11} fill="none" stroke={rgba(theme.glow, 0.6)} strokeWidth={3} />;
++          })}
++        </svg>
++        {words.map((word, i) => {
++          const start = 0.25 + i * stagger;
++          const p = ramp(t, start, start + 0.55, 0, 1, EASE_IN_POW4);
++          if (p >= 1) return null;
++          const side = i % 2 === 0 ? -1 : 1;
++          const sx = tip.x + side * (400 + rnd() * 100);
++          const sy = mouth.y - 30 + rnd() * 110;
++          const x = sx + (tip.x - sx) * p;
++          const y = sy + (mouth.y + 20 - sy) * p - Math.sin(p * Math.PI) * 90;
++          return (
++            <div
++              key={`${i}-${word}`}
++              style={{
++                position: "absolute",
++                left: x,
++                top: y,
++                translate: "-50% -50%",
++                padding: "10px 22px",
++                borderRadius: 999,
++                background: "#fff",
++                color: theme.ink,
++                fontFamily: theme.font,
++                fontWeight: 800,
++                fontSize: 34,
++                whiteSpace: "nowrap",
++                boxShadow: "0 10px 22px rgba(10,10,12,0.3)",
++                opacity: ramp(t, start, start + 0.1) * (1 - ramp(p, 0.75, 1)),
++                scale: `${1 - 0.7 * p}`,
++                rotate: `${(side * 18 * (1 - p)).toFixed(1)}deg`,
++              }}
++            >
++              {word}
++            </div>
++          );
++        })}
++        <div
++          style={{
++            position: "absolute",
++            left: tip.x,
++            top: middle,
++            translate: "-50% -50%",
++            padding: "14px 34px",
++            borderRadius: 999,
++            background: theme.accent,
++            color: "#fff",
++            fontFamily: theme.font,
++            fontWeight: 900,
++            fontSize: 52,
++            whiteSpace: "nowrap",
++            boxShadow: `0 14px 34px ${rgba(theme.accent, 0.5)}`,
++            opacity: result,
++            scale: `${0.3 + 0.7 * result}`,
++          }}
++        >
++          {cue.word ?? "one reel"}
++        </div>
++      </div>
++    </AbsoluteFill>
++  );
++};
++
++/* ------------------------------------------------------------------------------------------ */
++/* Glass tunnel: frames inside frames with glass rims, the camera keeps flying through them     */
++/* ------------------------------------------------------------------------------------------ */
++
++const RING = 0.7;
++const RINGS = 6;
++
++const GlassTunnel: React.FC<ExtraCtx> = ({ t, d, cue, source }) => {
++  const face = faceOf(cue);
++  const intro = ramp(t, 0, 0.35, 0, 1, EASE_OUT_POW4);
++  const outro = ramp(t, d - 0.3, d, 0, 1, EASE_IN_POW4);
++  // Flight: two rings per second, eased in and out with the window.
++  const travel = t * 1.6;
++  const phase = travel % 1;
++  const layers = Array.from({ length: RINGS }, (_, i) => {
++    const depth = i + 1 - phase;
++    return { i, depth, scale: Math.pow(RING, depth) };
++  });
++  return (
++    <AbsoluteFill style={{ background: "#05060a" }}>
++      <Layer transform={`scale(${(1 + 0.25 * phase).toFixed(4)})`} origin={face} style={{ filter: "brightness(0.55) blur(3px)" }}>
++        <Cam src={source} />
++      </Layer>
++      {layers.map(({ i, depth, scale }) => {
++        const s = 1 - (1 - scale) * intro * (1 - outro);
++        const twist = (depth * 4 - 2) * intro * (1 - outro);
++        const radius = 70 / Math.max(0.2, s);
++        return (
++          <Layer key={i} transform={`scale(${s.toFixed(4)}) rotate(${twist.toFixed(2)}deg)`} origin={face}>
++            <div style={{ ...FULL, borderRadius: radius, overflow: "hidden", boxShadow: `0 0 0 ${(10 / s).toFixed(1)}px rgba(255,255,255,0.22), 0 0 ${(60 / s).toFixed(0)}px rgba(120,200,255,0.35)` }}>
++              <Cam src={source} />
++              <div
++                style={{
++                  ...FULL,
++                  borderRadius: radius,
++                  boxShadow: `inset 0 0 0 ${(4 / s).toFixed(1)}px rgba(255,255,255,0.85), inset 0 0 ${(90 / s).toFixed(0)}px rgba(160,220,255,0.45)`,
++                  background: `linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 35%, rgba(255,255,255,0) 70%, rgba(255,255,255,0.12) 100%)`,
++                }}
++              />
++            </div>
++          </Layer>
++        );
++      })}
++    </AbsoluteFill>
++  );
++};
++
++/* ------------------------------------------------------------------------------------------ */
++/* Prompt box: a prompt gets typed into an input field above the head and sent off              */
++/* ------------------------------------------------------------------------------------------ */
++
++const PromptBox: React.FC<ExtraCtx> = ({ t, d, cue, source }) => {
++  const theme = useTheme();
++  const text = cue.prompt ?? "Edit my video and add the effects";
++  const appear = ramp(t, 0, 0.3, 0, 1, EASE_SLAM);
++  const typeStart = 0.3;
++  const typeEnd = Math.min(d - 0.7, typeStart + text.length * 0.045);
++  const shown = Math.round(text.length * ramp(t, typeStart, typeEnd, 0, 1, (x) => x));
++  const sendAt = typeEnd + (cue.at !== undefined ? Math.max(0, cue.at - typeEnd) : 0.2);
++  const press = interpolate(t, [sendAt, sendAt + 0.06, sendAt + 0.16], [1, 0.82, 1], clamp);
++  const fly = ramp(t, sendAt + 0.15, sendAt + 0.5, 0, 1, EASE_IN_POW4);
++  const lines = Math.max(1, Math.ceil(text.length / 30));
++  const height = 80 + lines * 54;
++  const top = aboveHead(cue, height + 40);
++  const caret = t < sendAt && Math.floor(t * 3) % 2 === 0;
++  return (
++    <AbsoluteFill>
++      <Cam src={source} />
++      <div
++        style={{
++          position: "absolute",
++          left: 90,
++          top: top - fly * 500,
++          width: 900,
++          minHeight: height,
++          padding: "26px 130px 26px 36px",
++          borderRadius: 36,
++          background: rgba(theme.paper, 0.96),
++          boxShadow: `0 24px 60px rgba(10,10,12,0.35), 0 0 0 2px ${rgba(theme.ink, 0.08)}`,
++          fontFamily: theme.font,
++          fontSize: 42,
++          fontWeight: 600,
++          lineHeight: 1.25,
++          color: theme.ink,
++          opacity: appear * (1 - fly),
++          scale: `${(0.85 + 0.15 * appear) * (1 - 0.4 * fly)}`,
++        }}
++      >
++        {shown === 0 ? <span style={{ color: rgba(theme.ink, 0.35) }}>Ask anything…</span> : text.slice(0, shown)}
++        <span style={{ display: "inline-block", width: 4, height: 46, marginLeft: 4, verticalAlign: "-8px", background: theme.accent, opacity: caret ? 1 : 0 }} />
++        <div
++          style={{
++            position: "absolute",
++            right: 24,
++            bottom: 22,
++            width: 80,
++            height: 80,
++            borderRadius: "50%",
++            background: shown >= text.length ? theme.ink : rgba(theme.ink, 0.2),
++            display: "flex",
++            alignItems: "center",
++            justifyContent: "center",
++            scale: `${press}`,
++          }}
++        >
++          <svg width={40} height={40} viewBox="0 0 24 24">
++            <path d="M12 19V5M5.5 11.5L12 5l6.5 6.5" fill="none" stroke="#fff" strokeWidth={2.8} strokeLinecap="round" strokeLinejoin="round" />
++          </svg>
++        </div>
++      </div>
++    </AbsoluteFill>
++  );
++};
++
++/* ------------------------------------------------------------------------------------------ */
++/* Disappear: you dissolve into dust and leave the empty room behind                            */
++/* ------------------------------------------------------------------------------------------ */
++
++const Disappear: React.FC<ExtraCtx> = ({ t, cue, source, cutout }) => {
++  const at = cue.at ?? 0.3;
++  const p = ramp(t, at, at + 0.9, 0, 1, (x) => x);
++  const face = faceOf(cue);
++  const rnd = random(777);
++  const dust = Array.from({ length: 90 }, () => ({
++    x: face.x + (rnd() - 0.5) * 640,
++    y: face.y - 260 + rnd() * 1000,
++    vx: 120 + rnd() * 320,
++    vy: -180 - rnd() * 260,
++    size: 4 + rnd() * 9,
++    delay: rnd() * 0.5,
++  }));
++  const tFilter = `disappear-${Math.round(p * 100)}`;
++  const person = (
++    <div style={{ ...FULL, opacity: 1 - ramp(p, 0.35, 1), filter: p > 0 ? `url(#${tFilter})` : undefined }}>
++      {cutout ? <Cam src={cutout} transparent /> : <Cam src={source} />}
++    </div>
++  );
++  return (
++    <AbsoluteFill style={{ background: "#000" }}>
++      {cutout && cue.plate ? <Picture src={cue.plate} /> : null}
++      <svg width={0} height={0} style={{ position: "absolute" }}>
++        <filter id={tFilter} x="-10%" y="-10%" width="120%" height="120%">
++          <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="9" result="noise" />
++          <feDisplacementMap in="SourceGraphic" in2="noise" scale={(p * 260).toFixed(1)} xChannelSelector="R" yChannelSelector="G" result="moved" />
++          <feComponentTransfer in="noise" result="mask">
++            <feFuncA type="linear" slope={-6} intercept={(6 * (1 - p) + 0.6).toFixed(3)} />
++          </feComponentTransfer>
++          <feComposite in="moved" in2="mask" operator="in" />
++        </filter>
++      </svg>
++      {person}
++      {dust.map((g, i) => {
++        const local = Math.max(0, t - at - g.delay);
++        if (local <= 0) return null;
++        const fade = interpolate(local, [0, 0.1, 0.9], [0, 0.9, 0], clamp);
++        return (
++          <div
++            key={i}
++            style={{
++              position: "absolute",
++              left: g.x + g.vx * local,
++              top: g.y + g.vy * local,
++              width: g.size,
++              height: g.size,
++              borderRadius: 2,
++              background: i % 3 === 0 ? "#3a2f2a" : "#e8ddd0",
++              opacity: fade,
++            }}
++          />
++        );
++      })}
++    </AbsoluteFill>
++  );
++};
++
++/* ------------------------------------------------------------------------------------------ */
++/* Thrown in: a photo or a sticker is thrown into the frame, lands with a thud and a shake      */
++/* ------------------------------------------------------------------------------------------ */
++
++const Thrown: React.FC<ExtraCtx> = ({ t, d, cue, source }) => {
++  const theme = useTheme();
++  const at = cue.at ?? 0.3;
++  const face = faceOf(cue);
++  const land = { x: Math.min(820, face.x + 220), y: Math.max(560, face.y - 280) };
++  const flyTime = 0.32;
++  const f = ramp(t, at - flyTime, at, 0, 1, (x) => x);
++  // Thrown from the bottom left on a parabola, spinning, and landing right on the trigger word.
++  const start = { x: -300, y: 1500 };
++  const x = start.x + (land.x - start.x) * f;
++  const y = start.y + (land.y - start.y) * f - Math.sin(f * Math.PI) * 380;
++  const spin = (1 - f) * -540 + 8;
++  const after = Math.max(0, t - at);
++  const squash = t >= at ? 1 + 0.18 * Math.exp(-after * 14) * Math.cos(after * 40) : 1;
++  const shake = t >= at ? 22 * Math.exp(-after * 12) * Math.sin(after * 70) : 0;
++  const out = ramp(t, d - 0.2, d, 1, 0);
++  const visible = t >= at - flyTime;
++  const impact = interpolate(after, [0, 0.35], [0, 1], clamp);
++  return (
++    <AbsoluteFill>
++      <Layer transform={`translate(${shake.toFixed(1)}px, ${(shake * 0.6).toFixed(1)}px)`}>
++        <Cam src={source} />
++      </Layer>
++      {t >= at && impact < 1 ? (
++        <svg width={WIDTH} height={HEIGHT} style={FULL}>
++          {Array.from({ length: 8 }, (_, i) => {
++            const a = (i / 8) * Math.PI * 2;
++            const r1 = 170 + impact * 90;
++            const r2 = r1 + 50 * (1 - impact);
++            return <line key={i} x1={land.x + Math.cos(a) * r1} y1={land.y + Math.sin(a) * r1} x2={land.x + Math.cos(a) * r2} y2={land.y + Math.sin(a) * r2} stroke="#fff" strokeWidth={8} strokeLinecap="round" opacity={1 - impact} />;
++          })}
++        </svg>
++      ) : null}
++      {visible ? (
++        <div
++          style={{
++            position: "absolute",
++            left: x,
++            top: y,
++            translate: "-50% -50%",
++            rotate: `${spin.toFixed(1)}deg`,
++            scale: `${squash} ${2 - squash}`,
++            opacity: out,
++            filter: "drop-shadow(0 22px 30px rgba(10,10,12,0.45))",
++          }}
++        >
++          {cue.src ? (
++            <div style={{ background: "#fff", padding: "16px 16px 60px", borderRadius: 8 }}>
++              <Img src={staticFile(cue.src)} style={{ width: 320, height: 320, objectFit: "cover", display: "block" }} />
++            </div>
++          ) : (
++            <div style={{ padding: "22px 40px", borderRadius: 28, background: theme.gold, color: theme.ink, fontFamily: theme.font, fontWeight: 900, fontSize: 72, whiteSpace: "nowrap", border: "6px solid #fff" }}>
++              {cue.word ?? "BOOM"}
++            </div>
++          )}
++        </div>
++      ) : null}
++    </AbsoluteFill>
++  );
++};
++
++/* ------------------------------------------------------------------------------------------ */
++/* Follow bell: profile card above the head, a cursor taps Follow, the bell rings               */
++/* ------------------------------------------------------------------------------------------ */
++
++const FollowBell: React.FC<ExtraCtx> = ({ t, d, cue, source }) => {
++  const theme = useTheme();
++  const at = cue.at ?? 0.9;
++  const pop = ramp(t, 0, 0.3, 0, 1, EASE_SLAM);
++  const out = ramp(t, d - 0.2, d, 1, 0);
++  const top = aboveHead(cue, 130);
++  const card = { left: 120, top, width: 840, height: 130 };
++  const followBtn = { x: card.left + 560, y: card.top + 65 };
++  const bellBtn = { x: card.left + 760, y: card.top + 65 };
++  const bellAt = at + 0.55;
++  const followed = t >= at;
++  const rung = t >= bellAt;
++  // Cursor: comes in, taps Follow on `at`, moves to the bell and taps it.
++  const toFollow = ramp(t, at - 0.45, at - 0.05, 0, 1, EASE_OUT_POW4);
++  const toBell = ramp(t, at + 0.15, bellAt - 0.05, 0, 1, EASE_OUT_POW4);
++  const cx = 1100 + (followBtn.x - 1100) * toFollow + (bellBtn.x - followBtn.x) * toBell;
++  const cy = 1400 + (followBtn.y - 1400) * toFollow + (bellBtn.y - followBtn.y) * toBell;
++  const tap = (when: number) => interpolate(t, [when, when + 0.06, when + 0.16], [1, 0.8, 1], clamp);
++  const cursorOut = ramp(t, bellAt + 0.35, bellAt + 0.6, 1, 0);
++  const ring = rung ? Math.exp(-(t - bellAt) * 3) * Math.sin((t - bellAt) * 38) * 24 : 0;
++  return (
++    <AbsoluteFill>
++      <Cam src={source} />
++      <div
++        style={{
++          position: "absolute",
++          ...card,
++          borderRadius: 30,
++          background: "#fff",
++          boxShadow: "0 22px 50px rgba(10,10,12,0.35)",
++          display: "flex",
++          alignItems: "center",
++          gap: 22,
++          padding: "0 30px",
++          boxSizing: "border-box",
++          fontFamily: theme.font,
++          color: theme.ink,
++          opacity: out * Math.min(1, pop * 2),
++          scale: `${0.6 + 0.4 * pop}`,
++        }}
++      >
++        <Avatar cue={cue} size={84} />
++        <div style={{ fontSize: 38, fontWeight: 800, flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{cue.handle ?? "yourname"}</div>
++        <div
++          style={{
++            width: 190,
++            height: 72,
++            borderRadius: 18,
++            display: "flex",
++            alignItems: "center",
++            justifyContent: "center",
++            fontSize: 32,
++            fontWeight: 800,
++            background: followed ? "#efefef" : "#0095f6",
++            color: followed ? theme.ink : "#fff",
++            scale: `${tap(at)}`,
++          }}
++        >
++          {followed ? "Following" : "Follow"}
++        </div>
++        <div style={{ width: 84, height: 84, borderRadius: "50%", background: rung ? theme.accent : "#efefef", display: "flex", alignItems: "center", justifyContent: "center", scale: `${tap(bellAt)}`, position: "relative" }}>
++          <svg width={46} height={46} viewBox="0 0 24 24" style={{ rotate: `${ring.toFixed(1)}deg`, transformOrigin: "50% 10%" }}>
++            <path d="M12 3a6 6 0 0 0-6 6v4l-2 3h16l-2-3V9a6 6 0 0 0-6-6zM10 19a2 2 0 0 0 4 0" fill={rung ? "#fff" : "none"} stroke={rung ? "#fff" : theme.ink} strokeWidth={2} strokeLinejoin="round" />
++          </svg>
++          {rung ? <div style={{ position: "absolute", right: 6, top: 6, width: 20, height: 20, borderRadius: "50%", background: "#fff", border: `4px solid ${theme.accent}`, scale: `${ramp(t, bellAt, bellAt + 0.2, 0, 1, EASE_SLAM)}` }} /> : null}
++        </div>
++      </div>
++      <div style={{ position: "absolute", left: cx - 12, top: cy - 6, opacity: ramp(t, at - 0.5, at - 0.35) * cursorOut, scale: `${Math.min(tap(at), tap(bellAt))}`, filter: "drop-shadow(0 6px 10px rgba(10,10,12,0.45))" }}>
++        <svg width={70} height={70} viewBox="0 0 24 24">
++          <path d="M5 2.5l13.5 11-6 .7 3.4 6.6-2.6 1.3-3.4-6.6L5 19.6z" fill="#fff" stroke={theme.ink} strokeWidth={1.4} strokeLinejoin="round" />
++        </svg>
++      </div>
++    </AbsoluteFill>
++  );
++};
++
++export const EXTRA_RENDERERS: Record<ExtraKind, React.FC<ExtraCtx>> = {
++  graphsplit: GraphSplit,
++  flightmap: FlightMap,
++  comment: CommentBox,
++  roomswap: RoomSwap,
++  notes: Notes,
++  stopmotion: StopMotion,
++  funnel: WordFunnel,
++  tunnel: GlassTunnel,
++  prompt: PromptBox,
++  disappear: Disappear,
++  thrown: Thrown,
++  bell: FollowBell,
++};

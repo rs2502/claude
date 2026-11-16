@@ -1,12 +1,14 @@
 #!/bin/bash
 # Installs the video-effects skill (github.com/KenoMedien/claude-video-effects) into a fresh container.
-# Called from session-start.sh; safe to run again, and it never touches an existing checkout's files.
+# Called from session-start.sh; safe to run again. On top of the pinned commit it applies our own
+# extra effects from video-effects-extra.patch (once; skipped when already applied).
 set -euo pipefail
 
 REPO_URL="https://github.com/KenoMedien/claude-video-effects.git"
 # Reviewed commit. Bump only after reading the upstream diff: skill/*.md become Claude's instructions.
 REPO_SHA="8f4bdfb14b0ef599ba8b3350fdb3faefa21b459d"
 DIR="$HOME/claude-video-effects"
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 if [ ! -d "$DIR/.git" ]; then
   git init --quiet "$DIR"
@@ -15,7 +17,16 @@ if [ ! -d "$DIR/.git" ]; then
 fi
 
 cd "$DIR"
-[ -d node_modules ] || npm install --no-audit --no-fund --loglevel=error
+
+# Our own extra effects (graph split, flight map, notes, ...): src/effects/extra.tsx plus catalog entries.
+# Applied once on top of the pinned commit; skipped when already applied.
+PATCH="$HOOK_DIR/video-effects-extra.patch"
+if [ -f "$PATCH" ] && ! git apply --reverse --check "$PATCH" 2>/dev/null; then
+  git apply "$PATCH"
+fi
+
+# An interrupted install leaves node_modules without .bin, so check for the CLI itself.
+[ -x node_modules/.bin/remotion ] || npm install --no-audit --no-fund --loglevel=error
 
 # Copies skill/ to ~/.claude/skills/video-effects with the repo path filled in.
 bash scripts/install-skill.sh
