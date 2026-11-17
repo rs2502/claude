@@ -44,8 +44,9 @@ export const Dealer: React.FC<DealerProps> = ({ video, trimBefore = 0, dur, card
         {cards.map((c, i) => {
           const deal = p(t, 0.05 + i * 0.1, 0.45 + i * 0.1, backOut);
           const f = flips[i];
-          const holdEnd = (flips[i + 1] ?? dur - 0.3) - 0.1;
-          const g = feature ? Math.min(p(t, f + 0.2, f + 0.5, backOut), 1 - p(t, holdEnd - 0.3, holdEnd, easeInOut)) : 0;
+          // Jede hervorgehobene Karte bekommt ihr Zeitfenster bis zur nächsten; die letzte gleich lang wie die vorige.
+          const slot = (flips[i + 1] ?? f + (n > 1 ? flips[n - 1] - flips[n - 2] : dur - f)) - f;
+          const g = feature ? Math.min(p(t, f + 0.1, f + 0.35, backOut), 1 - p(t, f + slot - 0.25, f + slot, easeInOut)) : 0;
           const flip = p(t, f, f + 0.3, easeInOut);
           const tx = 540 + (i - (n - 1) / 2) * (CW + 14);
           const rot = (i - (n - 1) / 2) * 3;
