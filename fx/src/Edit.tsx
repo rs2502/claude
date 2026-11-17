@@ -1,6 +1,7 @@
 import React from "react";
 import { AbsoluteFill, OffthreadVideo, Sequence, staticFile, useVideoConfig } from "remotion";
-import { FX } from "./effects";
+import { Captions, Word } from "./Captions";
+import { EXTRA, FX } from "./effects";
 import { FontPreload } from "./FontPreload";
 import { sans } from "./fonts";
 import { Face } from "./lib/util";
@@ -22,6 +23,8 @@ export type EditProps = {
   face?: Face;
   tiles?: string[];
   cues: Cue[];
+  /** Wortgenaue Untertitel (Sekunden). */
+  captions?: { words: Word[]; y?: number; accent?: string; hide?: [number, number][] };
   /** Effektname oben links einblenden (wie im Vorbild). */
   showLabels?: boolean;
   fps: number;
@@ -52,15 +55,15 @@ export const Label: React.FC<{ nr: number; name: string }> = ({ nr, name }) => (
 );
 
 /** Ganzes Video mit Ton; jeder Cue legt seinen Effekt für seine Dauer darüber. */
-export const Edit: React.FC<EditProps> = ({ video, cutout, face, tiles, cues, showLabels = false }) => {
+export const Edit: React.FC<EditProps> = ({ video, cutout, face, tiles, cues, captions, showLabels = false }) => {
   const { fps } = useVideoConfig();
   return (
     <AbsoluteFill style={{ background: "black" }}>
       <FontPreload />
       <OffthreadVideo src={staticFile(video)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
       {cues.map((c, i) => {
-        const info = FX[c.fx];
-        if (!info) throw new Error(`Unbekannter Effekt "${c.fx}". Erlaubt: ${Object.keys(FX).join(", ")}`);
+        const info = FX[c.fx] ?? EXTRA[c.fx];
+        if (!info) throw new Error(`Unbekannter Effekt "${c.fx}". Erlaubt: ${[...Object.keys(FX), ...Object.keys(EXTRA)].join(", ")}`);
         const dur = c.dur ?? info.dur;
         const from = Math.round(c.from * fps);
         const C = info.component;
@@ -71,6 +74,7 @@ export const Edit: React.FC<EditProps> = ({ video, cutout, face, tiles, cues, sh
           </Sequence>
         );
       })}
+      {captions ? <Captions {...captions} /> : null}
     </AbsoluteFill>
   );
 };

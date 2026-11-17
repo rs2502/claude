@@ -3,11 +3,14 @@ import { Arena } from "./Arena";
 import { Billboard } from "./Billboard";
 import { ColorPop } from "./ColorPop";
 import { Dealer } from "./Dealer";
+import { EndCard } from "./EndCard";
 import { Frosted } from "./Frosted";
 import { HallOfFame } from "./HallOfFame";
 import { Halo } from "./Halo";
 import { Headline } from "./Headline";
+import { KineticHook } from "./KineticHook";
 import { LiquidGlass } from "./LiquidGlass";
+import { Magnifier } from "./Magnifier";
 import { MatchCut } from "./MatchCut";
 import { MosaicDrop } from "./MosaicDrop";
 import { PromptDrop } from "./PromptDrop";
@@ -44,4 +47,11 @@ export const FX: Record<string, FxInfo> = {
   frosted: { label: "Frosted", component: Frosted, dur: 2.0, cutout: false },
   "color-pop": { label: "Color Pop", component: ColorPop, dur: 2.0, cutout: true },
   "reveal-bar": { label: "Reveal Bar", component: RevealBar, dur: 1.4, cutout: false },
+};
+
+/** Bausteine für den Alltag, nicht aus der Vorlage; nicht im Demo. */
+export const EXTRA: Record<string, FxInfo> = {
+  "kinetic-hook": { label: "Kinetic Hook", component: KineticHook, dur: 1.6, cutout: false },
+  magnifier: { label: "Lupe", component: Magnifier, dur: 1.0, cutout: false },
+  endcard: { label: "Endcard", component: EndCard, dur: 2.0, cutout: false },
 };
