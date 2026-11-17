@@ -77,6 +77,16 @@ Nachgebaut nach Reinhards Vorlage-Reel. Projekt `fx/` im Repo, Effekt-Code in `f
 
 Der 17. Effekt der Vorlage („Backstage“) ist im Vorlage-Video nicht zu sehen und deshalb nicht gebaut.
 
+Alltags-Bausteine (aus dem ersten Kundenvideo, Metro-Clip), gleiche Nutzung über `cues`:
+
+| Schlüssel | Was passiert | Passt zu | Felder (`props`) |
+|---|---|---|---|
+| `kinetic-hook` | Wörter kleben als Papierstreifen ins Bild, das Hauptwort schlägt rot mit Wackler und Blitz ein | erster Satz, ohne Person im Bild oder darüber | `words[{text,at,hit}]` (Sekunden ab Cue-Start), `y`, `accent` |
+| `magnifier` | Runde Lupe vergrößert die Stelle, auf die gezeigt wird | „das hier“, „schaut mal“ | `target{x,y}`, `at{x,y}` (Lupe woanders, wenn sie sonst aufs Gesicht käme), `radius`, `zoom` |
+| `endcard` | Video schrumpft in ein Fenster oben, darunter große Karte mit Satz, Name und Telefon | letzte ~2 s | `line`, `name`, `phone`, `stripe[]` |
+
+Bewährt: Hook → ein großes Wort hinter der Person (`color-pop`) → Lupe auf die gezeigte Ware → `endcard`, dazu Untertitel und SFX. Nicht nur 2–3 dezente Effekte setzen; zwischen zwei Effekten höchstens ~2 s ohne Element.
+
 ### 4b. Ideen (noch nicht gebaut)
 Nur auf Reinhards Wunsch, dann als neue Komponente in `fx/src/effects/` nach dem Muster der fertigen bauen und in `fx/src/effects/index.ts` eintragen. „Cut-out“ = braucht die freigestellte Person.
 
@@ -148,9 +158,15 @@ Ergebnis `public/<name>-cutout.webm` (VP9 mit Alpha; beim Lesen `-c:v libvpx-vp9
    }
    ```
    `dur` pro Cue nur setzen, wenn die empfohlene Dauer (`fx/src/effects/index.ts`) nicht passt.
+   Untertitel kommen in denselben Plan: `"captions": { "words": [{ "text": "Extra-Karte,", "start": 3.46, "end": 4.26 }, …], "y": 1300, "hide": [[0, 2.4], [7.9, 11]] }` – Wörter aus Whisper (`segments[].words[]`), abgetrennte Silben wie „-Karte“ ans Wort davor hängen, unter Hook und Endcard ausblenden.
 4. Standbilder prüfen: `node scripts/stills.mjs Edit .cache/stills <frame,frame,…> .cache/plan.json`.
 5. Rendern: `npx remotion render src/index.ts Edit out/<name>-fx.mp4 --props=.cache/plan.json --timeout=120000`. Auf schwachen Rechnern `--concurrency=2`.
-6. Untertitel, weitere Overlays, Color Grading und SFX wie unten darüberlegen.
+6. SFX aus dem Plan erzeugen und mischen:
+   ```bash
+   python3 scripts/sfx.py .cache/plan.json .cache/<name>-sfx.wav
+   ffmpeg -i out/<name>-fx.mp4 -i .cache/<name>-sfx.wav -filter_complex "[1:a]volume=-10dB[s];[0:a][s]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95[a]" -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 192k -movflags +faststart out/<Name>_Automatisch.mp4
+   ```
+7. Vor dem Senden das fertige Video als Kontaktbogen ansehen (`fps=3`, alle Bilder) – nicht nur Einzelbilder.
 
 ### Alles andere
 - Frames 1080×1920 @30 fps extrahieren (cover-Skalierung), Overlays deterministisch aus Zeit t in HTML/Canvas zeichnen, mit Playwright Frame für Frame aufnehmen, ffmpeg libx264 CRF 18, yuv420p, faststart.
