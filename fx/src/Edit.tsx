@@ -1,6 +1,7 @@
 import React from "react";
 import { AbsoluteFill, OffthreadVideo, Sequence, staticFile, useVideoConfig } from "remotion";
 import { FX } from "./effects";
+import { FontPreload } from "./FontPreload";
 import { sans } from "./fonts";
 import { Face } from "./lib/util";
 
@@ -55,6 +56,7 @@ export const Edit: React.FC<EditProps> = ({ video, cutout, face, tiles, cues, sh
   const { fps } = useVideoConfig();
   return (
     <AbsoluteFill style={{ background: "black" }}>
+      <FontPreload />
       <OffthreadVideo src={staticFile(video)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
       {cues.map((c, i) => {
         const info = FX[c.fx];

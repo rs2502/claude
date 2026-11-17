@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, Composition, Sequence } from "remotion";
 import { Edit, EditProps, Label } from "./Edit";
 import { FX } from "./effects";
+import { FontPreload } from "./FontPreload";
 import { Face } from "./lib/util";
 
 type DemoProps = {
@@ -22,6 +23,7 @@ const Demo: React.FC<DemoProps> = ({ video, cutout, face, tiles, videoFrames }) 
   let at = 0;
   return (
     <AbsoluteFill style={{ background: "black" }}>
+      <FontPreload />
       {names.map((k, i) => {
         const info = FX[k];
         const len = Math.round(info.dur * FPS);
