@@ -61,9 +61,11 @@ export const Tile: React.FC<{ i: number; tiles?: string[]; style?: CSSProperties
   style,
   titleSize = 34,
 }) => {
-  const src = tiles && tiles.length ? tiles[i % tiles.length] : undefined;
+  // Eintrag "bild.jpg|TITEL" zeigt einen Titel; ohne "|" bleibt die Kachel ohne Text (keine erfundenen Aussagen).
+  const entry = tiles && tiles.length ? tiles[i % tiles.length] : undefined;
+  const [src, ownTitle] = entry ? entry.split("|") : [undefined, undefined];
   const tint = TINTS[i % TINTS.length];
-  const title = TILE_TITLES[i % TILE_TITLES.length];
+  const title = entry ? ownTitle ?? "" : TILE_TITLES[i % TILE_TITLES.length];
   return (
     <div
       style={{
@@ -76,7 +78,8 @@ export const Tile: React.FC<{ i: number; tiles?: string[]; style?: CSSProperties
       }}
     >
       {src ? <Img src={staticFile(src)} style={{ ...fill, width: "100%", height: "100%", objectFit: "cover" }} /> : null}
-      <div style={{ ...fill, background: `linear-gradient(180deg, transparent 45%, ${tint}cc 100%)` }} />
+      {title ? <div style={{ ...fill, background: `linear-gradient(180deg, transparent 45%, ${tint}cc 100%)` }} /> : null}
+      {title ? (
       <div
         style={{
           position: "absolute",
@@ -94,6 +97,7 @@ export const Tile: React.FC<{ i: number; tiles?: string[]; style?: CSSProperties
       >
         {title}
       </div>
+      ) : null}
     </div>
   );
 };
