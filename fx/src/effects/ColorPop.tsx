@@ -26,7 +26,8 @@ export const ColorPop: React.FC<ColorPopProps> = ({
   const gray = Math.min(p(t, 0, 0.3), 1 - p(t, dur - 0.3, dur, easeIn));
   const inK = p(t, 0.1, 0.55, easeOut);
   const outK = p(t, dur - 0.4, dur, easeIn);
-  const fontSize = Math.min(240, (1080 * 1.0) / (word.length * 0.6));
+  // Inter Black in Versalien ist gut 0,7 em breit pro Zeichen; 6 % Rand links und rechts.
+  const fontSize = Math.min(240, (1080 * 0.88) / (word.length * 0.72));
   const y = yProp ?? (cutout ? face.y - 190 : face.y - 480);
   return (
     <AbsoluteFill>
@@ -36,7 +37,7 @@ export const ColorPop: React.FC<ColorPopProps> = ({
           position: "absolute",
           left: 0,
           right: 0,
-          top: y - fontSize / 2 - 70,
+          top: y - fontSize / 2 - (kicker ? 70 : 0),
           textAlign: "center",
           color: "white",
           fontFamily: sans,
@@ -45,7 +46,7 @@ export const ColorPop: React.FC<ColorPopProps> = ({
           transform: `scale(${1.12 - 0.12 * inK})`,
         }}
       >
-        <div style={{ fontSize: 28, fontWeight: 600, letterSpacing: "0.35em", opacity: 0.8, marginBottom: 18 }}>{kicker}</div>
+        {kicker ? <div style={{ fontSize: 28, fontWeight: 600, letterSpacing: "0.35em", opacity: 0.8, marginBottom: 18 }}>{kicker}</div> : null}
         <div style={{ fontSize, fontWeight: 900, lineHeight: 1, letterSpacing: `${-0.02 + (1 - inK) * 0.15}em`, whiteSpace: "nowrap", textShadow: "0 10px 40px rgba(0,0,0,0.35)" }}>
           {word}
         </div>

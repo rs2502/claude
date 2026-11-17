@@ -114,7 +114,8 @@ export const GridBg: React.FC<{ style?: CSSProperties }> = ({ style }) => (
 
 /** Glas-Look für Liquid Glass. */
 export const glass: CSSProperties = {
-  background: "linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.06))",
+  // Leicht abgedunkelt, damit weiße Schrift auch vor hellem Hintergrund lesbar bleibt.
+  background: "linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.05)), rgba(15,15,15,0.28)",
   backdropFilter: "blur(16px) saturate(170%) brightness(1.06)",
   WebkitBackdropFilter: "blur(16px) saturate(170%) brightness(1.06)",
   border: "2px solid rgba(255,255,255,0.5)",

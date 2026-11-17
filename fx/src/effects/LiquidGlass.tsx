@@ -112,7 +112,7 @@ export const LiquidGlass: React.FC<LiquidGlassProps> = ({
           }}
         >
           <div style={{ fontWeight: 700, fontSize: 44 }}>{cardTitle}</div>
-          <div style={{ fontWeight: 500, fontSize: 26, opacity: 0.85, marginTop: 4 }}>{cardSub}</div>
+          <div style={{ fontWeight: 600, fontSize: 36, opacity: 0.95, marginTop: 6 }}>{cardSub}</div>
         </div>
         {badge ? (
           <div
