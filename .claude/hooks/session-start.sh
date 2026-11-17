@@ -16,6 +16,9 @@ cp -n .claude/instagram/voice.md .claude/instagram/log.md ~/.claude/instagram/ 2
 # video-effects skill: Remotion project in ~/claude-video-effects. A failure here must not block the session.
 bash .claude/hooks/video-effects.sh || echo "video-effects setup failed; see .claude/hooks/video-effects.sh" >&2
 
+# fx/: die 16 Reel-Effekte für den Skill automatisch.
+bash .claude/hooks/fx.sh || echo "fx setup failed; see .claude/hooks/fx.sh" >&2
+
 # kinetic-multicam transcribes with the `whisper` CLI from openai-whisper.
 if ! command -v whisper >/dev/null 2>&1; then
   pip install --quiet -r .claude/skills/kinetic-multicam/requirements.txt

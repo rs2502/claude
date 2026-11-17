@@ -1,6 +1,6 @@
 ---
 name: "automatisch"
-description: "Voiceover-Video automatisch mit Motion Graphics, 20 Video-Effekten, Untertiteln und SFX versehen. Nutzen, wenn Reinhard ein Video mit Voiceover schickt und „automatisch“ sagt."
+description: "Voiceover-Video automatisch mit Motion Graphics, 16 fertigen Video-Effekten, Untertiteln und SFX versehen. Nutzen, wenn Reinhard ein Video mit Voiceover schickt und „automatisch“ sagt."
 ---
 
 # Automatisch – Voiceover → passende Motion Graphics pro Szene
@@ -32,8 +32,8 @@ In Sätze teilen: Satzzeichen, Pause > 0,6 s oder max. 12 Wörter.
 ## 3. Szenenplan (das ist der Kern)
 Pro Satz höchstens EIN Text/Grafik-Element, nicht jeden Satz belegen (Dichte nach Länge: ~ jeder 2. Satz). Inhaltlich wählen, nicht nur nach Schlüsselwort. Orientierung:
 - Erster Satz → Hook groß oben (Kinetic/Papercut Big Letters), Schlüsselwort in Akzentfarbe. Hook darf keine Erwartung setzen.
-- Zahl („seit 25 Jahren“, „3 Tipps“, Preis nur wenn gesagt) → Giant Number mit Hochzählen.
-- Aufzählung/Tipp → Headline-Box „TIPP 1“ / Check-List.
+- Zahl („seit 25 Jahren“, „3 Tipps“, Preis nur wenn gesagt) → Giant Number mit Hochzählen, `frosted` (Profilkarte zählt hoch) oder `color-pop`.
+- Aufzählung/Tipp → Headline-Box „TIPP 1“ / Check-List, bei 2–5 Punkten `dealer`.
 - Verneinung/Fehler → Stempel „NO GO“/„FALSCH“, stark: `/shatter`.
 - Reservieren/Bestellen/Anrufen → Push-Nachricht / Prompt-Bar / `/liquid-glass`.
 - „Schreibt in die Kommentare“ → Comment CTA / Comment Drop.
@@ -42,16 +42,43 @@ Pro Satz höchstens EIN Text/Grafik-Element, nicht jeden Satz belegen (Dichte na
 - Vorstellung Person → Lower Third / Name-Tag (nicht übers Gesicht), stark: `/head-pop-out`.
 - Frage → Snap-Zoom.
 - Betonte Wörter → Zoom-Punch, Shake leicht.
-- Bildschnitte → Übergänge abwechselnd (Whip-Pan mit Motion-Blur, `/zoom-through`, `/portal`, `/cube-spin`, `/grid-dive`, Glitch, Flash).
+- Bildschnitte → Übergänge abwechselnd (`rabbit-hole`, `mosaic-drop`, `match-cut`, `reveal-bar`, Whip-Pan mit Motion-Blur, Glitch, Flash).
 - Ende (letzte ~2,6 s) → `/screen-in-screen` + Endcard: voller Kundenname, Titel, Telefon ≥ 1 s sichtbar.
+- Thema/ein starkes Wort → `billboard`; Kernsatz → `split-stage` oder `liquid-glass`; Zitat/CTA → `headline`; „so mache ich das“ → `prompt-drop` oder `teardown`; Erfahrung/viele Beispiele → `hall-of-fame`, `arena`, `halo`.
 - Durchgehend wortgenaue Untertitel (Karaoke: aktives Wort in Akzentfarbe, Inter 800 / Anton), y ≈ 1300.
 
-Die 20 Effekte unten zusätzlich dort einsetzen, wo sie inhaltlich passen, oder wenn Reinhard einen beim Namen nennt („mach /shatter bei …“). Pro Video höchstens 4–5 große Effekte, keine zwei gleichen direkt hintereinander.
+Zusätzlich die Effekte aus Abschnitt 4 einsetzen, wo sie inhaltlich passen, oder wenn Reinhard einen beim Namen nennt („mach Billboard bei …“). Zuerst die 16 fertigen (4a), die Ideen aus 4b nur auf Wunsch. Pro Video höchstens 4–5 große Effekte, keine zwei gleichen direkt hintereinander.
 
 Keine erfundenen Fakten, Preise, Bewertungen, Angebote. Vor dem Rendern den Plan kurz als Tabelle (Zeit · Satz · Element) zeigen, wenn Reinhard da ist; sonst direkt rendern und Plan mitliefern.
 
-## 4. Die 20 Effekte
-„Cut-out“ = braucht die freigestellte Person (Abschnitt 5). Dauer meist 0,6–1,5 s, Übergänge 0,4–0,6 s, alles deterministisch aus Zeit t gezeichnet.
+## 4. Effekte
+
+### 4a. Fertig gebaut: 16 Effekte in `fx/` (Remotion)
+Nachgebaut nach Reinhards Vorlage-Reel. Projekt `fx/` im Repo, Effekt-Code in `fx/src/effects/`, Demo aller 16: `cd fx && npm run demo` → `out/demo.mp4`. „Cut-out“ = sieht nur mit Freisteller richtig aus (Abschnitt 5).
+
+| Schlüssel | Effekt | Was passiert | Passt zu | Braucht | Felder (`props`) |
+|---|---|---|---|---|---|
+| `teardown` | Teardown | Bild kippt in 3D und zerfällt in beschriftete Ebenen (Hook-Karte, Freisteller, Wand, A-Roll, Ton) | Einstieg, „so ist das gebaut“ | (Cut-out besser) | `hookTitle`, `hookSub`, `layers[{title,sub}]` |
+| `mosaic-drop` | Mosaic Drop | Raster-Hintergrund, Kacheln fallen von oben und füllen das Bild | Übergang, „so viele Videos“ | Kacheln | – |
+| `halo` | Halo | Ring aus Karten dreht sich auf Kopfhöhe hinter der Person | Thema, Portfolio, Kunden | Cut-out, `face` | `count` |
+| `match-cut` | Match Cut | Schnelle Textseiten, dasselbe Wort immer rot in der Mitte | ein Schlüsselwort betonen | – | `word`, `contexts[]`, `filler`, `pageDur` |
+| `dealer` | The Dealer | Karten werden ausgeteilt und nacheinander umgedreht | Aufzählung (2–5 Punkte) | – | `cards[{label,sub}]`, `y` |
+| `hall-of-fame` | Hall of Fame | Wand aus Thumbnails erscheint hinter der Person | Erfahrung, „hunderte Videos“ | Cut-out, Kacheln | – |
+| `rabbit-hole` | Rabbit Hole | Monitor hinter der Person zeigt die nächste Szene, Kamera fliegt hinein | Übergang an Bildschnitt | Cut-out | `next`, `nextTrimBefore`, `nextFilter`, `screen{x,y,w,h}` |
+| `billboard` | Billboard | Riesiges Wort auf Kopfhöhe hinter der Person | Thema, ein starkes Wort | Cut-out, `face` | `word` |
+| `liquid-glass` | Liquid Glass | Glasleiste, Glaskarte und Badge wachsen aus einem Tropfen | Kernaussage + Absender | – | `main`, `cardTitle`, `cardSub`, `badge`, `y` |
+| `prompt-drop` | Prompt Drop | Claude-Code-Terminal: Befehl wird getippt, Video läuft, Schritte haken sich ab | „So mache ich das“, KI, Ablauf | – | `user`, `prompt`, `file`, `steps[]` |
+| `arena` | The Arena | Oben gebogener Rang aus Video-Karten, unten das Video | Social Proof, viele Beispiele | Kacheln | `count` |
+| `headline` | Headline | Zeitungsseite, Stellen werden gelb/blau markiert und rot eingekreist | Zitat, Aussage, CTA | – | `paper`, `date`, `kicker`, `headline` (`[Kreis]`), `byline`, `body` (`[[g:…]]`, `[[b:…]]`, `[[r:…]]`) |
+| `split-stage` | Split Stage | Oben Textkarte, unten Video, Kopf ragt in die Karte | Kernsatz, Hook | Cut-out, `face` | `text` |
+| `frosted` | Frosted | Milchglas-Profilkarten, Zahlen zählen hoch | Zahlen (Jahre, Kunden, Effekte) | – | `name`, `avatar`, `stats[{value,unit,color}]`, `y` |
+| `color-pop` | Color Pop | Hintergrund grau, Person farbig, großes Wort dahinter | Zahl/Wort mit Gewicht | Cut-out, `face` | `kicker`, `word` |
+| `reveal-bar` | Reveal Bar | Bild wird grau, Lichtbalken bringt die Farbe zurück | Neuanfang, „vorher/nachher“ | – | – |
+
+Der 17. Effekt der Vorlage („Backstage“) ist im Vorlage-Video nicht zu sehen und deshalb nicht gebaut.
+
+### 4b. Ideen (noch nicht gebaut)
+Nur auf Reinhards Wunsch, dann als neue Komponente in `fx/src/effects/` nach dem Muster der fertigen bauen und in `fx/src/effects/index.ts` eintragen. „Cut-out“ = braucht die freigestellte Person.
 
 | Nr. | Effekt | Was passiert | Passt zu | Braucht |
 |---|---|---|---|---|
@@ -82,11 +109,11 @@ Zutaten:
 - **Standbild** (`/shatter`): `ffmpeg -ss <t> -i <video> -frames:v 1 .cache/still.png`.
 
 ## 5. Freistellen (Cut-out)
-Nur wenn ein Effekt mit „Cut-out“ im Plan ist. RobustVideoMatting aus `~/claude-video-effects` (kommt per Startup-Hook):
+Nur wenn ein Effekt mit „Cut-out“ im Plan ist. RobustVideoMatting über `fx/`:
 
 ```bash
-cd ~/claude-video-effects
-bash scripts/setup-rvm.sh            # einmalig, ≈ 2 GB
+cd fx
+bash scripts/setup-rvm.sh            # einmalig; nutzt vorhandenes PyTorch mit, sonst ≈ 2 GB
 cp <video> public/<name>.mp4
 bash scripts/make-cutout.sh <name>.mp4 mobilenetv3   # ohne GPU mobilenetv3, mit GPU resnet50
 ```
@@ -103,6 +130,29 @@ Ergebnis `public/<name>-cutout.webm` (VP9 mit Alpha; beim Lesen `-c:v libvpx-vp9
 - Bei Textfragen 3 Alternativen anbieten.
 
 ## 7. Rendern
+
+### Fertige Effekte (4a) mit `fx/`
+1. Video nach `fx/public/<name>.mp4` (1080×1920, 30 fps), bei Cut-out-Effekten Freisteller wie in Abschnitt 5.
+2. Kacheln für Wände/Ringe aus dem eigenen Video: `bash scripts/make-tiles.sh <name>.mp4` → `public/tiles/01.jpg …`. Hat Reinhard eigene Thumbnails, die stattdessen nach `public/tiles/` legen.
+3. Plan als JSON schreiben (`.cache/plan.json`), Zeiten in Sekunden, Texte auf Deutsch:
+   ```json
+   {
+     "video": "<name>.mp4", "cutout": "<name>-cutout.webm",
+     "face": { "x": 540, "y": 560 },
+     "tiles": ["tiles/01.jpg", "tiles/02.jpg"],
+     "fps": 30, "durationInSeconds": 41.2,
+     "cues": [
+       { "fx": "billboard", "from": 3.1, "props": { "word": "PIZZA" } },
+       { "fx": "frosted", "from": 9.4, "props": { "name": "Ristorante Pizzeria Italia", "stats": [{ "value": 25, "unit": "Jahre", "color": "orange" }] } }
+     ]
+   }
+   ```
+   `dur` pro Cue nur setzen, wenn die empfohlene Dauer (`fx/src/effects/index.ts`) nicht passt.
+4. Standbilder prüfen: `node scripts/stills.mjs Edit .cache/stills <frame,frame,…> .cache/plan.json`.
+5. Rendern: `npx remotion render src/index.ts Edit out/<name>-fx.mp4 --props=.cache/plan.json --timeout=120000`. Auf schwachen Rechnern `--concurrency=2`.
+6. Untertitel, weitere Overlays, Color Grading und SFX wie unten darüberlegen.
+
+### Alles andere
 - Frames 1080×1920 @30 fps extrahieren (cover-Skalierung), Overlays deterministisch aus Zeit t in HTML/Canvas zeichnen, mit Playwright Frame für Frame aufnehmen, ffmpeg libx264 CRF 18, yuv420p, faststart.
 - Effekte, die das Videobild selbst verformen (Raster, Würfel, Tunnel, Scherben, Lupe, Zooms), in Canvas/WebGL mit dem jeweiligen Frame als Textur zeichnen; Cut-out-Frames als zweite Ebene darüber.
 - SFX passend synthetisieren (numpy): Whoosh auf Übergänge, Pop/Click auf Texteinblendung, Hit auf Zoom-Punch, Ding auf Push, Stempel-Thump, Glasklirren auf `/shatter`. Mit Original-Ton mischen (Voiceover vorne, SFX ~ -10 dB darunter, alimiter).

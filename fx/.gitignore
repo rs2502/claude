@@ -1,0 +1,7 @@
+node_modules/
+out/
+.cache/
+# Eigenes Material (Videos, Freisteller, Kacheln) bleibt lokal.
+public/*
+!public/README.md
+!public/fonts/
