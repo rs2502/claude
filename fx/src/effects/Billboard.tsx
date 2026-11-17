@@ -5,20 +5,21 @@ import { Base, Cutout, FxProps } from "../lib/layers";
 import { DEFAULT_FACE, backOut, easeIn, p, useTime } from "../lib/util";
 
 /** 08 Billboard: ein riesiges Wort steht auf Kopfhöhe hinter der Person. Braucht den Freisteller. */
-export const Billboard: React.FC<FxProps & { word?: string }> = ({
+export const Billboard: React.FC<FxProps & { word?: string; /** Mitte des Worts (y). */ y?: number }> = ({
   video,
   cutout,
   trimBefore = 0,
   dur,
   face = DEFAULT_FACE,
   word = "BILLBOARD",
+  y: yProp,
 }) => {
   const t = useTime();
   const out = p(t, dur - 0.3, dur, easeIn);
   const letters = word.toUpperCase().split("");
   const fontSize = Math.min(300, (1080 * 1.08) / (letters.length * 0.66));
   // Ohne Freisteller unter das Kinn, damit das Gesicht frei bleibt.
-  const y = cutout ? face.y - fontSize * 0.25 : face.y + 330;
+  const y = yProp ?? (cutout ? face.y - fontSize * 0.25 : face.y + 330);
   return (
     <AbsoluteFill>
       <Base src={video} trimBefore={trimBefore} />

@@ -4,7 +4,7 @@ import { displaySerif } from "../fonts";
 import { Base, Cutout, FxProps } from "../lib/layers";
 import { DEFAULT_FACE, backOut, easeIn, easeInOut, mix, p, useTime } from "../lib/util";
 
-export type SplitStageProps = FxProps & { text?: string };
+export type SplitStageProps = FxProps & { text?: string; fontSize?: number };
 
 /** 13 Split Stage: oben eine Textkarte, unten das Video; der Kopf ragt aus dem Video in die Karte. */
 export const SplitStage: React.FC<SplitStageProps> = ({
@@ -14,6 +14,7 @@ export const SplitStage: React.FC<SplitStageProps> = ({
   dur,
   face = DEFAULT_FACE,
   text = "Hier sind 16 Video-Effekte auf Steroiden.",
+  fontSize = 100,
 }) => {
   const t = useTime();
   const k = p(t, 0, 0.45, easeInOut);
@@ -52,7 +53,7 @@ export const SplitStage: React.FC<SplitStageProps> = ({
           padding: "60px 64px",
           boxSizing: "border-box",
           fontFamily: displaySerif,
-          fontSize: 100,
+          fontSize,
           lineHeight: 1.02,
           color: "#1b1b1b",
           opacity: p(t, 0.25, 0.4),

@@ -16,6 +16,12 @@ export type HeadlineProps = FxProps & {
    * Sie erscheinen in der Reihenfolge, in der sie im Text stehen.
    */
   body?: string;
+  /** Große Zeile unten auf der Seite, z. B. Telefon. */
+  footer?: string;
+  /** Rechts oben neben dem Datum; leer = nichts. */
+  edition?: string;
+  /** Rubriken unter dem Titel; leere Liste = nur Linien. */
+  nav?: string[];
 };
 
 const DEFAULT_BODY =
@@ -49,6 +55,9 @@ export const Headline: React.FC<HeadlineProps> = ({
   headline = "Zehn Jahre als [Video-Editor.]",
   byline = "Von Reinhard",
   body = DEFAULT_BODY,
+  footer,
+  edition = "KI-AUSGABE",
+  nav = ["News", "Long Reads", "Reels", "Kurse", "Tools"],
 }) => {
   const t = useTime();
   const enter = p(t, 0, 0.45, backOut);
@@ -56,12 +65,15 @@ export const Headline: React.FC<HeadlineProps> = ({
   const circle = p(t, 0.45, 0.85, easeInOut);
   const parts = parse(body);
   const marks = parts.filter((x) => x.mark).length;
-  const markGap = Math.max(0.2, (dur - 1.0 - 0.4) / Math.max(1, marks));
+  // Markierungen so verteilen, dass auch die letzte vor dem Ausblenden fertig ist.
+  const markStart = Math.min(0.95, dur * 0.35);
+  const markGap = Math.max(0.1, (dur - markStart - 0.65) / Math.max(1, marks));
   const hm = headline.match(/^(.*)\[(.+)\](.*)$/);
-  const firstChar = body.replace(/\[\[[gbr]:/, "").charAt(0);
-  // Initial: erstes Zeichen aus dem ersten Textteil entfernen.
+  // Initial nur, wenn der Text nicht mit einer Markierung beginnt (sonst würde sie angeschnitten).
+  const dropCap = parts.length > 0 && !parts[0].mark;
+  const firstChar = dropCap ? parts[0].text.charAt(0) : "";
   const shown = [...parts];
-  if (shown.length) shown[0] = { ...shown[0], text: shown[0].text.slice(1) };
+  if (dropCap) shown[0] = { ...shown[0], text: shown[0].text.slice(1) };
   return (
     <AbsoluteFill style={{ background: "#0d0d0d", overflow: "hidden" }}>
       <Base src={video} trimBefore={trimBefore} style={{ filter: "blur(28px) brightness(0.35)", transform: "scale(1.15)" }} />
@@ -82,7 +94,7 @@ export const Headline: React.FC<HeadlineProps> = ({
       >
         <div style={{ display: "flex", justifyContent: "space-between", fontFamily: mono, fontSize: 15, color: "#666" }}>
           <span>{date}</span>
-          <span>KI-AUSGABE</span>
+          <span>{edition}</span>
         </div>
         <div style={{ textAlign: "center", fontFamily: masthead, fontWeight: 900, fontSize: 82, margin: "8px 0 4px", letterSpacing: "-0.01em" }}>{paper}</div>
         <div
@@ -98,7 +110,7 @@ export const Headline: React.FC<HeadlineProps> = ({
             color: "#333",
           }}
         >
-          {["News", "Long Reads", "Reels", "Kurse", "Tools"].map((x) => (
+          {nav.map((x) => (
             <span key={x}>{x}</span>
           ))}
         </div>
@@ -133,10 +145,11 @@ export const Headline: React.FC<HeadlineProps> = ({
           {byline}
         </div>
         <div style={{ fontFamily: bodySerif, fontSize: 33, lineHeight: 1.42, marginTop: 20 }}>
-          <span style={{ float: "left", fontFamily: masthead, fontWeight: 900, fontSize: 132, lineHeight: 0.82, margin: "8px 12px 0 0" }}>{firstChar}</span>
+          {dropCap ? <span style={{ float: "left", fontFamily: masthead, fontWeight: 900, fontSize: 132, lineHeight: 0.82, margin: "8px 12px 0 0" }}>{firstChar}</span> : null}
           {shown.map((part, i) => {
             if (!part.mark) return <span key={i}>{part.text}</span>;
-            const k = p(t, 0.95 + (part.idx ?? 0) * markGap, 0.95 + (part.idx ?? 0) * markGap + 0.3, easeInOut);
+            const a = markStart + (part.idx ?? 0) * markGap;
+            const k = p(t, a, a + Math.min(0.3, markGap + 0.1), easeInOut);
             if (part.mark === "r") {
               return (
                 <span key={i} style={{ outline: `3px solid rgba(192,40,27,${k})`, outlineOffset: 3, borderRadius: 3 }}>
@@ -161,6 +174,9 @@ export const Headline: React.FC<HeadlineProps> = ({
             );
           })}
         </div>
+        {footer ? (
+          <div style={{ marginTop: 26, paddingTop: 18, borderTop: "2px solid #141414", textAlign: "center", fontFamily: sans, fontWeight: 800, fontSize: 56 }}>{footer}</div>
+        ) : null}
       </div>
     </AbsoluteFill>
   );

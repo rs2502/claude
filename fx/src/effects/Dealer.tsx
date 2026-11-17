@@ -8,6 +8,8 @@ export type DealerProps = FxProps & {
   cards?: { label: string; sub: string }[];
   /** Mitte der Kartenreihe (y in Pixeln). */
   y?: number;
+  /** Wann jede Karte umdreht (Sekunden ab Effektstart), z. B. auf das Wort. Standard: kurz nacheinander. */
+  flipAt?: number[];
 };
 
 const DEFAULT_CARDS = [
@@ -21,7 +23,7 @@ const CW = 236;
 const CH = 330;
 
 /** 05 The Dealer: Karten werden ausgeteilt und nacheinander umgedreht. */
-export const Dealer: React.FC<DealerProps> = ({ video, trimBefore = 0, dur, cards = DEFAULT_CARDS, y = 1470 }) => {
+export const Dealer: React.FC<DealerProps> = ({ video, trimBefore = 0, dur, cards = DEFAULT_CARDS, y = 1470, flipAt }) => {
   const t = useTime();
   const n = cards.length;
   const out = p(t, dur - 0.3, dur, easeIn);
@@ -31,7 +33,8 @@ export const Dealer: React.FC<DealerProps> = ({ video, trimBefore = 0, dur, card
       <AbsoluteFill style={{ perspective: 1800 }}>
         {cards.map((c, i) => {
           const deal = p(t, 0.05 + i * 0.1, 0.45 + i * 0.1, backOut);
-          const flip = p(t, 0.75 + i * 0.28, 1.05 + i * 0.28, easeInOut);
+          const f = flipAt?.[i] ?? 0.75 + i * 0.28;
+          const flip = p(t, f, f + 0.3, easeInOut);
           const tx = 540 + (i - (n - 1) / 2) * (CW + 14);
           const rot = (i - (n - 1) / 2) * 3;
           const x = 980 + (tx - 980) * deal;
