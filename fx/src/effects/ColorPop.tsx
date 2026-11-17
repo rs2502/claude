@@ -4,7 +4,12 @@ import { sans } from "../fonts";
 import { Base, Cutout, FxProps } from "../lib/layers";
 import { DEFAULT_FACE, easeIn, easeOut, p, useTime } from "../lib/util";
 
-export type ColorPopProps = FxProps & { kicker?: string; word?: string };
+export type ColorPopProps = FxProps & {
+  kicker?: string;
+  word?: string;
+  /** Mitte des großen Worts (y); Standard: knapp über der Gesichtsmitte. */
+  y?: number;
+};
 
 /** 15 Color Pop: Hintergrund wird grau, die Person bleibt farbig, dahinter ein großes Wort mit Unterzeile. */
 export const ColorPop: React.FC<ColorPopProps> = ({
@@ -15,13 +20,14 @@ export const ColorPop: React.FC<ColorPopProps> = ({
   face = DEFAULT_FACE,
   kicker = "ALS VIDEO-EDITOR",
   word = "10 JAHRE",
+  y: yProp,
 }) => {
   const t = useTime();
   const gray = Math.min(p(t, 0, 0.3), 1 - p(t, dur - 0.3, dur, easeIn));
   const inK = p(t, 0.1, 0.55, easeOut);
   const outK = p(t, dur - 0.4, dur, easeIn);
   const fontSize = Math.min(240, (1080 * 1.0) / (word.length * 0.6));
-  const y = cutout ? face.y - 190 : face.y - 480;
+  const y = yProp ?? (cutout ? face.y - 190 : face.y - 480);
   return (
     <AbsoluteFill>
       <Base src={video} trimBefore={trimBefore} style={{ filter: `grayscale(${gray}) brightness(${1 - 0.15 * gray})` }} />

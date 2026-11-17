@@ -8,9 +8,16 @@ export type LiquidGlassProps = FxProps & {
   main?: string;
   cardTitle?: string;
   cardSub?: string;
+  /** Leer lassen für kein Badge. */
   badge?: string;
   /** y-Mitte der großen Glasleiste. */
   y?: number;
+  /** Glaskarte: linke obere Ecke und Breite. */
+  card?: { x: number; y: number; w: number };
+  /** Icon in der Leiste (Text/Emoji); Standard: Claude-Stern. */
+  icon?: string;
+  /** Farbe der Icon-Kachel. */
+  accent?: string;
 };
 
 /** 09 Liquid Glass: Glaselemente mit Lichtbrechung wachsen aus einem Tropfen zu Leiste, Karte und Badge. */
@@ -23,6 +30,9 @@ export const LiquidGlass: React.FC<LiquidGlassProps> = ({
   cardSub = "als Video-Editor",
   badge = "Made by Claude",
   y = 1180,
+  card: cardBox = { x: 60, y: 330, w: 330 },
+  icon,
+  accent = "#d97757",
 }) => {
   const t = useTime();
   const out = p(t, dur - 0.3, dur, easeIn);
@@ -58,14 +68,15 @@ export const LiquidGlass: React.FC<LiquidGlassProps> = ({
               width: 86,
               height: 86,
               borderRadius: 24,
-              background: "#d97757",
+              background: accent,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
+              fontSize: 54,
             }}
           >
-            <Spark size={56} />
+            {icon ?? <Spark size={56} />}
           </div>
           <div
             style={{
@@ -87,9 +98,9 @@ export const LiquidGlass: React.FC<LiquidGlassProps> = ({
           style={{
             ...glass,
             position: "absolute",
-            left: 60,
-            top: 330,
-            width: 330,
+            left: cardBox.x,
+            top: cardBox.y,
+            width: cardBox.w,
             padding: "26px 30px",
             borderRadius: 32,
             opacity: p(t, 0.6, 0.75),
@@ -103,32 +114,34 @@ export const LiquidGlass: React.FC<LiquidGlassProps> = ({
           <div style={{ fontWeight: 700, fontSize: 44 }}>{cardTitle}</div>
           <div style={{ fontWeight: 500, fontSize: 26, opacity: 0.85, marginTop: 4 }}>{cardSub}</div>
         </div>
-        <div
-          style={{
-            ...glass,
-            position: "absolute",
-            right: 50,
-            top: y + 140,
-            height: 92,
-            padding: "0 30px 0 16px",
-            borderRadius: 46,
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
-            opacity: p(t, 0.8, 0.95),
-            transform: `translateX(${(1 - pill) * 120}px)`,
-            fontFamily: sans,
-            fontWeight: 600,
-            fontSize: 34,
-            color: "white",
-            textShadow: "0 2px 8px rgba(0,0,0,0.35)",
-          }}
-        >
-          <div style={{ width: 60, height: 60, borderRadius: 18, background: "#d97757", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Spark size={38} />
+        {badge ? (
+          <div
+            style={{
+              ...glass,
+              position: "absolute",
+              right: 50,
+              top: y + 140,
+              height: 92,
+              padding: "0 30px 0 16px",
+              borderRadius: 46,
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              opacity: p(t, 0.8, 0.95),
+              transform: `translateX(${(1 - pill) * 120}px)`,
+              fontFamily: sans,
+              fontWeight: 600,
+              fontSize: 34,
+              color: "white",
+              textShadow: "0 2px 8px rgba(0,0,0,0.35)",
+            }}
+          >
+            <div style={{ width: 60, height: 60, borderRadius: 18, background: "#d97757", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Spark size={38} />
+            </div>
+            {badge}
           </div>
-          {badge}
-        </div>
+        ) : null}
       </AbsoluteFill>
     </AbsoluteFill>
   );
