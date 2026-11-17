@@ -18,6 +18,8 @@ export type LiquidGlassProps = FxProps & {
   icon?: string;
   /** Farbe der Icon-Kachel. */
   accent?: string;
+  /** Heranzoomen: Punkt (x, y) im Video landet bei (540, 760), `scale`-fach vergrößert. */
+  zoom?: { scale: number; x: number; y: number };
 };
 
 /** 09 Liquid Glass: Glaselemente mit Lichtbrechung wachsen aus einem Tropfen zu Leiste, Karte und Badge. */
@@ -33,6 +35,7 @@ export const LiquidGlass: React.FC<LiquidGlassProps> = ({
   card: cardBox = { x: 60, y: 330, w: 330 },
   icon,
   accent = "#d97757",
+  zoom,
 }) => {
   const t = useTime();
   const out = p(t, dur - 0.3, dur, easeIn);
@@ -44,7 +47,22 @@ export const LiquidGlass: React.FC<LiquidGlassProps> = ({
   const pill = p(t, 0.8, 1.15, backOut);
   return (
     <AbsoluteFill>
-      <Base src={video} trimBefore={trimBefore} />
+      {zoom ? (
+        <AbsoluteFill
+          style={{
+            transformOrigin: "0 0",
+            transform: (() => {
+              const z = p(t, 0, 0.45, easeInOut);
+              const sc = mix(1, zoom.scale, z);
+              return `translate(${mix(0, 540 - zoom.x * zoom.scale, z)}px, ${mix(0, 760 - zoom.y * zoom.scale, z)}px) scale(${sc})`;
+            })(),
+          }}
+        >
+          <Base src={video} trimBefore={trimBefore} />
+        </AbsoluteFill>
+      ) : (
+        <Base src={video} trimBefore={trimBefore} />
+      )}
       <AbsoluteFill style={{ opacity: 1 - out, filter: `blur(${out * 8}px)` }}>
         <div
           style={{
