@@ -1,10 +1,12 @@
 import React from "react";
 import { Arena } from "./Arena";
+import { BackdropWord } from "./BackdropWord";
 import { Billboard } from "./Billboard";
 import { ColorPop } from "./ColorPop";
 import { Dealer } from "./Dealer";
 import { EndCard } from "./EndCard";
 import { Frosted } from "./Frosted";
+import { GiantCaptions } from "./GiantCaptions";
 import { HallOfFame } from "./HallOfFame";
 import { Halo } from "./Halo";
 import { Headline } from "./Headline";
@@ -13,8 +15,11 @@ import { LiquidGlass } from "./LiquidGlass";
 import { Magnifier } from "./Magnifier";
 import { MatchCut } from "./MatchCut";
 import { MosaicDrop } from "./MosaicDrop";
+import { PhoneWall } from "./PhoneWall";
+import { ProfileWall } from "./ProfileWall";
 import { PromptDrop } from "./PromptDrop";
 import { RabbitHole } from "./RabbitHole";
+import { RedCollage } from "./RedCollage";
 import { RevealBar } from "./RevealBar";
 import { SplitStage } from "./SplitStage";
 import { Teardown } from "./Teardown";
@@ -54,4 +59,9 @@ export const EXTRA: Record<string, FxInfo> = {
   "kinetic-hook": { label: "Kinetic Hook", component: KineticHook, dur: 1.6, cutout: false },
   magnifier: { label: "Lupe", component: Magnifier, dur: 1.0, cutout: false },
   endcard: { label: "Endcard", component: EndCard, dur: 2.0, cutout: false },
+  "backdrop-word": { label: "Backdrop Word", component: BackdropWord, dur: 1.6, cutout: true },
+  "giant-captions": { label: "Giant Captions", component: GiantCaptions, dur: 2.0, cutout: false },
+  "profile-wall": { label: "Profile Wall", component: ProfileWall, dur: 2.4, cutout: false },
+  "phone-wall": { label: "Phone Wall", component: PhoneWall, dur: 2.0, cutout: true },
+  "red-collage": { label: "Red Collage", component: RedCollage, dur: 2.2, cutout: true },
 };
